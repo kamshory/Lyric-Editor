@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-0": {
+            "Pico\\": "classes/"
+        }
+    },
+    "require": {
+        "symfony/yaml": "^3.4"
+    }
+}

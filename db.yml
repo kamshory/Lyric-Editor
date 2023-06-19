@@ -1,0 +1,8 @@
+timezone_system: Asia/Jakarta
+driver: mysql
+host: localhost
+port: 3306
+username: root
+password: alto1234
+database_name: music
+timezone: Asia/Jakarta
