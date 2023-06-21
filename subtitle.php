@@ -213,6 +213,10 @@ if($song != null)
     }
     function saveLyric()
     {
+        if(srt.zoomLevelIndex < srt.zoomLevelIndexOriginal)
+        {
+            srt.resetZoom();
+        }
         srt.updateData();
         let duration = srt.duration;
         rawData = srt.getFinalResult();

@@ -33,7 +33,7 @@
 }
 
 .srt-edit-area {
-    padding-top: 32px;
+    padding-top: 40px;
     width: 100%;
     position: relative;
     box-sizing: border-box;
@@ -61,10 +61,10 @@
 
 .srt-text-container {
     height: 100%;
-    padding: 5px 5px 0px 5px;
+    padding: 4px 4px 0px 4px;
     box-sizing: border-box;
     overflow: hidden;
-    line-height: 1.15;
+    line-height: 1.1;
 }
 
 .srt-resizer {
@@ -85,12 +85,12 @@
 }
 
 .srt-time-position {
-    height: 140px;
+    height: 160px;
     position: absolute;
 }
 
 .srt-time-position-inner {
-    height: 140px;
+    height: 160px;
     position: relative;
 }
 
@@ -98,7 +98,7 @@
     position: absolute;
     left: -3px;
     top: 0px;
-    height: 140px;
+    height: 160px;
     width: 7px;
 }
 
@@ -120,7 +120,7 @@
     left: 3px;
     top: 37px;
     width: 1px;
-    height: 108px;
+    height: 128px;
     border-left: 1px solid rgba(0, 0, 0, 0.8);
 }
 
