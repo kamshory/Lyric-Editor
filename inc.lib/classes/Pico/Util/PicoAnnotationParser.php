@@ -185,7 +185,7 @@ class PicoAnnotationParser
         // Please test with https://regex101.com/
         
         // parse with quotes
-        $re1 = '/([_\-\w+]+)\=\"([a-zA-Z0-9\-\+ _,.\(\)\{\}\`\~\!\@\#\$\%\^\*\\\|\<\>\[\]\/&%?=:;\']+)\"/m';
+        $re1 = '([_\-\w+]+)\=\"([a-zA-Z0-9\-\+ _,.\(\)\{\}\`\~\!\@\#\$\%\^\*\\\|\<\>\[\]\/&%?=:;\'\r\n|\r|\n]+)\"/m';
         preg_match_all($re1, $queryString, $matches);
         $c1 = array_combine($matches[1], $matches[2]);
         
