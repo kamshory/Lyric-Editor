@@ -1,15 +1,14 @@
 <?php
 
 use Pico\Constants\PicoHttpStatus;
+use Pico\Data\Song;
 use Pico\Response\PicoResponse;
-use Pico\Song\PicoSong;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 
-$songLoader = new PicoSong($database);
 try
 {
-    $song = $songLoader->getSong(trim(@$_GET['song_id']));
+    $song = new Song(array('song_id'=>trim(@$_GET['song_id'])), $database);
     if($song != null)
     {
         $response = array(
