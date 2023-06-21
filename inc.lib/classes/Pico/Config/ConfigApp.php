@@ -9,11 +9,11 @@ class ConfigApp extends DynamicObject
      * @param mixed $data Initial data
      * @param boolean $readonly Readonly flag
      */
-    public function __construct($data = null, $database= null, $readonly = false)
+    public function __construct($data = null, $readonly = false)
     {
         if($data != null)
         {
-            parent::__construct($data, $database);
+            parent::__construct($data);
         }
         $this->readOnly($readonly);
     }

@@ -23,8 +23,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		else
 		{
 			$this->databaseType = $databaseType;
-		}
-		
+		}	
 	}
 	public function newQuery()
 	{
@@ -128,8 +127,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		else
 		{
 			$this->buffer .= "where $query \r\n";
-		}
-		
+		}		
 		return $this;
 	}
 	public function createFilter($args)
@@ -146,15 +144,13 @@ class PicoDatabaseQueryBuilder // NOSONAR
 				$j = $i + 1;
 				$values[$i] = $this->escapeValue($args[$j]);
 			}
-
 			for($i = 0; $i<$len; $i++)
 			{
 				$result .= $formats[$i];
 				if($j <= $len)
 				{
 					$result .= $values[$i];
-				}
-				
+				}			
 			}
 		}
 		return $result;
@@ -168,19 +164,33 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	{
 		if($value === null)
 		{
+			// null
 			return 'null';
 		}
 		else if(is_string($value))
 		{
+			// escape the value
 			return "'".$this->escapeSQL($value)."'";
 		}
 		else if(is_bool($value))
 		{
+			// true or false
 			return $value?'true':'false';
+		}
+		else if(is_numeric($value))
+		{
+			// convert number to string
+			return $value."";
+		}
+		else if(is_array($value) || is_object($value))
+		{
+			// encode to JSON and escapethe value
+			return "'".$this->escapeSQL(json_encode($value))."'";
 		}
 		else
 		{
-			return $value."";
+			// force convert to string and escapethe value
+			return "'".$this->escapeSQL($value)."'";
 		}
 	}
 	public function having($query)

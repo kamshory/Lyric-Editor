@@ -2,14 +2,49 @@
 
 namespace Pico\Util;
 
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionProperty;
 
 class PicoAnnotationParser
 {
+    /**
+     * Raw docblock
+     * @var string
+     */
     private $rawDocBlock;
+
+    /**
+     * Parameters
+     * @var array
+     */
     private $parameters;
+
+    /**
+     * Key pattern
+     *
+     * @var string
+     */
     private $keyPattern = "[A-z0-9\_\-]+";
+
+    /**
+     * End pattern
+     *
+     * @var string
+     */
     private $endPattern = "[ ]*(?:@|\r\n|\n)";
-    private $parsedAll = FALSE;
+
+    /**
+     * Parsed
+     *
+     * @var boolean
+     */
+    private $parsedAll = false;
+
+    /**
+     * Reflection
+     * @var ReflectionClass|ReflectionMethod|ReflectionProperty
+     */
 
     private $reflection;
 
@@ -26,14 +61,14 @@ class PicoAnnotationParser
         if ($count === 0) {
             throw new \Exception("No zero argument constructor allowed");
         } else if ($count === 1) {
-            $reflection = new \ReflectionClass($arguments[0]);
+            $reflection = new ReflectionClass($arguments[0]);
         } else {
             $type = $count === 3 ? $arguments[2] : "method";
 
             if ($type === "method") {
-                $reflection = new \ReflectionMethod($arguments[0], $arguments[1]);
+                $reflection = new ReflectionMethod($arguments[0], $arguments[1]);
             } else if ($type === "property") {
-                $reflection = new \ReflectionProperty($arguments[0], $arguments[1]);
+                $reflection = new ReflectionProperty($arguments[0], $arguments[1]);
             }
         }
         $this->reflection = $reflection;
@@ -107,11 +142,9 @@ class PicoAnnotationParser
     public function getVariableDeclarations($name)
     {
         $declarations = (array)$this->getParameter($name);
-
         foreach ($declarations as &$declaration) {
             $declaration = $this->parseVariableDeclaration($declaration, $name);
         }
-
         return $declarations;
     }
 
@@ -150,15 +183,14 @@ class PicoAnnotationParser
     {
         if ($originalValue && $originalValue !== 'null') {
             // try to json decode, if cannot then store as string
-            if (($json = json_decode($originalValue, TRUE)) === NULL) {
+            if (($json = json_decode($originalValue, true)) === null) {
                 $value = $originalValue;
             } else {
                 $value = $json;
             }
         } else {
-            $value = NULL;
+            $value = null;
         }
-
         return $value;
     }
 
@@ -171,7 +203,6 @@ class PicoAnnotationParser
             $this->parse();
             $this->parsedAll = TRUE;
         }
-
         return $this->parameters;
     }
 
@@ -180,21 +211,21 @@ class PicoAnnotationParser
         return $this->parseSingle($key);
     }
 
-    function parseKeyValue($queryString)
+    public function parseKeyValue($queryString)
     {
         // Please test with https://regex101.com/
         
         // parse with quotes
-        $re1 = '([_\-\w+]+)\=\"([a-zA-Z0-9\-\+ _,.\(\)\{\}\`\~\!\@\#\$\%\^\*\\\|\<\>\[\]\/&%?=:;\'\r\n|\r|\n]+)\"/m';
-        preg_match_all($re1, $queryString, $matches);
-        $c1 = array_combine($matches[1], $matches[2]);
+        $regex1 = '/([_\-\w+]+)\=\"([a-zA-Z0-9\-\+ _,.\(\)\{\}\`\~\!\@\#\$\%\^\*\\\|\<\>\[\]\/&%?=:;\'\t\r\n|\r|\n]+)\"/m';
+        preg_match_all($regex1, $queryString, $matches);
+        $pair1 = array_combine($matches[1], $matches[2]);
         
         // parse without quotes
-        $re2 = '/([_\-\w+]+)\=([a-zA-Z0-9._]+)/m';
-        preg_match_all($re2, $queryString, $matches);
-        $c2 = array_combine($matches[1], $matches[2]);
+        $regex2 = '/([_\-\w+]+)\=([a-zA-Z0-9._]+)/m';
+        preg_match_all($regex2, $queryString, $matches);
+        $pair2 = array_combine($matches[1], $matches[2]);
         
         // merge result
-        return array_merge($c1, $c2);
+        return array_merge($pair1, $pair2);
     }
 }

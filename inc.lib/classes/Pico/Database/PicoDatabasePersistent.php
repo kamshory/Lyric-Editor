@@ -519,7 +519,10 @@ class PicoDatabasePersistent
      */
     public function delete()
     {
-        return $this->_delete();
+        $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
+        $info = $this->getTableInfo();
+        $where = $this->getWhere($info, $queryBuilder);
+        return $this->_delete($info, $queryBuilder, $where);
     }
 
     /**
