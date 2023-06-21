@@ -1,5 +1,5 @@
 <?php
-namespace Pico\Data;
+namespace Pico\Data\Entity;
 
 use Pico\DynamicObject\DynamicObject;
 

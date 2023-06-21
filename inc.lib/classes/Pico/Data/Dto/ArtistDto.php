@@ -1,7 +1,8 @@
 <?php
 
-namespace Pico\Data;
+namespace Pico\Data\Dto;
 
+use Pico\Data\Entity\Artist;
 use Pico\DynamicObject\SetterGetter;
 
 class ArtistDto extends SetterGetter

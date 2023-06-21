@@ -1,17 +1,18 @@
 <?php
 
-namespace Pico\Data;
+namespace Pico\Data\Dto;
 
+use Pico\Data\Entity\Album;
 use Pico\DynamicObject\SetterGetter;
 
-class GenreDto extends SetterGetter
+class AlbumDto extends SetterGetter
 {
     /**
-     * Genre ID
+     * Album ID
      *
      * @var string
      */
-    protected $genreId;
+    protected $albumId;
 
     /**
      * Title
@@ -28,17 +29,17 @@ class GenreDto extends SetterGetter
     protected $active;
 
     /**
-     * Construct GenreDto from Genre and not copy other properties
+     * Construct AlbumDto from Album and not copy other properties
      *
-     * @param Genre $input
+     * @param Album $input
      * @return self
      */
     public static function valueOf($input)
     {
-        $output = new GenreDto();
-        $output->setGenreId($input->getGenreId());
+        $output = new AlbumDto();
+        $output->setAlbumId($input->getAlbumId());
         $output->setName($input->getName());
         $output->setActive($input->getActive());        
         return $output;
-    } 
+    }
 }

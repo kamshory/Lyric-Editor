@@ -1,6 +1,6 @@
 <?php
 
-use Pico\Data\Song;
+use Pico\Data\Entity\Song;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 $song_id = trim(@$_POST['song_id']);

@@ -1,7 +1,7 @@
 <?php
 
 use Pico\Constants\PicoHttpStatus;
-use Pico\Data\Song;
+use Pico\Data\Entity\Song;
 use Pico\File\FileMp3;
 use Pico\File\FileUpload;
 use Pico\Response\PicoResponse;

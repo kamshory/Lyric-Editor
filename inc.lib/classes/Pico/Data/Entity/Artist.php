@@ -1,22 +1,22 @@
 <?php
-namespace Pico\Data;
+namespace Pico\Data\Entity;
 
 use Pico\DynamicObject\DynamicObject;
 
 /**
- * Genre
- * @Table (name=genre)
+ * Artist
+ * @Table (name=artist)
  */
-class Genre extends DynamicObject
+class Artist extends DynamicObject
 {    
     /**
-     * Genre ID
+     * Artis ID
      *
      * @var string
-     * @Column (name=genre_id)
+     * @Column (name=artist_id)
      * @Id
      */
-    protected $genreId;
+    protected $artistId;
     
     /**
      * Name

@@ -1,8 +1,8 @@
 <?php
 
 use Pico\Constants\PicoHttpStatus;
-use Pico\Data\Artist;
-use Pico\Data\ArtistDto;
+use Pico\Data\Dto\ArtistDto;
+use Pico\Data\Entity\Artist;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
