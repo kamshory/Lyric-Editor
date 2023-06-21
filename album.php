@@ -2,7 +2,7 @@
 use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
-use Pico\Data\Entity\Song;
+use Pico\Data\Entity\Album;
 
 require_once "inc/auth.php";
 require_once "inc/header.php";
@@ -39,11 +39,11 @@ if($data != null && !empty($data))
     foreach($data as $row)
     {
       $no++;
-      $song = new Song($row);
+      $album = new Album($row);
     ?>
     <tr>
       <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo basename($_SERVER['PHP_SELF']);?>?album_id=<?php echo $song->getAlbumId();?>"><?php echo $song->getName();?></a></td>
+      <td><a href="<?php echo basename($_SERVER['PHP_SELF']);?>?album_id=<?php echo $album->getAlbumId();?>"><?php echo $album->getName();?></a></td>
     </tr>
     <?php
     }

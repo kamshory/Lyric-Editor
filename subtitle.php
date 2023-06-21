@@ -1,9 +1,8 @@
 <?php
 
-
+use Pico\Data\Entity\Song;
 use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
-use Pico\Song\PicoSong;
 
 require_once "inc/auth.php";
 require_once "inc/header.php";
@@ -119,10 +118,10 @@ if($song_id != '')
 
 <?php
 
-$songLoader = new PicoSong($database);
 try
 {
-$song = $songLoader->getSong(@$_GET['song_id']);
+$song = new Song(array('song_id'=>@$_GET['song_id']), $database);
+$song->select();
 if($song != null)
 {
     $lyric = $song->getLyric();

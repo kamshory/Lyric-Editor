@@ -2,7 +2,7 @@
 use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
-
+use Pico\Data\Entity\Song;
 
 require_once "inc/auth.php";
 require_once "inc/header.php";
