@@ -1,19 +1,26 @@
 <?php
 
 use Pico\Constants\PicoHttpStatus;
-use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Response\PicoResponse;
+use Pico\Song\PicoSong;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 
-$song_id = trim(@$_GET['song_id']);
-$queryBuilder = new PicoDatabaseQueryBuilder($database);
-$queryBuilder
-    ->newQuery()
-    ->select("song.song_id as id, song.name as value, song.lyric as lyric")
-    ->from("song")
-    ->where("song.song_id = ? and song.active = ? ", $song_id, true);
-$response = $database->fetch($queryBuilder, PDO::FETCH_ASSOC);
-
-$restResponse = new PicoResponse();
-$restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);
+$songLoader = new PicoSong($database);
+try
+{
+    $song = $songLoader->getSong(trim(@$_GET['song_id']));
+    if($song != null)
+    {
+        $response = array(
+            'song_id'=>$song->getSongId(),
+            'lyric'=>$song->getLyric()
+        );
+        $restResponse = new PicoResponse();
+        $restResponse->sendResponseJSON($response, null, PicoHttpStatus::HTTP_OK);
+    }
+}
+catch(Exception $e)
+{
+    
+}

@@ -65,6 +65,7 @@ if($song_id != '')
                     <button class="btn btn-dark button-play-master">Play</button>
                     <button class="btn btn-dark button-pause-master">Pause</button>
                     <button class="btn btn-dark button-scroll-master">Scroll</button>
+                    <button class="btn btn-dark button-reset-master">Reset</button>
                     <button class="btn btn-dark button-save-master">Save</button>
                 </div>
             </div>
@@ -136,15 +137,15 @@ if($song != null)
 ?>
 <script>
     let song_id = '<?php echo $song->getSongId(); ?>';
-    let pathSong = '<?php echo $cfg->getSongBaseUrl();?>/<?php echo $song->getFileName(); ?>';
+    let path = '<?php echo $cfg->getSongBaseUrl();?>/<?php echo $song->getFileName(); ?>';
     let jsonData = <?php echo json_encode(array('lyric'=>$lyric)); ?>;
     let rawData = jsonData.lyric;
 </script>
 <script>
     let srt;
-    $(document).ready(function(e)
+    $(document).ready(function(evt)
     {      
-        srt = new SrtGenerator('.editor1', rawData, pathSong);
+        srt = new SrtGenerator('.editor1', rawData, path);
         srt.onDeleteData = function(index, countData) {
             if (countData > 1) {
                 idToDelete = index;
@@ -152,7 +153,7 @@ if($song != null)
                     keyboard: false
                 });
                 myModal.show();
-                document.querySelector('#deleteItem .delete').addEventListener('click', function() {
+                document.querySelector('#deleteItem .delete').addEventListener('click', function(e) {
                     srt.deleteData(idToDelete);
                     idToDelete = -1;
                     myModal.hide();
@@ -161,19 +162,32 @@ if($song != null)
         };
 
         document.querySelector('.button-play-master').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             srt.play();
         });
 
         document.querySelector('.button-scroll-master').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             srt.toggleScroll();
         });
 
         document.querySelector('.button-pause-master').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             srt.pause(true);
         });
 
-        document.querySelector('.button-save-master').addEventListener('click', function() {
+        document.querySelector('.button-save-master').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             saveLyric();
+        });
+        document.querySelector('.button-reset-master').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            resetLyric();
         });
 
         document.onkeydown = function(e) {
@@ -184,6 +198,20 @@ if($song != null)
             }
         };
     });
+    function resetLyric()
+    {
+         $.ajax({
+            type:'GET',
+            url:'lib.ajax/subtitle-load.php',
+            data:{song_id:song_id},
+            dataType:'json',
+            success:function(data)
+            {
+                rawData:data.lyric;
+                srt.initData(rawData, path)
+            }
+        });
+    }
     function saveLyric()
     {
         srt.updateData();

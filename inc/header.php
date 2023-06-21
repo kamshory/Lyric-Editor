@@ -23,7 +23,7 @@
       padding:100px 20px 0px 20px;
       box-sizing: border-box;
       position: relative;
-      min-height: calc(100vh - 100px);
+      min-height: calc(100vh - 75px);
   }
 
   .modal-body .table-borderless td
