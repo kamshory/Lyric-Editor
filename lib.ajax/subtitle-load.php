@@ -9,6 +9,7 @@ require_once dirname(__DIR__)."/inc/auth.php";
 try
 {
     $song = new Song(array('song_id'=>trim(@$_GET['song_id'])), $database);
+    $song->select();
     if($song != null)
     {
         $response = array(
