@@ -8,6 +8,7 @@ use Pico\Database\PicoDatabasePersistent;
 use Pico\Exception\NoDatabaseConnectionException;
 use Pico\Exception\NoRecordFoundException;
 use Pico\Util\PicoEnvironmentVariable;
+use ReflectionClass;
 use stdClass;
 use Symfony\Component\Yaml\Yaml;
 
@@ -300,11 +301,15 @@ class DynamicObject extends stdClass
         return isset($this->$var) ? $this->$var : null;   
     }
 
+    /**
+     * Get value
+     */
     public function value()
     {
+        $parentProps = $this->propertyList(true, true);
         $value = new stdClass;
         foreach ($this as $key => $val) {
-            if($key != '__readonly' && $key != '__database')
+            if(!in_array($key, $parentProps))
             {
                 $value->$key = $val;
             }
@@ -312,6 +317,38 @@ class DynamicObject extends stdClass
         return $value;
     }
 
+    /**
+     * Property list
+     * @var bool $reflectSelf
+     * @return array
+     */
+    protected function propertyList($reflectSelf = false, $asArrayProps = false)
+    {
+        $reflectionClass = $reflectSelf ? self::class : get_called_class();
+        $class = new ReflectionClass($reflectionClass);
+
+        // filter only the calling class properties
+        $properties = array_filter(
+            $class->getProperties(), 
+            function($property) use($class) { 
+                return $property->getDeclaringClass()->getName() == $class->getName();
+            }
+        );
+
+        if($asArrayProps)
+        {
+            $result = array();
+            foreach ($properties as $key) {
+                $prop = $key->name;
+                $result[] = $prop;
+            }
+            return $result;
+        }
+        else
+        {
+            return $properties;
+        }
+    }
 
     /**
      * Magic method called when user call any undefined method
@@ -371,9 +408,7 @@ class DynamicObject extends stdClass
      */
     public function __toString()
     {
-        $obj = clone $this;;
-        unset($obj->__readonly);
-        unset($obj->__database);
-        return json_encode($obj);
+        $obj = clone $this;
+        return json_encode($obj->value());
     }
 }
