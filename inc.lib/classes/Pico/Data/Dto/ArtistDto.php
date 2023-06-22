@@ -5,6 +5,10 @@ namespace Pico\Data\Dto;
 use Pico\Data\Entity\Artist;
 use Pico\DynamicObject\SetterGetter;
 
+/**
+ * Artist DTO
+ * @JSON (property-naming-strategy=SNAKE_CASE)
+ */
 class ArtistDto extends SetterGetter
 {
     /**
@@ -36,7 +40,7 @@ class ArtistDto extends SetterGetter
      */
     public static function valueOf($input)
     {
-        $output = new ArtistDto();
+        $output = new ArtistDto($input);
         $output->setArtistId($input->getArtistId());
         $output->setName($input->getName());
         $output->setActive($input->getActive());        

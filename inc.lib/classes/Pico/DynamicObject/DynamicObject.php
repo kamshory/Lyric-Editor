@@ -8,6 +8,7 @@ use Pico\Database\PicoDatabasePersistent;
 use Pico\Exception\NoDatabaseConnectionException;
 use Pico\Exception\NoRecordFoundException;
 use Pico\Util\PicoEnvironmentVariable;
+use ReflectionClass;
 use stdClass;
 use Symfony\Component\Yaml\Yaml;
 
@@ -180,7 +181,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -199,7 +200,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -219,7 +220,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -238,7 +239,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -256,7 +257,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -270,6 +271,15 @@ class DynamicObject extends stdClass
     protected function camelize($input, $separator = '_')
     {
         return lcfirst(str_replace($separator, '', ucwords($input, $separator)));
+    }
+
+    protected function snakeize($input, $glue = '_') {
+        return ltrim(
+            preg_replace_callback('/[A-Z]/', function ($matches) use ($glue) {
+                return $glue . strtolower($matches[0]);
+            }, $input),
+            $glue
+        );
     }
 
     /**
@@ -300,18 +310,63 @@ class DynamicObject extends stdClass
         return isset($this->$var) ? $this->$var : null;   
     }
 
-    public function value()
+    /**
+     * Get value
+     */
+    public function value($snakeCase = false)
     {
+        $parentProps = $this->propertyList(true, true);
         $value = new stdClass;
         foreach ($this as $key => $val) {
-            if($key != '__readonly' && $key != '__database')
+            if(!in_array($key, $parentProps))
             {
                 $value->$key = $val;
             }
         }
+        if($snakeCase)
+        {
+            $value2 = new stdClass;
+            foreach ($value as $key => $val) {
+                $key2 = $this->snakeize($key);
+                $value2->$key2 = $val;
+            }
+            return $value2;
+        }
         return $value;
     }
 
+    /**
+     * Property list
+     * @var bool $reflectSelf
+     * @return array
+     */
+    protected function propertyList($reflectSelf = false, $asArrayProps = false)
+    {
+        $reflectionClass = $reflectSelf ? self::class : get_called_class();
+        $class = new ReflectionClass($reflectionClass);
+
+        // filter only the calling class properties
+        $properties = array_filter(
+            $class->getProperties(), 
+            function($property) use($class) { 
+                return $property->getDeclaringClass()->getName() == $class->getName();
+            }
+        );
+
+        if($asArrayProps)
+        {
+            $result = array();
+            foreach ($properties as $key) {
+                $prop = $key->name;
+                $result[] = $prop;
+            }
+            return $result;
+        }
+        else
+        {
+            return $properties;
+        }
+    }
 
     /**
      * Magic method called when user call any undefined method
@@ -348,7 +403,7 @@ class DynamicObject extends stdClass
             }
             else
             {
-                throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+                throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
             }         
         }
     }
@@ -371,9 +426,7 @@ class DynamicObject extends stdClass
      */
     public function __toString()
     {
-        $obj = clone $this;;
-        unset($obj->__readonly);
-        unset($obj->__database);
-        return json_encode($obj);
+        $obj = clone $this;
+        return json_encode($obj->value());
     }
 }

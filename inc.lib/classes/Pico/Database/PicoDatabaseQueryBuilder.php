@@ -25,17 +25,20 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			$this->databaseType = $databaseType;
 		}	
 	}
+
 	public function newQuery()
 	{
 		$this->buffer = "";
 		$this->limitOffset = false;
 		return $this;
 	}
+
 	public function insert()
 	{
 		$this->buffer = "insert \r\n";
 		return $this;
 	}
+
 	public function into($query)
 	{
 		$this->buffer .= "into $query\r\n";
@@ -96,21 +99,25 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		$this->buffer .= "right join $query \r\n";
 		return $this;
 	}
+
 	public function on($query)
 	{
 		$this->buffer .= "on $query \r\n";
 		return $this;
 	}
+
 	public function update($query)
 	{
 		$this->buffer .= "update $query \r\n";
 		return $this;
 	}
+
 	public function set($query)
 	{
 		$this->buffer .= "set $query \r\n";
 		return $this;
 	}
+
 	public function where($query)
 	{
 		$count = func_num_args();
@@ -130,6 +137,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		}		
 		return $this;
 	}
+
 	public function createFilter($args)
 	{
 		$result = "";
@@ -155,6 +163,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		}
 		return $result;
 	}
+
 	/**
 	 * Escape value
 	 * @var mixed
@@ -193,33 +202,39 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			return "'".$this->escapeSQL($value)."'";
 		}
 	}
+
 	public function having($query)
 	{
 		$this->buffer .= "having $query \r\n";
 		return $this;
 	}
+
 	public function orderBy($query)
 	{
 		$this->buffer .= "order by $query \r\n";
 		return $this;
 	}
+
 	public function groupBy($query)
 	{
 		$this->buffer .= "group by $query \r\n";
 		return $this;
 	}
+
 	public function limit($limit)
 	{
 		$this->limitOffset = true;
 		$this->limit = $limit;
 		return $this;
 	}
+
 	public function offset($offset)
 	{
 		$this->limitOffset = true;
 		$this->offset = $offset;
 		return $this;
 	}
+
 	public function lockTables($tables)
 	{
 		if($this->databaseType == "mysql" || $this->databaseType == "mariadb")
@@ -231,6 +246,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			return "lock tables $tables";
 		}
 	}
+
 	public function unlockTables()
 	{
 		if($this->databaseType == "mysql" || $this->databaseType == "mariadb")
@@ -242,6 +258,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			return "unlock tables";
 		}
 	}
+
 	public function startTransaction()
 	{
 		if($this->databaseType == "mysql" || $this->databaseType == "mariadb")
@@ -253,6 +270,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			return "start transaction";
 		}
 	}
+
 	public function commit()
 	{
 		if($this->databaseType == "mysql" || $this->databaseType == "mariadb")

@@ -27,6 +27,22 @@ class Genre extends DynamicObject
     protected $name;
 
     /**
+     * Sort order
+     *
+     * @var integer
+     * @Column (name=sort_order)
+     */
+    protected $sortOrder;
+
+    /**
+     * Default data
+     *
+     * @var bool
+     * @Column (name=default_data)
+     */
+    protected $defaultData;
+
+    /**
      * Active
      *
      * @var bool
