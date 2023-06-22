@@ -26,6 +26,22 @@ class GenreDto extends SetterGetter
     protected $name;
 
     /**
+     * Sort order
+     *
+     * @var integer
+     * @Column (name=sort_order)
+     */
+    protected $sortOrder;
+
+    /**
+     * Default data
+     *
+     * @var bool
+     * @Column (name=default_data)
+     */
+    protected $defaultData;
+
+    /**
      * Active
      *
      * @var bool
@@ -43,6 +59,8 @@ class GenreDto extends SetterGetter
         $output = new GenreDto($input);
         $output->setGenreId($input->getGenreId());
         $output->setName($input->getName());
+        $output->setSortOrder($input->getSortOrder());
+        $output->setDefaultData($input->getDefaultData());
         $output->setActive($input->getActive());        
         return $output;
     } 

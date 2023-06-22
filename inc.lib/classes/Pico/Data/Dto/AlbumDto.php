@@ -26,6 +26,27 @@ class AlbumDto extends SetterGetter
     protected $name;
 
     /**
+     * Release date
+     *
+     * @var string
+     */
+    protected $releaseDate;
+
+    /**
+     * Number of song
+     *
+     * @var integer
+     */
+    protected $numberOfSong;
+
+    /**
+     * Total duration
+     *
+     * @var float
+     */
+    protected $duration;
+
+    /**
      * Active
      *
      * @var bool
@@ -43,6 +64,9 @@ class AlbumDto extends SetterGetter
         $output = new AlbumDto($input);
         $output->setAlbumId($input->getAlbumId());
         $output->setName($input->getName());
+        $output->setReleaseDate($input->getReleaseDate());
+        $output->setNumberOfSong($input->getNumberOfSong());
+        $output->setDuration($input->getDuration());
         $output->setActive($input->getActive());        
         return $output;
     }
