@@ -1,3 +1,10 @@
+<?php
+
+use Pico\Util\PicoHttpCache;
+
+require_once dirname(__DIR__)."/inc/auth.php";
+PicoHttpCache::cacheLifetime(3600*12);
+?>
 <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="addGenreDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addGenreDialogLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
