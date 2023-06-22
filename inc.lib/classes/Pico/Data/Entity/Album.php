@@ -38,7 +38,7 @@ class Album extends DynamicObject
      *
      * @var integer
      * @Column (name=number_of_song)
-     * @Value (minimum=0, default=0)
+     * @Value (minimum=0)
      */
     protected $numberOfSong;
 
@@ -47,7 +47,7 @@ class Album extends DynamicObject
      *
      * @var float
      * @Column (name=duration)
-     * @Value (minimum=0, default=0)
+     * @Value (minimum=0)
      */
     protected $duration;
 

@@ -181,7 +181,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -200,7 +200,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -220,7 +220,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -239,7 +239,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -257,7 +257,7 @@ class DynamicObject extends stdClass
         }
         else
         {
-            throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
         }
     }
 
@@ -403,7 +403,7 @@ class DynamicObject extends stdClass
             }
             else
             {
-                throw new NoDatabaseConnectionException(DynamicObject::NO_DATABASE_CONNECTION);
+                throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
             }         
         }
     }
