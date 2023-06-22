@@ -1,10 +1,11 @@
 <?php
 
-use Pico\Data\Entity\Song;
+use Pico\Data\Dto\ArtistDto;
+use Pico\Data\Entity\Artist;
 
 require_once "inc/auth.php";
 
-$song = new Song();
-$song->setCoba("AAAAAAAAAAAAAAAA");
-
-echo($song);
+$artist = new Artist();
+$artistDto = ArtistDto::valueOf($artist);
+$artistDto->setCobaSajaYa("AAAAAAAAAAAAAAAA");
+echo($artistDto);

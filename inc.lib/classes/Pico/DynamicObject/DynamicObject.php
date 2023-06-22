@@ -273,6 +273,15 @@ class DynamicObject extends stdClass
         return lcfirst(str_replace($separator, '', ucwords($input, $separator)));
     }
 
+    protected function snakeize($input, $glue = '_') {
+        return ltrim(
+            preg_replace_callback('/[A-Z]/', function ($matches) use ($glue) {
+                return $glue . strtolower($matches[0]);
+            }, $input),
+            $glue
+        );
+    }
+
     /**
      * Set property value
      *
@@ -304,7 +313,7 @@ class DynamicObject extends stdClass
     /**
      * Get value
      */
-    public function value()
+    public function value($snakeCase = false)
     {
         $parentProps = $this->propertyList(true, true);
         $value = new stdClass;
@@ -313,6 +322,15 @@ class DynamicObject extends stdClass
             {
                 $value->$key = $val;
             }
+        }
+        if($snakeCase)
+        {
+            $value2 = new stdClass;
+            foreach ($value as $key => $val) {
+                $key2 = $this->snakeize($key);
+                $value2->$key2 = $val;
+            }
+            return $value2;
         }
         return $value;
     }

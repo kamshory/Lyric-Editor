@@ -5,6 +5,10 @@ namespace Pico\Data\Dto;
 use Pico\Data\Entity\Genre;
 use Pico\DynamicObject\SetterGetter;
 
+/**
+ * Genre DTO
+ * @JSON (property-naming-strategy=SNAKE_CASE)
+ */
 class GenreDto extends SetterGetter
 {
     /**
@@ -36,7 +40,7 @@ class GenreDto extends SetterGetter
      */
     public static function valueOf($input)
     {
-        $output = new GenreDto();
+        $output = new GenreDto($input);
         $output->setGenreId($input->getGenreId());
         $output->setName($input->getName());
         $output->setActive($input->getActive());        
