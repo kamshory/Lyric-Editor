@@ -87,6 +87,7 @@ class PicoPagination
     {
         $orderBy = $this->getOrderBy($filter, $default);
         $orderByFixed = $orderBy;
+        // mapping if any
         if($map != null && is_array($map) && isset($map[$orderBy]))
         {
             $orderByFixed = $map[$orderBy];

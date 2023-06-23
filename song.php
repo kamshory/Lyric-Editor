@@ -12,30 +12,39 @@ $subquery = new PicoDatabaseQueryBuilder($database);
 $queryBuilder = new PicoDatabaseQueryBuilder($database);
 
 $order = $pagination->getOrder(array(
-    'time_create'=>'song.time_create',
-    'title'=>'song.title',
-    'duration'=>'song.duration'
-  ), array(
-    'time_create',
-    'title',
-    'duration'
-  ), 
-  'time_create'
+  'time_create'=>'song.time_create',
+  'title'=>'song.title',
+  'duration'=>'song.duration',
+  'artist_vocal'=>'artist.name',
+  'genre'=>'genre.name',
+  'album'=>'album.name'
+), array(
+  'time_create',
+  'title',
+  'duration',
+  'artist_vocal',
+  'genre',
+  'album'
+), 
+'time_create'
 );
 
 $sql = $queryBuilder->newQuery()
-  ->select("song.*, 
-  (select artist.name from artist where artist.artist_id = song.artist_vocal) as artist_vocal_name,
+->select("song.*, 
   (select artist.name from artist where artist.artist_id = song.artist_composer) as artist_composer_name,
   (select artist.name from artist where artist.artist_id = song.artist_arranger) as artist_arranger_name,
-  (select genre.name from genre where genre.genre_id = song.genre_id) as genre_name,
-  (select album.name from album where album.album_id = album.album_id) as album_name
+  artist.name as artist_vocal_name,
+  genre.name as genre_name,
+  album.name as album_name
   ")
-  ->from("song")
-  ->where("song.active = ? ", true)
-  ->orderBy($order)
-  ->limit($pagination->getLimit())
-  ->offset($pagination->getOffset());
+->from("song")
+->leftJoin("artist")->on("artist.artist_id = song.artist_vocal")
+->leftJoin("genre")->on("genre.genre_id = song.genre_id")
+->leftJoin("album")->on("album.album_id = album.album_id")
+->where("song.active = ? ", true)
+->orderBy($order)
+->limit($pagination->getLimit())
+->offset($pagination->getOffset());
 try
 {
 $data = $database->fetchAll($sql, PDO::FETCH_OBJ);
