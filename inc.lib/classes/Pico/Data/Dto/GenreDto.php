@@ -56,7 +56,7 @@ class GenreDto extends SetterGetter
      */
     public static function valueOf($input)
     {
-        $output = new GenreDto($input);
+        $output = new GenreDto();
         $output->setGenreId($input->getGenreId());
         $output->setName($input->getName());
         $output->setSortOrder($input->getSortOrder());

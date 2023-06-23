@@ -1,5 +1,8 @@
 <?php
 namespace Pico\Pagination;
+
+use Pico\Exception\NullPointerException;
+
 class PicoPagination
 {
     /**
@@ -33,6 +36,8 @@ class PicoPagination
     {
         $this->limit = $limit;
         $this->offset = $this->parseOffset();
+        $this->orderBy = @$_GET['orderby'];
+        $this->orderType = @$_GET['ordertype'];
     }
 
     /**
@@ -58,8 +63,6 @@ class PicoPagination
         return 0;
     }
 
-    
-
     /**
      * Get offset
      *
@@ -80,14 +83,47 @@ class PicoPagination
         return $this->limit;
     }
 
+    public function getOrder($map = null, $filter = null, $default = null)
+    {
+        $orderBy = $this->getOrderBy($filter, $default);
+        $orderByFixed = $orderBy;
+        if($map != null && is_array($map) && isset($map[$orderBy]))
+        {
+            $orderByFixed = $map[$orderBy];
+        }
+        if($orderByFixed == null)
+        {
+            throw new NullPointerException("ORDER BY can not be null");
+        }
+        return $orderByFixed." ".$this->getOrderType();
+    }
+
     /**
      * Get order by
      *
-     * @return  string
+     * @var array $filter
+     * @var string $default
+     * @return string
      */ 
-    public function getOrderBy()
+    public function getOrderBy($filter = null, $default = null)
     {
-        return $this->orderBy;
+        if($filter != null && is_array($filter))
+        {
+            $orderBy = $this->orderBy;
+            if(!in_array($orderBy, $filter))
+            {
+                $orderBy = null;
+            }
+            if($orderBy == null)
+            {
+                $orderBy = $default;
+            }
+        }
+        if($orderBy == null)
+        {
+            throw new NullPointerException("ORDER BY can not be null");
+        }
+        return $orderBy;
     }
 
     /**
@@ -97,6 +133,15 @@ class PicoPagination
      */ 
     public function getOrderType()
     {
-        return $this->orderType;
+        $orderType = $this->orderType;
+        if(strcasecmp($orderType, 'desc') == 0)
+        {
+            $orderType = 'desc';
+        }
+        else
+        {
+            $orderType = 'asc';
+        }
+        return $orderType;
     }
 }

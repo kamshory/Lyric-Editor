@@ -8,10 +8,17 @@ use stdClass;
 
 class SetterGetter
 {
-    private $object = null;
-    public function __construct($object)
+    private $classParams = array();
+
+    public function __construct()
     {
-        $this->object = $object;
+        $jsonAnnot = new PicoAnnotationParser(get_class($this));
+        $params = $jsonAnnot->getParameters();
+        foreach($params as $paramName=>$paramValue)
+        {
+            $vals = $jsonAnnot->parseKeyValue($paramValue);
+            $this->classParams[$paramName] = $vals;
+        }
     }
     /**
      * Convert snake case to camel case
@@ -140,24 +147,41 @@ class SetterGetter
         }
     }
 
+ 
+    /**
+     * Check if JSON naming strategy is snake case or not
+     *
+     * @return boolean
+     */
     private function isSnake()
     {
-        $jsonAnnot = new PicoAnnotationParser(get_class($this));
-        $annot = $jsonAnnot->getParameter('JSON');
-        if(!empty($annot))
-        {
-            $vals = $jsonAnnot->parseKeyValue($annot);
-            if($vals != null && isset($vals['property-naming-strategy']))
-            {
-                return strcasecmp($vals['property-naming-strategy'], 'SNAKE_CASE') == 0;
-            }
-        }
-        return false;
+        return isset($this->classParams['JSON']) 
+            && isset($this->classParams['JSON']['property-naming-strategy']) 
+            && strcasecmp($this->classParams['JSON']['property-naming-strategy'], 'SNAKE_CASE') == 0
+            ;
+    }
+
+    /**
+     * Check if JSON naming strategy is snake case or not
+     *
+     * @return boolean
+     */
+    private function isPretty()
+    {
+        return isset($this->classParams['JSON']) 
+            && isset($this->classParams['JSON']['prettify']) 
+            && strcasecmp($this->classParams['JSON']['prettify'], 'true') == 0
+            ;
     }
 
     public function __toString()
     {
         $obj = clone $this;
-        return json_encode($obj->value($this->isSnake()));
+        $json_flag = 0;
+        if($this->isPretty())
+        {
+            $json_flag |= JSON_PRETTY_PRINT;
+        }
+        return json_encode($obj->value($this->isSnake()), $json_flag);
     }
 }

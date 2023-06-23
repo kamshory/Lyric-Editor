@@ -5,6 +5,7 @@ use Pico\DynamicObject\DynamicObject;
 
 /**
  * Song
+ * @Entity
  * @Table (name=song)
  */
 class Song extends DynamicObject

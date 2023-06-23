@@ -4,6 +4,8 @@ namespace Pico\Data\Entity;
 use Pico\DynamicObject\DynamicObject;
 
 /**
+ * Rating
+ * @Entity
  * @Table (name=rating)
  */
 class Rating extends DynamicObject

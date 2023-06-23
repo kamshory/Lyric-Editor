@@ -4,6 +4,7 @@ namespace Pico\Data\Entity;
 use Pico\DynamicObject\DynamicObject;
 
 /**
+ * @Entity
  * @Table (name=album)
  */
 class Album extends DynamicObject

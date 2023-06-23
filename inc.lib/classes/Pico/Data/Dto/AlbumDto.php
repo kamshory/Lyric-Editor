@@ -61,7 +61,7 @@ class AlbumDto extends SetterGetter
      */
     public static function valueOf($input)
     {
-        $output = new AlbumDto($input);
+        $output = new AlbumDto();
         $output->setAlbumId($input->getAlbumId());
         $output->setName($input->getName());
         $output->setReleaseDate($input->getReleaseDate());

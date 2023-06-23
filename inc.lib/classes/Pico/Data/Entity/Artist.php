@@ -5,6 +5,7 @@ use Pico\DynamicObject\DynamicObject;
 
 /**
  * Artist
+ * @Entity
  * @Table (name=artist)
  */
 class Artist extends DynamicObject
@@ -25,6 +26,22 @@ class Artist extends DynamicObject
      * @Column (name=name)
      */
     protected $name;
+
+    /**
+     * Gender
+     *
+     * @var string
+     * @Column (name=gender)
+     */
+    protected $gender;
+
+    /**
+     * Birth day
+     *
+     * @var string
+     * @Column (name=birth_day)
+     */
+    protected $birthDay;
 
     /**
      * Active

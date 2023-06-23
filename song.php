@@ -11,6 +11,18 @@ $pagination = new PicoPagination($cfg->getResultPerPage());
 $subquery = new PicoDatabaseQueryBuilder($database);
 $queryBuilder = new PicoDatabaseQueryBuilder($database);
 
+$order = $pagination->getOrder(array(
+    'time_create'=>'song.time_create',
+    'title'=>'song.title',
+    'duration'=>'song.duration'
+  ), array(
+    'time_create',
+    'title',
+    'duration'
+  ), 
+  'time_create'
+);
+
 $sql = $queryBuilder->newQuery()
   ->select("song.*, 
   (select artist.name from artist where artist.artist_id = song.artist_vocal) as artist_vocal_name,
@@ -21,7 +33,7 @@ $sql = $queryBuilder->newQuery()
   ")
   ->from("song")
   ->where("song.active = ? ", true)
-  ->orderBy("song.time_create desc")
+  ->orderBy($order)
   ->limit($pagination->getLimit())
   ->offset($pagination->getOffset());
 try

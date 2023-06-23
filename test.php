@@ -8,4 +8,5 @@ require_once "inc/auth.php";
 $artist = new Artist();
 $artistDto = ArtistDto::valueOf($artist);
 $artistDto->setCobaSajaYa("AAAAAAAAAAAAAAAA");
-echo($artistDto);
+echo $artistDto;
+//print_r($artistDto->value(false));

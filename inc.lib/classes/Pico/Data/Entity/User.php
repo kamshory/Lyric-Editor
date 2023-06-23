@@ -5,6 +5,7 @@ use Pico\DynamicObject\DynamicObject;
 
 /**
  * User
+ * @Entity
  * @Table (name=user)
  */
 class User extends DynamicObject

@@ -7,7 +7,7 @@ use Pico\DynamicObject\SetterGetter;
 
 /**
  * Artist DTO
- * @JSON (property-naming-strategy=SNAKE_CASE)
+ * @JSON (property-naming-strategy=SNAKE_CASE, prettify=true)
  */
 class ArtistDto extends SetterGetter
 {
@@ -26,6 +26,20 @@ class ArtistDto extends SetterGetter
     protected $name;
 
     /**
+     * Gender
+     *
+     * @var string
+     */
+    protected $gender;
+
+    /**
+     * Birth day
+     *
+     * @var string
+     */
+    protected $birthDay;
+
+    /**
      * Active
      *
      * @var bool
@@ -40,9 +54,11 @@ class ArtistDto extends SetterGetter
      */
     public static function valueOf($input)
     {
-        $output = new ArtistDto($input);
+        $output = new ArtistDto();
         $output->setArtistId($input->getArtistId());
         $output->setName($input->getName());
+        $output->setGender($input->getGender());
+        $output->setBirthDay($input->getBirthDay());
         $output->setActive($input->getActive());        
         return $output;
     }
