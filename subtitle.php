@@ -243,7 +243,7 @@ else
     $subquery = new PicoDatabaseQueryBuilder($database);
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
 
-    $order = $pagination->getOrder(array(
+    $order = $pagination->createOrder(array(
         'time_create'=>'song.time_create',
         'title'=>'song.title',
         'duration'=>'song.duration',

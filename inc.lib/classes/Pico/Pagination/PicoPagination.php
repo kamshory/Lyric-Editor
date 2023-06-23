@@ -83,7 +83,15 @@ class PicoPagination
         return $this->limit;
     }
 
-    public function getOrder($map = null, $filter = null, $default = null)
+    /**
+     * Create order
+     *
+     * @param array $map
+     * @param array $filter
+     * @param string $default
+     * @return string
+     */
+    public function createOrder($map = null, $filter = null, $default = null)
     {
         $orderBy = $this->getOrderBy($filter, $default);
         $orderByFixed = $orderBy;
