@@ -49,7 +49,7 @@ if($data != null && !empty($data))
     {
       $no++;
       $artist = new Artist($row);
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?artist_id=".$album->getArtistId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?artist_id=".$artist->getArtistId();
     ?>
     <tr>
       <th scope="row"><?php echo $no;?></th>

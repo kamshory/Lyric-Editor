@@ -49,7 +49,7 @@ if($data != null && !empty($data))
     {
       $no++;
       $genre = new Genre($row);
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?genre_id=".$album->getGenreId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?genre_id=".$genre->getGenreId();
     ?>
     <tr>
       <th scope="row"><?php echo $no;?></th>
