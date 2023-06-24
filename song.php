@@ -69,10 +69,11 @@ if($data != null && !empty($data))
     {
       $no++;
       $song = new Song($row);
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?song_id=".$album->getSongId();
     ?>
     <tr>
       <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo basename($_SERVER['PHP_SELF']);?>?song_id=<?php echo $song->getSongId();?>"><?php echo $song->getTitle();?></a></td>
+      <td><a href="<?php echo $linkEdit;?>"><?php echo $song->getTitle();?></a></td>
       <td><?php echo $song->getArtisName();?></td>
       <td><?php echo $song->getAlbumName();?></td>
       <td><?php echo $song->getDuration();?></td>

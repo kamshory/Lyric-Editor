@@ -38,7 +38,7 @@ if($data != null && !empty($data))
 <table class="table">
   <thead>
     <tr>
-      <th scope="col" width="20">&nbsp;</th>
+      <th scope="col" width="20"><i class="ti ti-edit"></i></th>
       <th scope="col" width="20">#</th>
       <th scope="col">Name</th>
     </tr>
@@ -50,11 +50,12 @@ if($data != null && !empty($data))
     {
       $no++;
       $album = new Album($row);
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?album_id=".$album->getAlbumId();
     ?>
     <tr data-id="<?php echo $album->getAlbumId();?>">
-      <th scope="row"><a href="#" class="edit-data">Edit</a></th>
+      <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo basename($_SERVER['PHP_SELF']);?>?album_id=<?php echo $album->getAlbumId();?>"><?php echo $album->getName();?></a></td>
+      <td><a href="<?php echo $linkEdit;?>"><?php echo $album->getName();?></a></td>
     </tr>
     <?php
     }
