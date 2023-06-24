@@ -85,6 +85,22 @@ class Song extends DynamicObject
     protected $fileName;
 
     /**
+     * File type
+     *
+     * @var string
+     * @Column (name=file_type)
+     */
+    protected $fileType;
+
+    /**
+     * File extension
+     *
+     * @var string
+     * @Column (name=file_extension)
+     */
+    protected $fileExtension;
+
+    /**
      * File size
      *
      * @var integer

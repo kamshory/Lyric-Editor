@@ -9,4 +9,4 @@ $artist = new Artist();
 $artistDto = ArtistDto::valueOf($artist);
 $artistDto->setCobaSajaYa("AAAAAAAAAAAAAAAA");
 echo $artistDto;
-//print_r($artistDto->value(false));
+print_r($artistDto->value(false));

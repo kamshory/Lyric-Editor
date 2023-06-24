@@ -24,14 +24,22 @@ try
     // get uploaded file path
     $fileUpload = new FileUpload();
     $targetDir = dirname(__DIR__)."/files";
-    $path = $fileUpload->upload($_FILES, 'file', $targetDir, $id);
+    $fileUpload->upload($_FILES, 'file', $targetDir, $id);
+
+    $path = $fileUpload->getFilePath();
+
     $response->setFilePath($path);
     $response->setFileName(basename($path));
-
+    $response->setFileSize($fileUpload->getFileSize());
+    $response->setFileType($fileUpload->getFileType());
+    $response->setFileExtension($fileUpload->getFileExtension());
+    $response->setFileMd5(md5_file($path));
+    
     // get MP3 duration
     $mp3file = new FileMp3($path); 
     $duration = $mp3file->getDuration(); 
     $response->setDuration($duration);
+    
 
     $response->update();
 
