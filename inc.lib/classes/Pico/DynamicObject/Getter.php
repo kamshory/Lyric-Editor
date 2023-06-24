@@ -8,8 +8,16 @@ use stdClass;
 
 class Getter
 {
+    /**
+     * Class parameter
+     *
+     * @var array
+     */
     private $classParams = array();
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $jsonAnnot = new PicoAnnotationParser(get_class($this));

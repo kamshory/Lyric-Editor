@@ -127,6 +127,7 @@ class DynamicObject extends stdClass
 
     /**
      * Set database connection
+     * @var $database
      */
     public function withDatabase($database)
     {
@@ -135,6 +136,13 @@ class DynamicObject extends stdClass
     }
     
 
+    /**
+     * Remove property
+     *
+     * @param object $sourceData
+     * @param array $propertyNames
+     * @return mixed
+     */
     public function removePropertyExcept($sourceData, $propertyNames)
     {
         if(is_object($sourceData))
@@ -352,7 +360,6 @@ class DynamicObject extends stdClass
                 return $property->getDeclaringClass()->getName() == $class->getName();
             }
         );
-
         if($asArrayProps)
         {
             $result = array();
@@ -408,6 +415,12 @@ class DynamicObject extends stdClass
         }
     }
 
+    /**
+     * Convert to array object
+     *
+     * @param array $result
+     * @return array
+     */
     private function toArrayObject($result)
     {
         $instance = array();

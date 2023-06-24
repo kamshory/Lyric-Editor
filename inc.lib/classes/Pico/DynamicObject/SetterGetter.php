@@ -8,8 +8,16 @@ use stdClass;
 
 class SetterGetter
 {
+    /**
+     * Class parameter
+     *
+     * @var array
+     */
     private $classParams = array();
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $jsonAnnot = new PicoAnnotationParser(get_class($this));
@@ -20,6 +28,7 @@ class SetterGetter
             $this->classParams[$paramName] = $vals;
         }
     }
+
     /**
      * Convert snake case to camel case
      *
@@ -32,9 +41,17 @@ class SetterGetter
         return lcfirst(str_replace($separator, '', ucwords($input, $separator)));
     }
 
+    /**
+     * Convert camel case to snake case
+     *
+     * @param string $input
+     * @param string $glue
+     * @return string
+     */
     protected function snakeize($input, $glue = '_') {
         return ltrim(
-            preg_replace_callback('/[A-Z]/', function ($matches) use ($glue) {
+            preg_replace_callback('/[A-Z]/', function ($matches) use ($glue) 
+            {
                 return $glue . strtolower($matches[0]);
             }, $input),
             $glue
@@ -71,12 +88,15 @@ class SetterGetter
 
     /**
      * Get value
+     * 
+     * @var bool $snakeCase
      */
     public function value($snakeCase = false)
     {
         $parentProps = $this->propertyList(true, true);
         $value = new stdClass;
-        foreach ($this as $key => $val) {
+        foreach ($this as $key => $val) 
+        {
             if(!in_array($key, $parentProps))
             {
                 $value->$key = $val;
@@ -85,7 +105,8 @@ class SetterGetter
         if($snakeCase)
         {
             $value2 = new stdClass;
-            foreach ($value as $key => $val) {
+            foreach ($value as $key => $val) 
+            {
                 $key2 = $this->snakeize($key);
                 $value2->$key2 = $val;
             }
@@ -96,7 +117,9 @@ class SetterGetter
 
     /**
      * Property list
+     * 
      * @var bool $reflectSelf
+     * @var bool $asArrayProps
      * @return array
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
@@ -107,7 +130,8 @@ class SetterGetter
         // filter only the calling class properties
         $properties = array_filter(
             $class->getProperties(), 
-            function($property) use($class) { 
+            function($property) use($class) 
+            { 
                 return $property->getDeclaringClass()->getName() == $class->getName();
             }
         );
@@ -115,7 +139,8 @@ class SetterGetter
         if($asArrayProps)
         {
             $result = array();
-            foreach ($properties as $key) {
+            foreach ($properties as $key) 
+            {
                 $prop = $key->name;
                 $result[] = $prop;
             }
@@ -136,17 +161,18 @@ class SetterGetter
      */
     public function __call($method, $params)
     {
-        if (strncasecmp($method, "get", 3) === 0) {
+        if (strncasecmp($method, "get", 3) === 0) 
+        {
             $var = lcfirst(substr($method, 3));
             return isset($this->$var) ? $this->$var : null;
         }
-        if (strncasecmp($method, "set", 3) === 0) {
+        if (strncasecmp($method, "set", 3) === 0) 
+        {
             $var = lcfirst(substr($method, 3));
             $this->$var = $params[0];
             return $this;
         }
     }
-
  
     /**
      * Check if JSON naming strategy is snake case or not
@@ -174,6 +200,11 @@ class SetterGetter
             ;
     }
 
+    /**
+     * toString
+     *
+     * @return string
+     */
     public function __toString()
     {
         $obj = clone $this;

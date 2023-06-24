@@ -1,7 +1,6 @@
 <?php
 namespace Pico\Exception;
 
-
 class NoDatabaseConnectionException extends \Exception
 {
     /**
