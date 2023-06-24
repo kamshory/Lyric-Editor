@@ -117,6 +117,14 @@ class Song extends DynamicObject
     protected $fileMd5;
 
     /**
+     * File upload time
+     *
+     * @var string
+     * @Column (name=file_upload_time)
+     */
+    protected $fileUploadTime;
+
+    /**
      * File size
      *
      * @var float

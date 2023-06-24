@@ -19,15 +19,14 @@ try
     $response->setTimeCreate(date('Y-m-d H:i:s'));
     $response->setIpCreate($_SERVER['REMOTE_ADDR']);
     $response->setAdminCreate('1');
-    $response->insert();
 
-    // get uploaded file path
+    // get uploaded file properties
+    $uploadTime = date('Y-m-d H:i:s');
     $fileUpload = new FileUpload();
     $targetDir = dirname(__DIR__)."/files";
     $fileUpload->upload($_FILES, 'file', $targetDir, $id);
-
     $path = $fileUpload->getFilePath();
-
+    $response->setFileUploadTime($uploadTime);
     $response->setFilePath($path);
     $response->setFileName(basename($path));
     $response->setFileSize($fileUpload->getFileSize());
@@ -39,9 +38,7 @@ try
     $mp3file = new FileMp3($path); 
     $duration = $mp3file->getDuration(); 
     $response->setDuration($duration);
-    
-
-    $response->update();
+    $response->insert();
 
     $restResponse = new PicoResponse();
     $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);

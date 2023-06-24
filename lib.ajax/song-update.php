@@ -31,7 +31,6 @@ try
     $data->setArtistAranger($artist_arranger);
     $data->setAlbumId($album_id);
     $data->setGenreId($genre_id);
-
     $data->setTimeEdit(date('Y-m-d H:i:s'));
     $data->setIpEdit($_SERVER['REMOTE_ADDR']);
     $data->setAdminEdit('1');

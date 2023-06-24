@@ -11,12 +11,21 @@ $pagination = new PicoPagination($cfg->getResultPerPage());
 $subquery = new PicoDatabaseQueryBuilder($database);
 $queryBuilder = new PicoDatabaseQueryBuilder($database);
 
+$order = $pagination->createOrder(array(
+), array(
+  'artist_id',
+  'name',
+  'time_create'
+), 
+'name'
+);
+
 $sql = $queryBuilder->newQuery()
   ->select("artist.*
   ")
   ->from("artist")
   ->where("artist.active = ? ", true)
-  ->orderBy("artist.name asc")
+  ->orderBy($order)
   ->limit($pagination->getLimit())
   ->offset($pagination->getOffset());
 try
