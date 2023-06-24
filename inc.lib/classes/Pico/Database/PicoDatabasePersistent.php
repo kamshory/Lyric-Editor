@@ -186,7 +186,7 @@ class PicoDatabasePersistent
         {
             $columnName = $column[self::KEY_NAME];
             $value = $this->object->get($property);
-            if($this->flagIncludeNull || $value != null)
+            if($this->flagIncludeNull || $value !== null)
             {
                 $value = $queryBuilder->escapeValue($value);
                 $values[$columnName] =  $value;
@@ -212,7 +212,7 @@ class PicoDatabasePersistent
             if(!$this->isPrimaryKeys($columnName, $primaryKeys))
             {
                 $value = $this->object->get($property);
-                if($this->flagIncludeNull || $value != null)
+                if($this->flagIncludeNull || $value !== null)
                 {
                     $value = $queryBuilder->escapeValue($value);
                     $sets[] = "$columnName = $value";

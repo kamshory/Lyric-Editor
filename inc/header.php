@@ -61,6 +61,16 @@
     display: block;
   }
 
+  .dialog-table{
+    width: 100%;
+  }
+  .dialog-table tr td:first-child{
+    width: 35%;
+  }
+  .dialog-table tr td{
+    padding: 2px 0;
+  }
+
   </style>
 </head>
 

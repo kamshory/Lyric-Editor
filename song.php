@@ -41,7 +41,6 @@ $sql = $queryBuilder->newQuery()
 ->leftJoin("artist")->on("artist.artist_id = song.artist_vocal")
 ->leftJoin("genre")->on("genre.genre_id = song.genre_id")
 ->leftJoin("album")->on("album.album_id = album.album_id")
-->where("song.active = ? ", true)
 ->orderBy($order)
 ->limit($pagination->getLimit())
 ->offset($pagination->getOffset());

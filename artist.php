@@ -24,7 +24,6 @@ $sql = $queryBuilder->newQuery()
   ->select("artist.*
   ")
   ->from("artist")
-  ->where("artist.active = ? ", true)
   ->orderBy($order)
   ->limit($pagination->getLimit())
   ->offset($pagination->getOffset());

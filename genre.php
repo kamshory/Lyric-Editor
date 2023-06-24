@@ -24,7 +24,6 @@ $sql = $queryBuilder->newQuery()
   ->select("album.*
   ")
   ->from("album")
-  ->where("album.active = ? ", true)
   ->orderBy($order)
   ->limit($pagination->getLimit())
   ->offset($pagination->getOffset());

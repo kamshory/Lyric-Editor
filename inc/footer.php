@@ -44,7 +44,7 @@
 
 
 
-<div>
+<div class="lazy-dom-container">
     <div class="lazy-dom song-upload-dialog" data-url="lib.ajax/song-upload-dialog.php"></div>
     <div class="lazy-dom album-add-dialog" data-url="lib.ajax/album-add-dialog.php"></div>
     <div class="lazy-dom genre-add-dialog" data-url="lib.ajax/genre-add-dialog.php"></div>

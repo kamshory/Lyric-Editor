@@ -24,7 +24,6 @@ $sql = $queryBuilder->newQuery()
   ->select("album.*
   ")
   ->from("album")
-  ->where("album.active = ? ", true)
   ->orderBy($order)
   ->limit($pagination->getLimit())
   ->offset($pagination->getOffset());
@@ -64,13 +63,38 @@ if($data != null && !empty($data))
   </tbody>
 </table>
 
+<div class="lazy-dom modal-container" data-url="lib.ajax/album-edit-dialog.php"></div>
+
 <script>
+  let editAlbumModal;
   $(document).ready(function(e){
     $(document).on('click', '.edit-data', function(e2){
       e2.preventDefault();
       e2.stopPropagation();
       let albumId = $(this).closest('tr').attr('data-id') || '';
-      console.log(albumId)
+      let dialogSelector = $('.modal-container');
+      dialogSelector.load(dialogSelector.attr('data-url')+'?album_id='+albumId, function(data){
+        let editAlbumModalElem = document.querySelector('#editAlbumDialog');
+        editAlbumModal = new bootstrap.Modal(editAlbumModalElem, {
+          keyboard: false
+        });
+        editAlbumModal.show();
+      })
+    });
+
+    $(document).on('click', '.save-edit-album', function(){
+      let dataSet = $(this).closest('form').serializeArray();
+      $.ajax({
+        type:'POST',
+        url:'lib.ajax/album-update.php',
+        data:dataSet, 
+        dataType:'html',
+        success: function(data)
+        {
+          console.log(data)
+          editAlbumModal.hide();
+        }
+      })
     });
   });
 </script>
