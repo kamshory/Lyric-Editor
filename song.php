@@ -40,7 +40,7 @@ $sql = $queryBuilder->newQuery()
 ->from("song")
 ->leftJoin("artist")->on("artist.artist_id = song.artist_vocal")
 ->leftJoin("genre")->on("genre.genre_id = song.genre_id")
-->leftJoin("album")->on("album.album_id = album.album_id")
+->leftJoin("album")->on("album.album_id = song.album_id")
 ->orderBy($order)
 ->limit($pagination->getLimit())
 ->offset($pagination->getOffset());
@@ -68,7 +68,7 @@ if($data != null && !empty($data))
     {
       $no++;
       $song = new Song($row);
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?song_id=".$album->getSongId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?song_id=".$song->getSongId();
     ?>
     <tr>
       <th scope="row"><?php echo $no;?></th>

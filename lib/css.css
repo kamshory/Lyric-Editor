@@ -167,8 +167,6 @@
     padding: 3px;
 }
 
-
-
 .tab-content {
     padding: 10px 0;
 }
@@ -293,4 +291,34 @@ input[type=range]+datalist option:first-child {
 input[type=range]+datalist option:last-child {
     width: calc((100% - 12px) / ((var(--list-length) - 1) * 2) + 6px);
     text-align: right;
+}
+
+.srt-cm {
+    position: absolute;
+    z-index: 100;
+    min-width: 200px;
+    border: 1px solid #DDDDDD;
+    display: none;
+
+}
+
+.cm-wrapper {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.cm-wrapper li {
+    background-color: #F8F8F8;
+}
+
+.cm-wrapper li:hover {
+    background-color: #FAFAFA;
+}
+
+.cm-wrapper li a {
+    padding: 10px 20px;
+    display: block;
+    text-decoration: none;
+    color: #555555;
 }

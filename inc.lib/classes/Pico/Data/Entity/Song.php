@@ -149,6 +149,14 @@ class Song extends DynamicObject
     protected $lyric;
 
     /**
+     * Comment
+     *
+     * @var string
+     * @Column (name=comment)
+     */
+    protected $comment;
+
+    /**
      * Rate
      *
      * @var float

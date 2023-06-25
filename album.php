@@ -2,6 +2,7 @@
 use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
+use Pico\Data\Dto\AlbumDto;
 use Pico\Data\Entity\Album;
 
 require_once "inc/auth.php";
@@ -21,8 +22,7 @@ $order = $pagination->createOrder(array(
 );
 
 $sql = $queryBuilder->newQuery()
-  ->select("album.*
-  ")
+  ->select("album.*")
   ->from("album")
   ->orderBy($order)
   ->limit($pagination->getLimit())
@@ -40,6 +40,9 @@ if($data != null && !empty($data))
       <th scope="col" width="20"><i class="ti ti-edit"></i></th>
       <th scope="col" width="20">#</th>
       <th scope="col">Name</th>
+      <th scope="col">Duration</th>
+      <th scope="col">Song</th>
+      <th scope="col">Active</th>
     </tr>
   </thead>
   <tbody>
@@ -48,13 +51,16 @@ if($data != null && !empty($data))
     foreach($data as $row)
     {
       $no++;
-      $album = new Album($row);
+      $album = AlbumDto::valueOf(new Album($row));
       $linkEdit = basename($_SERVER['PHP_SELF'])."?album_id=".$album->getAlbumId();
     ?>
     <tr data-id="<?php echo $album->getAlbumId();?>">
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkEdit;?>"><?php echo $album->getName();?></a></td>
+      <td><?php echo $album->getDuration();?></td>
+      <td><?php echo $album->getNumberOfSong();?></td>
+      <td><?php echo $album->getActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
     }

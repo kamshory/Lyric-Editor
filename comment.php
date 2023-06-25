@@ -124,21 +124,21 @@ $song = new Song(array('song_id'=>@$_GET['song_id']), $database);
 $song->select();
 if($song != null)
 {
-    $lyric = $song->getLyric();
-    if(strlen(trim($lyric)) == 0)
+    $comment = $song->getComment();
+    if(strlen(trim($comment)) == 0)
     {
-        $lyric = "{type here}";
+        $comment = "{type here}";
     }
-    if(stripos($lyric, "-->") === false)
+    if(stripos($comment, "-->") === false)
     {
-        $lyric = "00:00:00,000 --> 00:00:01,000\r\n".$lyric;
+        $comment = "00:00:00,000 --> 00:00:01,000\r\n".$comment;
     }
 ?>
 <script>
     let song_id = '<?php echo $song->getSongId(); ?>';
     let path = '<?php echo $cfg->getSongBaseUrl();?>/<?php echo $song->getFileName(); ?>';
-    let jsonData = <?php echo json_encode(array('lyric'=>$lyric)); ?>;
-    let rawData = jsonData.lyric;
+    let jsonData = <?php echo json_encode(array('comment'=>$comment)); ?>;
+    let rawData = jsonData.comment;
 </script>
 <script>
     let srt;
@@ -181,37 +181,37 @@ if($song != null)
         document.querySelector('.button-save-master').addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            saveLyric();
+            saveComment();
         });
         document.querySelector('.button-reset-master').addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            resetLyric();
+            resetComment();
         });
 
         document.onkeydown = function(e) {
             if (e.ctrlKey && e.keyCode === 83) {
                 e.preventDefault();
                 e.stopPropagation();
-                saveLyric();
+                saveComment();
             }
         };
     });
-    function resetLyric()
+    function resetComment()
     {
          $.ajax({
             type:'GET',
-            url:'lib.ajax/lyric-load.php',
+            url:'lib.ajax/comment-load.php',
             data:{song_id:song_id},
             dataType:'json',
             success:function(data)
             {
-                rawData:data.lyric;
+                rawData:data.comment;
                 srt.initData(rawData, path)
             }
         });
     }
-    function saveLyric()
+    function saveComment()
     {
         if(srt.zoomLevelIndex < srt.zoomLevelIndexOriginal)
         {
@@ -220,9 +220,9 @@ if($song != null)
         srt.updateData();
         let duration = srt.duration;
         rawData = srt.getFinalResult();
-        ajax.post('lib.ajax/lyric-save.php', {
+        ajax.post('lib.ajax/comment-save.php', {
             song_id: song_id,
-            lyric: rawData,
+            comment: rawData,
             duration: duration
         }, function(response, status) {
         });

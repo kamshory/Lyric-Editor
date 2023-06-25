@@ -3,6 +3,7 @@
 use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Dto\AlbumDto;
 use Pico\Data\Entity\Album;
+use Pico\Data\Entity\Song;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
@@ -25,6 +26,19 @@ $data->setActive($active);
 
 try
 {
+    $song = new Song(null, $database);
+    $songs = $song->findByAlbumId($album_id);
+    $duration = 0;
+    $number_of_song = 0;
+    foreach($songs as $val)
+    {
+        $duration += $val->getDuration();
+        $number_of_song ++;
+    }
+
+    $data->setDuration($duration);
+    $data->setNumberOfSong($number_of_song);
+
     $data->update();
     $restResponse = new PicoResponse();
     $response = AlbumDto::valueOf($data);
