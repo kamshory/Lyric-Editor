@@ -8,7 +8,7 @@ use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 
-$album_id = htmlspecialchars(trim(@$_POST['album_id']));
+$album_id = trim(@$_POST['album_id']);
 $name = htmlspecialchars(trim(@$_POST['name']));
 $release_date = trim(@$_POST['release_date']);
 $active = trim(@$_POST['active']) == '1' || trim(@$_POST['active']) == 'true';

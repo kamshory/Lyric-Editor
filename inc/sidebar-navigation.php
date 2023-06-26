@@ -26,11 +26,11 @@
             </a>
         </li>
         <li class="sidebar-item">
-            <a class="sidebar-link" href="subtitle.php" aria-expanded="false">
+            <a class="sidebar-link" href="lyric.php" aria-expanded="false">
                 <span>
                     <i class="ti ti-file-description"></i>
                 </span>
-                <span class="hide-menu">Subtitle</span>
+                <span class="hide-menu">Lyric</span>
             </a>
         </li>
         <li class="sidebar-item">
