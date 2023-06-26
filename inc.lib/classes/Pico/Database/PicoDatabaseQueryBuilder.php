@@ -60,8 +60,22 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		return $this;
 	}
 	public function values($query)
-	{
-		$this->buffer .= "values $query \r\n";
+	{	
+		$count = func_num_args();
+		if($count > 1)
+		{
+			$params = array();
+			for($i = 0; $i<$count; $i++)
+			{
+				$params[] = func_get_arg($i);
+			}
+			$buffer = $this->createMatchedValue($params);
+			$this->buffer .= "values $buffer \r\n";
+		}
+		else
+		{
+			$this->buffer .= "values $query \r\n";
+		}
 		return $this;
 	}
 	public function delete()
@@ -114,7 +128,21 @@ class PicoDatabaseQueryBuilder // NOSONAR
 
 	public function set($query)
 	{
-		$this->buffer .= "set $query \r\n";
+		$count = func_num_args();
+		if($count > 1)
+		{
+			$params = array();
+			for($i = 0; $i<$count; $i++)
+			{
+				$params[] = func_get_arg($i);
+			}
+			$buffer = $this->createMatchedValue($params);
+			$this->buffer .= "set $buffer \r\n";
+		}
+		else
+		{
+			$this->buffer .= "set $query \r\n";
+		}	
 		return $this;
 	}
 
@@ -128,7 +156,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			{
 				$params[] = func_get_arg($i);
 			}
-			$buffer = $this->createFilter($params);
+			$buffer = $this->createMatchedValue($params);
 			$this->buffer .= "where $buffer \r\n";
 		}
 		else
@@ -138,7 +166,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		return $this;
 	}
 
-	public function createFilter($args)
+	public function createMatchedValue($args)
 	{
 		$result = "";
 		if(count($args) > 1)
