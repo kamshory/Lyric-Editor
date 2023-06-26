@@ -2,7 +2,8 @@
 
 namespace Pico\Util;
 
-class PicoHttpCache{
+class PicoHttpCache
+{
     public static function cacheLifetime($lifetime)
     {
         $ts = gmdate("D, d M Y H:i:s", time() + $lifetime) . " GMT";

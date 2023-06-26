@@ -54,6 +54,4 @@ class PicoSelectOption
     {
         return json_encode($this->data);
     }
-
-    
 }

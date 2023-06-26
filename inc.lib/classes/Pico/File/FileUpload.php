@@ -87,8 +87,6 @@ class FileUpload
         $this->fileExtension = $file_ext;
     }
 
-    
-
     /**
      * Get maximum file length
      *
