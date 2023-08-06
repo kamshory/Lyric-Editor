@@ -1,221 +1,168 @@
 <?php
+
 namespace Pico\Data\Entity;
 
 use Pico\DynamicObject\DynamicObject;
 
 /**
- * Song
  * @Entity
- * @Table (name=song)
+ * @JSON(property-naming-strategy=SNAKE_CASE)
+ * @Table(name="song")
  */
 class Song extends DynamicObject
 {
-    /**
-     * Song ID
-     *
-     * @var string
-     * @Column (name=song_id)
-     * @Id
-     * @NotNull
-     */
-    protected $songId;    
+	/**
+	 * @Id
+	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @NotNull
+	 * @Column(name="song_id", type="varchar(50)", length=50, nullable=false)
+	 * @var string
+	 */
+	protected $songId;
 
-    /**
-     * Random song ID
-     *
-     * @var string
-     * @Column (name=random_song_id)
-     */
-    protected $randomSongId;
+	/**
+	 * @Column(name="random_song_id", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $randomSongId;
 
-    /**
-     * Title
-     *
-     * @var string
-     * @Column (name=title)
-     */
-    protected $title;
+	/**
+	 * @Column(name="title", type="text", nullable=true)
+	 * @var string
+	 */
+	protected $title;
 
-    /**
-     * Album ID
-     *
-     * @var string
-     * @Column (name=album_id)
-     */
-    protected $albumId;
+	/**
+	 * @Column(name="album_id", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $albumId;
 
-    /**
-     * Artist Vocal
-     *
-     * @var string
-     * @Column (name=artist_vocal)
-     */
-    protected $artistVocal;
+	/**
+	 * @Column(name="artist_vocal", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $artistVocal;
 
-    /**
-     * Artist Composer
-     *
-     * @var string
-     * @Column (name=artist_composer)
-     */
-    protected $artistComposer;
+	/**
+	 * @Column(name="artist_composer", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $artistComposer;
 
-    /**
-     * Artist Arranger
-     *
-     * @var string
-     * @Column (name=artist_arranger)
-     */
-    protected $artistArranger;
+	/**
+	 * @Column(name="artist_arranger", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $artistArranger;
 
-    /**
-     * File path
-     *
-     * @var string
-     * @Column (name=file_path)
-     */
-    protected $filePath;
+	/**
+	 * @Column(name="file_path", type="text", nullable=true)
+	 * @var string
+	 */
+	protected $filePath;
 
-    /**
-     * File base name
-     *
-     * @var string
-     * @Column (name=file_name)
-     */
-    protected $fileName;
+	/**
+	 * @Column(name="file_name", type="varchar(100)", length=100, nullable=true)
+	 * @var string
+	 */
+	protected $fileName;
 
-    /**
-     * File type
-     *
-     * @var string
-     * @Column (name=file_type)
-     */
-    protected $fileType;
+	/**
+	 * @Column(name="file_type", type="varchar(100)", length=100, nullable=true)
+	 * @var string
+	 */
+	protected $fileType;
 
-    /**
-     * File extension
-     *
-     * @var string
-     * @Column (name=file_extension)
-     */
-    protected $fileExtension;
+	/**
+	 * @Column(name="file_extension", type="varchar(20)", length=20, nullable=true)
+	 * @var string
+	 */
+	protected $fileExtension;
 
-    /**
-     * File size
-     *
-     * @var integer
-     * @Column (name=file_size)
-     */
-    protected $fileSize;
+	/**
+	 * @Column(name="file_size", type="bigint(20)", length=20, nullable=true)
+	 * @var integer
+	 */
+	protected $fileSize;
 
-    /**
-     * File MD5
-     *
-     * @var string
-     * @Column (name=file_md5)
-     */
-    protected $fileMd5;
+	/**
+	 * @Column(name="file_md5", type="varchar(32)", length=32, nullable=true)
+	 * @var string
+	 */
+	protected $fileMd5;
 
-    /**
-     * File upload time
-     *
-     * @var string
-     * @Column (name=file_upload_time)
-     */
-    protected $fileUploadTime;
+	/**
+	 * @Column(name="file_upload_time", type="timestamp", length=19, nullable=true)
+	 * @var string
+	 */
+	protected $fileUploadTime;
 
-    /**
-     * File size
-     *
-     * @var float
-     * @Column (name=duration)
-     */
-    protected $duration;
+	/**
+	 * @Column(name="duration", type="float", nullable=true)
+	 * @var double
+	 */
+	protected $duration;
 
-    /**
-     * Genre ID
-     *
-     * @var string
-     * @Column (name=genre_id)
-     */
-    protected $genreId;
+	/**
+	 * @Column(name="genre_id", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $genreId;
 
-    /**
-     * Lyric
-     *
-     * @var string
-     * @Column (name=lyric)
-     */
-    protected $lyric;
+	/**
+	 * @Column(name="lyric", type="longtext", nullable=true)
+	 * @var string
+	 */
+	protected $lyric;
 
-    /**
-     * Comment
-     *
-     * @var string
-     * @Column (name=comment)
-     */
-    protected $comment;
+	/**
+	 * @Column(name="comment", type="longtext", nullable=true)
+	 * @var string
+	 */
+	protected $comment;
 
-    /**
-     * Rate
-     *
-     * @var float
-     * @Column (name=rate)
-     */
-    protected $rate;
+	/**
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $timeCreate;
 
-    /**
-     * Time create
-     *
-     * @var string
-     * @Column (name=time_create)
-     */
-    protected $timeCreate;
+	/**
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @var string
+	 */
+	protected $timeEdit;
 
-    /**
-     * Time edit
-     *
-     * @var string
-     * @Column (name=time_edit)
-     */
-    protected $timeEdit;
+	/**
+	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $ipCreate;
 
-    /**
-     * IP create
-     *
-     * @var string
-     * @Column (name=ip_create)
-     */
-    protected $ipCreate;
+	/**
+	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $ipEdit;
 
-    /**
-     * IP edit
-     *
-     * @var string
-     * @Column (name=ip_edit)
-     */
-    protected $ipEdit;
+	/**
+	 * @Column(name="admin_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $adminCreate;
 
-    /**
-     * Admin create
-     *
-     * @var string
-     * @Column (name=admin_create)
-     */
-    protected $adminCreate;
+	/**
+	 * @Column(name="admin_edit", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $adminEdit;
 
-    /**
-     * Admin edit
-     *
-     * @var string
-     * @Column (name=admin_edit)
-     */
-    protected $adminEdit;
-  
-    /**
-     * Active
-     * @var bool
-     * @Column (name=active)
-     */
-    protected $active;
+	/**
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @DefaultColumn(value="1")
+	 * @var bool
+	 */
+	protected $active;
+
 }
