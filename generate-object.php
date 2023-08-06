@@ -88,6 +88,10 @@ function createProperty($typeMap, $columnName, $columnType, $columnKey, $columnN
     {
         $docs[] = "\t * @GeneratedValue(strategy=GenerationType.IDENTITY)";
     }
+    else
+    {
+        $docs[] = "\t * @GeneratedValue(strategy=GenerationType.UUID)";
+    }
 
     if(strcasecmp($columnNull, 'No') == 0)
     {
