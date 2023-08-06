@@ -3,7 +3,7 @@
 use Pico\DynamicObject\DynamicObject;
 use Pico\Util\StringUtil;
 
-require_once __DIR__ . "/lib.inc/auth.php";
+require_once __DIR__ . "/inc/auth.php";
 
 $picoTableName = "";
 
@@ -25,9 +25,7 @@ if(empty($picoTableName))
 }
 
 $className = ucfirst(StringUtil::camelize($picoTableName));
-//$namespace = "KSPS\\Entity\\Master";
-$namespace = "KSPS\\Entity\\Reference";
-//$namespace = "Pico\\CMS\\Entity\\Master";
+$namespace = "Pico\\Data\\Entity";
 
 $fileName = $namespace."/".$className;
 $path = __DIR__ . "/inc.lib/classes/".$fileName.".php";
@@ -176,7 +174,7 @@ function getLength($str)
     }
     return $length;
 }
-$rows = $database1->fetchAll($sql);
+$rows = $database->fetchAll($sql);
 
 $attrs = [];
 foreach($rows as $row)
