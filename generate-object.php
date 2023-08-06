@@ -82,17 +82,17 @@ function createProperty($typeMap, $columnName, $columnType, $columnKey, $columnN
     if(!empty($columnKey) && stripos($columnKey, "PRI") === 0)
     {
         $docs[] = "\t * @Id";
+        if(stripos("auto_increment", $columnExtra) === false)
+        {
+            $docs[] = "\t * @GeneratedValue(strategy=GenerationType.UUID)";
+        }
     }
 
     if(stripos("auto_increment", $columnExtra) !== false)
     {
         $docs[] = "\t * @GeneratedValue(strategy=GenerationType.IDENTITY)";
     }
-    else
-    {
-        $docs[] = "\t * @GeneratedValue(strategy=GenerationType.UUID)";
-    }
-
+ 
     if(strcasecmp($columnNull, 'No') == 0)
     {
         $docs[] = "\t * @NotNull";
