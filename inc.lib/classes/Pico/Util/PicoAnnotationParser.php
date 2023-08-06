@@ -2,6 +2,7 @@
 
 namespace Pico\Util;
 
+use Pico\Exception\ZeroArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -45,7 +46,6 @@ class PicoAnnotationParser
      * Reflection
      * @var ReflectionClass|ReflectionMethod|ReflectionProperty
      */
-
     private $reflection;
 
     /**
@@ -59,7 +59,7 @@ class PicoAnnotationParser
         // get reflection from class or class/method
         // (depends on constructor arguments)
         if ($count === 0) {
-            throw new \Exception("No zero argument constructor allowed");
+            throw new ZeroArgumentException("No zero argument constructor allowed");
         } else if ($count === 1) {
             $reflection = new ReflectionClass($arguments[0]);
         } else {
@@ -78,7 +78,7 @@ class PicoAnnotationParser
 
     /**
      * Get properties
-     * 
+     *
      * @return array
      */
     public function getProperties()
@@ -86,24 +86,31 @@ class PicoAnnotationParser
         return $this->reflection->getProperties();
     }
 
+    /**
+     * Parse single annotation
+     *
+     * @param string $key
+     * @return array
+     */
     private function parseSingle($key)
     {
+        $ret = null;
         if (isset($this->parameters[$key])) {
-            return $this->parameters[$key];
+            $ret = $this->parameters[$key];
         } else {
             if (preg_match("/@" . preg_quote($key) . $this->endPattern . "/", $this->rawDocBlock, $match)) {
-                return TRUE;
+                $ret = true;
             } else {
                 preg_match_all("/@" . preg_quote($key) . "(.*)" . $this->endPattern . "/U", $this->rawDocBlock, $matches);
                 $size = sizeof($matches[1]);
 
                 // not found
                 if ($size === 0) {
-                    return NULL;
+                    $ret = null;
                 }
                 // found one, save as scalar
                 elseif ($size === 1) {
-                    return $this->parseValue($matches[1][0]);
+                    $ret = $this->parseValue($matches[1][0]);
                 }
                 // found many, save as array
                 else {
@@ -111,12 +118,18 @@ class PicoAnnotationParser
                     foreach ($matches[1] as $elem) {
                         $this->parameters[$key][] = $this->parseValue($elem);
                     }
-                    return $this->parameters[$key];
+                    $ret = $this->parameters[$key];
                 }
             }
         }
+        return $ret;
     }
 
+    /**
+     * Parse annotation
+     *
+     * @return void
+     */
     private function parse()
     {
         $pattern = "/@(?=(.*)" . $this->endPattern . ")/U";
@@ -132,13 +145,19 @@ class PicoAnnotationParser
                     $this->parameters[$match[1]] = $parsedValue;
                 }
             } else if (preg_match("/^" . $this->keyPattern . "$/", $rawParameter, $match)) {
-                $this->parameters[$rawParameter] = TRUE;
+                $this->parameters[$rawParameter] = true;
             } else {
-                $this->parameters[$rawParameter] = NULL;
+                $this->parameters[$rawParameter] = null;
             }
         }
     }
 
+    /**
+     * Get declared variables
+     *
+     * @param string $name
+     * @return string[]
+     */
     public function getVariableDeclarations($name)
     {
         $declarations = (array)$this->getParameter($name);
@@ -148,6 +167,13 @@ class PicoAnnotationParser
         return $declarations;
     }
 
+    /**
+     * Get declared variable
+     *
+     * @param mixed $declaration
+     * @param string $name
+     * @return string[]
+     */
     private function parseVariableDeclaration($declaration, $name)
     {
         $type = gettype($declaration);
@@ -179,6 +205,12 @@ class PicoAnnotationParser
         return $declaration;
     }
 
+    /**
+     * Parse value
+     *
+     * @param string $originalValue
+     * @return array
+     */
     private function parseValue($originalValue)
     {
         if ($originalValue && $originalValue !== 'null') {
@@ -195,37 +227,79 @@ class PicoAnnotationParser
     }
 
     /**
+     * Get parameters
+     * 
      * @return array
      */
     public function getParameters()
     {
         if (!$this->parsedAll) {
             $this->parse();
-            $this->parsedAll = TRUE;
+            $this->parsedAll = true;
         }
         return $this->parameters;
     }
 
+    /**
+     * Get parameter
+     *
+     * @param string $key
+     * @return array
+     */
     public function getParameter($key)
     {
         return $this->parseSingle($key);
     }
 
+    /**
+     * Parse parameters. Note that all numeric attributes will be started with underscore (_). Do not use it as is
+     *
+     * @param string $queryString
+     * @return string[]
+     */
     public function parseKeyValue($queryString)
     {
-        // Please test with https://regex101.com/
+        // For every modification, please test regular expression with https://regex101.com/
+    
+        // parse attributes with quotes
+        $regex1 = '/([_\-\w+]+)\=\"([a-zA-Z0-9\-\+ _,.\(\)\{\}\`\~\!\@\#\$\%\^\*\\\|\<\>\[\]\/&%?=:;\'\t\r\n|\r|\n]+)\"/m'; // NOSONAR
+        preg_match_all($regex1, $queryString, $matches1);
+        $pair1 = array_combine($matches1[1], $matches1[2]);
         
-        // parse with quotes
-        $regex1 = '/([_\-\w+]+)\=\"([a-zA-Z0-9\-\+ _,.\(\)\{\}\`\~\!\@\#\$\%\^\*\\\|\<\>\[\]\/&%?=:;\'\t\r\n|\r|\n]+)\"/m';
-        preg_match_all($regex1, $queryString, $matches);
-        $pair1 = array_combine($matches[1], $matches[2]);
+        // parse attributes without quotes
+        $regex2 = '/([_\-\w+]+)\=([a-zA-Z0-9._]+)/m'; // NOSONAR
+        preg_match_all($regex2, $queryString, $matches2);
+        $pair2 = array_combine($matches2[1], $matches2[2]);
         
-        // parse without quotes
-        $regex2 = '/([_\-\w+]+)\=([a-zA-Z0-9._]+)/m';
-        preg_match_all($regex2, $queryString, $matches);
-        $pair2 = array_combine($matches[1], $matches[2]);
+        // merge $pair1 and $pair2 into $pair3
+        $pair3 = array_merge($pair1, $pair2);
         
-        // merge result
-        return array_merge($pair1, $pair2);
+        // parse attributes without any value
+        $regex3 = '/([\w\=\-\_"]+)/m'; // NOSONAR
+        preg_match_all($regex3, $queryString, $matches3);
+        
+        $pair4 = array();
+        if(isset($matches3) && isset($matches3[0]) && is_array($matches3[0]))
+        {
+            $keys = array_keys($pair3);
+            foreach($matches3[0] as $val)
+            {
+                if(stripos($val, '=') === false && stripos($val, '"') === false && stripos($val, "'") === false && !in_array($val, $keys))
+                {
+                    if(is_numeric($val))
+                    {
+                        // prepend attribute with underscore due unexpected array key
+                        $pair4["_".$val] = true;
+                    }
+                    else
+                    {
+                        $pair4[$val] = true;
+                    }
+                }
+            }
+        }
+        
+        // merge $pair3 and $pair4 into result
+        return array_merge($pair3, $pair4);
     }
 }

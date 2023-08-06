@@ -22,16 +22,47 @@ class PicoEnvironmentVariable
                 }
                 else
                 {
-                    $value = $this->replaceSysEnv($value);
+                    $value = $this->replaceWithEnvironmentVariable($value);
                 }
             }
             else
             {
-                $value = $this->replaceSysEnv($value);
+                $value = $this->replaceWithEnvironmentVariable($value);
             }
             $values[$key] = $value;
         }
         return $values;
+    }
+    
+    /**
+     * Replace string with environment variable nane from a string
+     *
+     * @param string $value
+     * @return string
+     */
+    public function replaceWithEnvironmentVariable($value)
+    {
+        $result = $value;
+        $regex = '/\$\\{([^}]+)\\}/m';
+        preg_match_all($regex, $value, $matches);
+        $pair = array_combine($matches[0], $matches[1]);  
+        if(!empty($pair))
+        {
+            foreach($pair as $key=>$value)
+            {
+                $systemEnv = getenv($value);
+                if($systemEnv === false)
+                {
+                    // not found
+                }
+                else
+                {
+                    // found
+                    $result = str_replace($key, $systemEnv, $result);
+                }
+            }
+        }
+        return $result;
     }
 
     /**
@@ -56,7 +87,7 @@ class PicoEnvironmentVariable
     }
 
     /**
-     * Get environment variable nane from a string
+     * Get environment variable name from a string
      *
      * @param string $value
      * @return array
