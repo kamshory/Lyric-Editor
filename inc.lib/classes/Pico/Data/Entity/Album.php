@@ -1,62 +1,90 @@
 <?php
+
 namespace Pico\Data\Entity;
 
 use Pico\DynamicObject\DynamicObject;
 
 /**
  * @Entity
- * @Table (name=album)
+ * @JSON(property-naming-strategy=SNAKE_CASE)
+ * @Table(name="album")
  */
 class Album extends DynamicObject
 {
-    /**
-     * Album ID
-     *
-     * @var string
-     * @Column (name=album_id)
-     * @Id
-     */
-    protected $albumId;
+	/**
+	 * @Id
+	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @NotNull
+	 * @Column(name="album_id", type="varchar(50)", length=50, nullable=false)
+	 * @var string
+	 */
+	protected $albumId;
 
-    /**
-     * Title
-     *
-     * @var string
-     * @Column (name=name)
-     */
-    protected $name;
+	/**
+	 * @Column(name="name", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $name;
 
-    /**
-     * Release date
-     *
-     * @var string
-     * @Column (name=release_date)
-     */
-    protected $releaseDate;
+	/**
+	 * @Column(name="release_date", type="date", nullable=true)
+	 * @var string
+	 */
+	protected $releaseDate;
 
-    /**
-     * Number of song
-     *
-     * @var integer
-     * @Column (name=number_of_song)
-     * @Value (minimum=0)
-     */
-    protected $numberOfSong;
+	/**
+	 * @Column(name="number_of_song", type="int(11)", length=11, nullable=true)
+	 * @var integer
+	 */
+	protected $numberOfSong;
 
-    /**
-     * Total duration
-     *
-     * @var float
-     * @Column (name=duration)
-     * @Value (minimum=0)
-     */
-    protected $duration;
+	/**
+	 * @Column(name="duration", type="float", nullable=true)
+	 * @var double
+	 */
+	protected $duration;
 
-    /**
-     * Active
-     *
-     * @var bool
-     * @Column (name=active)
-     */
-    protected $active;
+	/**
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $timeCreate;
+
+	/**
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @var string
+	 */
+	protected $timeEdit;
+
+	/**
+	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $adminCreate;
+
+	/**
+	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+	 * @var string
+	 */
+	protected $adminEdit;
+
+	/**
+	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $ipCreate;
+
+	/**
+	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $ipEdit;
+
+	/**
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @DefaultColumn(value="1")
+	 * @var bool
+	 */
+	protected $active;
+
 }
