@@ -117,7 +117,7 @@ function createProperty($typeMap, $columnName, $columnType, $columnKey, $columnN
         $attrs[] = "nullable=$val";
     }
 
-    if($columnName == "waktu_buat" || $columnName == "admin_buat" || $columnName == "ip_buat")
+    if($columnName == "time_create" || $columnName == "admin_create" || $columnName == "ip_create")
     {
         $attrs[] = "updatable=false";
     }
