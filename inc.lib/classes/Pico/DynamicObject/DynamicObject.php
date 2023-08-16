@@ -661,9 +661,10 @@ class DynamicObject extends stdClass // NOSONAR
      * Find all
      *
      * @param string $orderType
+     * @param bool $passive
      * @return array
      */
-    private function _findAll($orderType = null)
+    private function _findAll($orderType = null, $passive = false)
     {
         if($this->database != null && $this->database->isConnected())
         {
@@ -671,7 +672,7 @@ class DynamicObject extends stdClass // NOSONAR
             $result = $persist->findAll($orderType);
             if($result != null && !empty($result))
             {
-                return $this->toArrayObject($result);
+                return $this->toArrayObject($result, $passive);
             }
             else
             {
@@ -718,9 +719,10 @@ class DynamicObject extends stdClass // NOSONAR
      * @param string $method
      * @param mixed $params
      * @param string $orderType
+     * @param bool $passive
      * @return array
      */
-    private function findBy($method, $params, $orderType = null)
+    private function findBy($method, $params, $orderType = null, $passive = false)
     {
         if($this->database != null && $this->database->isConnected())
         {
@@ -728,12 +730,32 @@ class DynamicObject extends stdClass // NOSONAR
             $result = $persist->findBy($method, $params, $orderType);
             if($result != null && !empty($result))
             {
-                return $this->toArrayObject($result);
+                return $this->toArrayObject($result, $passive);
             }
             else
             {
                 throw new NoRecordFoundException(self::NO_RECORD_FOUND);
             }
+        }
+        else
+        {
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+        }
+    }
+    
+    /**
+     * Delete by params
+     *
+     * @param string $method
+     * @param mixed $params
+     * @return bool
+     */
+    private function deleteBy($method, $params)
+    {
+        if($this->database != null && $this->database->isConnected())
+        {
+            $persist = new PicoDatabasePersistent($this->database, $this);
+            return $persist->deleteBy($method, $params);
         }
         else
         {
@@ -771,6 +793,27 @@ class DynamicObject extends stdClass // NOSONAR
     }
     
     /**
+     * Exists by params
+     *
+     * @param string $method
+     * @param mixed $params
+     * @param string $orderType
+     * @return array
+     */
+    private function existsBy($method, $params)
+    {
+        if($this->database != null && $this->database->isConnected())
+        {
+            $persist = new PicoDatabasePersistent($this->database, $this);
+            return $persist->existsBy($method, $params);
+        }
+        else
+        {
+            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+        }
+    }
+    
+    /**
      * Convert boolean to text
      *
      * @param string $propertyName
@@ -795,15 +838,16 @@ class DynamicObject extends stdClass // NOSONAR
      * Convert to array object
      *
      * @param array $result
+     * @param bool $passive
      * @return array
      */
-    private function toArrayObject($result)
+    private function toArrayObject($result, $passive = false)
     {
         $instance = array();
         foreach($result as $value)
         {
             $className = get_class($this);
-            $instance[] = new $className($value, $this->database);
+            $instance[] = new $className($value, $passive ? null : $this->database);
         }
         return $instance;
     }
@@ -841,9 +885,17 @@ class DynamicObject extends stdClass // NOSONAR
      * findAll &raquo; search data from database without filter
      * findAllAsc &raquo; search data from database without filter order by primary keys ascending
      * findAllDesc &raquo; search data from database without filter order by primary keys descending
+     * listBy &raquo; search data from database. Similar to findBy but does not contain a connection to the database so objects cannot be saved directly to the database
+     * listAscBy &raquo; search data from database order by primary keys ascending. Similar to findAscBy but does not contain a connection to the database so objects cannot be saved directly to the database
+     * listDescBy &raquo; search data from database order by primary keys descending. Similar to findDescBy but does not contain a connection to the database so objects cannot be saved directly to the database
+     * listAll &raquo; search data from database without filter. Similar to findAll but does not contain a connection to the database so objects cannot be saved directly to the database
+     * listAllAsc &raquo; search data from database without filter order by primary keys ascending. Similar to findAllAsc but does not contain a connection to the database so objects cannot be saved directly to the database
+     * listAllDesc &raquo; search data from database without filter order by primary keys descending. Similar to findAllDesc but does not contain a connection to the database so objects cannot be saved directly to the database
+     * deleteBy &raquo; delete data from database without read it first
      * booleanToTextBy &raquo; convert boolean value to yes/no or true/false depend on parameters given. Example: $result = booleanToTextByActive("Yes", "No"); If $obj->active is true, $result will be "Yes" otherwise "No"
      * booleanToSelectedBy &raquo; Create selected="selected" for form
      * booleanToCheckedBy &raquo; Create checked="checked" for form
+     * existsBy &raquo; check data from database
      *
      * @param string $method
      * @param mixed $params
@@ -901,6 +953,31 @@ class DynamicObject extends stdClass // NOSONAR
         }
         else if ($method == "findAllDesc") {
             return $this->_findAll(PicoDatabasePersistent::ORDER_DESC);
+        }     
+        else if (strncasecmp($method, "listBy", 6) === 0) {
+            $var = lcfirst(substr($method, 6));
+            return $this->findBy($var, $params, null, true);
+        }
+        else if (strncasecmp($method, "listAscBy", 9) === 0) {
+            $var = lcfirst(substr($method, 9));
+            return $this->findBy($var, $params, PicoDatabasePersistent::ORDER_ASC, true);
+        }
+        else if (strncasecmp($method, "listDescBy", 10) === 0) {
+            $var = lcfirst(substr($method, 10));
+            return $this->findBy($var, $params, PicoDatabasePersistent::ORDER_DESC, true);
+        }
+        else if ($method == "listAll") {
+            return $this->_findAll(null, true);
+        }
+        else if ($method == "listAllAsc") {
+            return $this->_findAll(PicoDatabasePersistent::ORDER_ASC, true);
+        }
+        else if ($method == "listAllDesc") {
+            return $this->_findAll(PicoDatabasePersistent::ORDER_DESC, true);
+        }
+        else if (strncasecmp($method, "deleteBy", 8) === 0) {
+            $var = lcfirst(substr($method, 8));
+            return $this->deleteBy($var, $params, null, true);
         }
         else if (strncasecmp($method, "booleanToTextBy", 15) === 0) {
             $prop = lcfirst(substr($method, 15));
@@ -913,6 +990,10 @@ class DynamicObject extends stdClass // NOSONAR
         else if (strncasecmp($method, "booleanToCheckedBy", 18) === 0) {
             $prop = lcfirst(substr($method, 18));
             return $this->booleanToTextBy($prop, array(' cheked="checked"', ''));
+        }
+        else if (strncasecmp($method, "existsBy", 8) === 0) {
+            $var = lcfirst(substr($method, 8));
+            return $this->existsBy($var, $params);
         }
     }
 

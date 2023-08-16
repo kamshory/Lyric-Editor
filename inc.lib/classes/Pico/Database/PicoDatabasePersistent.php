@@ -1,4 +1,5 @@
 <?php
+
 namespace Pico\Database;
 
 use Exception;
@@ -6,10 +7,8 @@ use PDO;
 use PDOStatement;
 use Pico\Exception\EmptyResultException;
 use Pico\Exception\NoColumnMatchException;
-use Pico\Exception\NoColumnUpdatedException;
 use Pico\Exception\NoInsertableColumnException;
 use Pico\Exception\NoPrimaryKeyDefinedException;
-use Pico\Exception\NotNullColumnException;
 use Pico\Exception\NoUpdatableColumnException;
 use Pico\Util\PicoAnnotationParser;
 use stdClass;
@@ -865,6 +864,68 @@ class PicoDatabasePersistent // NOSONAR
             {
                 $data = null;
             }
+        }
+        catch(Exception $e)
+        {
+            throw new EmptyResultException($e->getMessage());
+        }
+        return $data;
+    }
+    
+    /**
+     * Check if data is exists or not
+     *
+     * @param string $propertyName
+     * @param mixed $propertyValue
+     * @return boolean
+     */
+    public function existsBy($propertyName, $propertyValue)
+    {
+        $info = $this->getTableInfo();
+        $primaryKeys = array_values($info->primaryKeys);
+        $primaryKey = $primaryKeys[0][self::KEY_NAME];
+        $where = $this->createWhereFromArgs($info, $propertyName, $propertyValue);
+        $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
+        $data = null;
+        $sqlQuery = $queryBuilder
+            ->newQuery()
+            ->select($primaryKey)
+            ->from($info->tableName)
+            ->where($where);
+        try
+        {
+            $stmt = $this->database->executeQuery($sqlQuery);
+            return $this->matchRow($stmt) > 0;
+        }
+        catch(Exception $e)
+        {
+            throw new EmptyResultException($e->getMessage());
+        }
+        return $data;
+    }
+    
+    /**
+     * Delete data from database without read it first
+     *
+     * @param string $propertyName
+     * @param mixed $propertyValue
+     * @return boolean
+     */
+    public function deleteBy($propertyName, $propertyValue)
+    {
+        $info = $this->getTableInfo();
+        $where = $this->createWhereFromArgs($info, $propertyName, $propertyValue);
+        $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
+        $data = null;
+        $sqlQuery = $queryBuilder
+            ->newQuery()
+            ->delete()
+            ->from($info->tableName)
+            ->where($where);
+        try
+        {
+            $stmt = $this->database->executeQuery($sqlQuery);
+            return $this->matchRow($stmt) > 0;
         }
         catch(Exception $e)
         {

@@ -50,7 +50,7 @@ class SetterGetter
      */
     protected function snakeize($input, $glue = '_') {
         return ltrim(
-            preg_replace_callback('/[A-Z]/', function ($matches) use ($glue) 
+            preg_replace_callback('/[A-Z]/', function ($matches) use ($glue)
             {
                 return $glue . strtolower($matches[0]);
             }, $input),
@@ -83,19 +83,19 @@ class SetterGetter
     {
         $var = lcfirst($propertyName);
         $var = $this->camelize($var);
-        return isset($this->$var) ? $this->$var : null;   
+        return isset($this->$var) ? $this->$var : null;
     }
 
     /**
      * Get value
-     * 
+     *
      * @var bool $snakeCase
      */
     public function value($snakeCase = false)
     {
         $parentProps = $this->propertyList(true, true);
         $value = new stdClass;
-        foreach ($this as $key => $val) 
+        foreach ($this as $key => $val)
         {
             if(!in_array($key, $parentProps))
             {
@@ -105,7 +105,7 @@ class SetterGetter
         if($snakeCase)
         {
             $value2 = new stdClass;
-            foreach ($value as $key => $val) 
+            foreach ($value as $key => $val)
             {
                 $key2 = $this->snakeize($key);
                 $value2->$key2 = $val;
@@ -117,7 +117,7 @@ class SetterGetter
 
     /**
      * Property list
-     * 
+     *
      * @var bool $reflectSelf
      * @var bool $asArrayProps
      * @return array
@@ -129,9 +129,9 @@ class SetterGetter
 
         // filter only the calling class properties
         $properties = array_filter(
-            $class->getProperties(), 
-            function($property) use($class) 
-            { 
+            $class->getProperties(),
+            function($property) use($class)
+            {
                 return $property->getDeclaringClass()->getName() == $class->getName();
             }
         );
@@ -139,7 +139,7 @@ class SetterGetter
         if($asArrayProps)
         {
             $result = array();
-            foreach ($properties as $key) 
+            foreach ($properties as $key)
             {
                 $prop = $key->name;
                 $result[] = $prop;
@@ -161,19 +161,24 @@ class SetterGetter
      */
     public function __call($method, $params)
     {
-        if (strncasecmp($method, "get", 3) === 0) 
+        if (strncasecmp($method, "is", 2) === 0) 
+        {
+            $var = lcfirst(substr($method, 2));
+            return isset($this->$var) ? $this->$var == 1 : false;
+        } 
+        else if (strncasecmp($method, "get", 3) === 0)
         {
             $var = lcfirst(substr($method, 3));
             return isset($this->$var) ? $this->$var : null;
         }
-        if (strncasecmp($method, "set", 3) === 0) 
+        else if (strncasecmp($method, "set", 3) === 0)
         {
             $var = lcfirst(substr($method, 3));
             $this->$var = $params[0];
             return $this;
         }
     }
- 
+
     /**
      * Check if JSON naming strategy is snake case or not
      *
@@ -181,10 +186,20 @@ class SetterGetter
      */
     private function isSnake()
     {
-        return isset($this->classParams['JSON']) 
-            && isset($this->classParams['JSON']['property-naming-strategy']) 
+        return isset($this->classParams['JSON'])
+            && isset($this->classParams['JSON']['property-naming-strategy'])
             && strcasecmp($this->classParams['JSON']['property-naming-strategy'], 'SNAKE_CASE') == 0
             ;
+    }
+    
+    /**
+     * Check if JSON naming strategy is camel case or not
+     *
+     * @return boolean
+     */
+    protected function isCamel()
+    {
+        return !$this->isSnake();
     }
 
     /**
@@ -194,8 +209,8 @@ class SetterGetter
      */
     private function isPretty()
     {
-        return isset($this->classParams['JSON']) 
-            && isset($this->classParams['JSON']['prettify']) 
+        return isset($this->classParams['JSON'])
+            && isset($this->classParams['JSON']['prettify'])
             && strcasecmp($this->classParams['JSON']['prettify'], 'true') == 0
             ;
     }

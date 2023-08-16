@@ -70,11 +70,6 @@
   .dialog-table tr td{
     padding: 2px 0;
   }
-
-
-
-  
-
   </style>
 </head>
 
