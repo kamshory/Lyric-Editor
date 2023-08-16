@@ -50,12 +50,13 @@ if($data != null && !empty($data))
     {
       $no++;
       $genre = new Genre($row);
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?genre_id=".$genre->getGenreId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&genre_id=".$genre->getGenreId();
+      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&genre_id=".$genre->getGenreId();
     ?>
     <tr data-id="<?php echo $genre->getGenreId();?>">
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo $linkEdit;?>"><?php echo $genre->getName();?></a></td>
+      <td><a href="<?php echo $linkDetail;?>"><?php echo $genre->getName();?></a></td>
       <td><?php echo $genre->getActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php

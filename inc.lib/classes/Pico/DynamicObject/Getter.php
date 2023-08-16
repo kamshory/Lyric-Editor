@@ -6,7 +6,7 @@ use Pico\Util\PicoAnnotationParser;
 use ReflectionClass;
 use stdClass;
 
-class Getter
+class Getter extends stdClass
 {
     /**
      * Class parameter
@@ -28,6 +28,21 @@ class Getter
             $this->classParams[$paramName] = $vals;
         }
     }
+    
+    /**
+     * Load data to object
+     * @param mixed $data
+     */
+    public function loadData($data)
+    {
+        if (is_array($data) || is_object($data)) {
+            foreach ($data as $key => $value) {
+                $key2 = $this->camelize(str_replace("-", "_", $key));
+                $this->{$key2} = $value;
+            }
+        }
+    }
+    
     /**
      * Convert snake case to camel case
      *
@@ -133,9 +148,13 @@ class Getter
             $var = lcfirst(substr($method, 3));
             return isset($this->$var) ? $this->$var : null;
         }
+        if (strncasecmp($method, "equals", 6) === 0) {
+            $var = lcfirst(substr($method, 6));
+            $value = isset($this->$var) ? $this->$var : null;
+            return isset($params[0]) && $params[0] == $value;
+        }
     }
 
- 
     /**
      * Check if JSON naming strategy is snake case or not
      *
@@ -172,4 +191,6 @@ class Getter
         }
         return json_encode($obj->value($this->isSnake()), $json_flag);
     }
+    
+    
 }

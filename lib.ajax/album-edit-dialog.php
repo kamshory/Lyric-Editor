@@ -1,21 +1,28 @@
 <?php
 
 use Pico\Data\Entity\Album;
+use Pico\Exception\NoRecordFoundException;
+use Pico\Request\PicoRequest;
 
 require_once dirname(__DIR__)."/inc/auth.php";
-
-$album = new Album(array('album_id'=>trim(@$_GET['album_id'])), $database);
-$album->select();
+$inputGet = new PicoRequest(INPUT_GET);
+$album = new Album(null, $database);
 ?>
 <form action="">
     <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="editAlbumDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editAlbumDialogLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editAlbumDialogLabel">Add Album</h5>
+                    <h5 class="modal-title" id="editAlbumDialogLabel">Edit Album</h5>
                     <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    
+                    <?php
+                    try
+                    {                     
+                    $album->findOneByAlbumId($inputGet->getAlbumId());
+                    ?>
                     <table class="dialog-table">
                         <tbody>
                             <tr>
@@ -33,6 +40,19 @@ $album->select();
                         </tbody>
                         <input type="hidden" name="album_id" value="<?php echo $album->getAlbumId();?>">
                     </table>
+                    <?php
+                    }
+                    catch(NoRecordFoundException $e)
+                    {
+                        ?>
+                        <div class="alert alert-warning"><?php echo $e->getMessage();?></div>
+                        <?php
+                    }
+                    catch(Exception $e)
+                    {
+                        
+                    }
+                    ?>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success save-edit-album">OK</button>

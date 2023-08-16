@@ -3,9 +3,48 @@ use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
 use Pico\Data\Entity\Artist;
+use Pico\Exception\NoRecordFoundException;
+use Pico\Request\PicoRequest;
 
 require_once "inc/auth.php";
 require_once "inc/header.php";
+
+$inputGet = new PicoRequest(INPUT_GET);
+if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getArtistId() != null)
+{
+  $artist = new Artist(null, $database);
+  try
+  {
+  $artist->findOneByArtistId($inputGet->getArtistId());
+  ?>
+  <table class="table table-responsive">
+    <tbody>
+      <tr>
+        <td>Artist ID</td>
+        <td><?php echo $artist->getArtistId();?></td>
+      </tr>
+      <tr>
+        <td>Name</td>
+        <td><?php echo $artist->getName();?></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <?php
+  }
+  catch(NoRecordFoundException $e)
+  {
+    ?>
+    <div class="alert alert-warning"><?php echo $e->getMessage();?></div>
+    <?php
+  }
+  catch(Exception $e)
+  {
+    
+  }
+}
+else
+{
 
 $pagination = new PicoPagination($cfg->getResultPerPage()); 
 $subquery = new PicoDatabaseQueryBuilder($database);
@@ -49,11 +88,13 @@ if($data != null && !empty($data))
     {
       $no++;
       $artist = new Artist($row);
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?artist_id=".$artist->getArtistId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&artist_id=".$artist->getArtistId();
+      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&artist_id=".$artist->getArtistId();
     ?>
-    <tr>
+    <tr data-id="<?php echo $artist->getArtistId();?>">
+      <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo $linkEdit;?>"><?php echo $artist->getName();?></a></td>
+      <td><a href="<?php echo $linkDetail;?>"><?php echo $artist->getName();?></a></td>
     </tr>
     <?php
     }
@@ -61,6 +102,42 @@ if($data != null && !empty($data))
     
   </tbody>
 </table>
+
+<div class="lazy-dom modal-container" data-url="lib.ajax/artist-edit-dialog.php"></div>
+
+<script>
+  let editArtistModal;
+  $(document).ready(function(e){
+    $(document).on('click', '.edit-data', function(e2){
+      e2.preventDefault();
+      e2.stopPropagation();
+      let artistId = $(this).closest('tr').attr('data-id') || '';
+      let dialogSelector = $('.modal-container');
+      dialogSelector.load(dialogSelector.attr('data-url')+'?artist_id='+artistId, function(data){
+        let editArtistModalElem = document.querySelector('#editArtistDialog');
+        editArtistModal = new bootstrap.Modal(editArtistModalElem, {
+          keyboard: false
+        });
+        editArtistModal.show();
+      })
+    });
+
+    $(document).on('click', '.save-edit-artist', function(){
+      let dataSet = $(this).closest('form').serializeArray();
+      $.ajax({
+        type:'POST',
+        url:'lib.ajax/artist-update.php',
+        data:dataSet, 
+        dataType:'html',
+        success: function(data)
+        {
+          console.log(data)
+          editArtistModal.hide();
+        }
+      })
+    });
+  });
+</script>
 
 <?php
 }
@@ -74,6 +151,7 @@ catch(Exception $e)
    ?>
  </div>
  <?php
+}
 }
 
 require_once "inc/footer.php";

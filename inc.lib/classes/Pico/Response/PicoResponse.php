@@ -4,7 +4,6 @@ namespace Pico\Response;
 
 use Pico\Constants\PicoConstants;
 use Pico\Constants\PicoHttpStatus;
-use Pico\Response\Generated\PicoSelectOption;
 use \stdClass;
 
 class PicoResponse

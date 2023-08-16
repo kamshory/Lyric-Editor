@@ -68,11 +68,12 @@ if($data != null && !empty($data))
     {
       $no++;
       $midi = new Midi($row);
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?midi_id=".$midi->getMidiId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&midi_id=".$midi->getMidiId();
+      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&midi_id=".$midi->getMidiId();
     ?>
     <tr>
       <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo $linkEdit;?>"><?php echo $midi->getTitle();?></a></td>
+      <td><a href="<?php echo $linkDetail;?>"><?php echo $midi->getTitle();?></a></td>
       <td><?php echo $midi->getArtisName();?></td>
       <td><?php echo $midi->getAlbumName();?></td>
       <td><?php echo $midi->getDuration();?></td>

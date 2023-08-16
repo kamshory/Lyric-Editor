@@ -4,10 +4,61 @@ use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
 use Pico\Data\Dto\AlbumDto;
 use Pico\Data\Entity\Album;
+use Pico\Exception\NoRecordFoundException;
+use Pico\Request\PicoRequest;
 
 require_once "inc/auth.php";
 require_once "inc/header.php";
 
+$inputGet = new PicoRequest(INPUT_GET);
+if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getAlbumId() != null)
+{
+  $album = new Album(null, $database);
+  try
+  {
+  $album->findOneByAlbumId($inputGet->getAlbumId());
+  ?>
+  
+  <table class="table table-responsive">
+    <tbody>
+      <tr>
+        <td>Album ID</td>
+        <td><?php echo $album->getAlbumId();?></td>
+      </tr>
+      <tr>
+        <td>Name</td>
+        <td><?php echo $album->getName();?></td>
+      </tr>
+      <tr>
+        <td>Release Date</td>
+        <td><?php echo $album->getReleaseDate();?></td>
+      </tr>
+      <tr>
+        <td>Number of Song</td>
+        <td><?php echo $album->getNumberOfSong();?></td>
+      </tr>
+      <tr>
+        <td>Duration</td>
+        <td><?php echo $album->getDuration();?></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <?php
+  }
+  catch(NoRecordFoundException $e)
+  {
+    ?>
+    <div class="alert alert-warning"><?php echo $e->getMessage();?></div>
+    <?php
+  }
+  catch(Exception $e)
+  {
+    
+  }
+}
+else
+{
 $pagination = new PicoPagination($cfg->getResultPerPage()); 
 $subquery = new PicoDatabaseQueryBuilder($database);
 $queryBuilder = new PicoDatabaseQueryBuilder($database);
@@ -52,12 +103,13 @@ if($data != null && !empty($data))
     {
       $no++;
       $album = AlbumDto::valueOf(new Album($row));
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?album_id=".$album->getAlbumId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&album_id=".$album->getAlbumId();
+      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&album_id=".$album->getAlbumId();
     ?>
     <tr data-id="<?php echo $album->getAlbumId();?>">
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo $linkEdit;?>"><?php echo $album->getName();?></a></td>
+      <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $album->getName();?></a></td>
       <td><?php echo $album->getDuration();?></td>
       <td><?php echo $album->getNumberOfSong();?></td>
       <td><?php echo $album->getActive() ? 'Yes' : 'No';?></td>
@@ -97,12 +149,18 @@ if($data != null && !empty($data))
         dataType:'html',
         success: function(data)
         {
-          console.log(data)
           editAlbumModal.hide();
+          let formData = getFormData(dataSet);
+          console.log(formData)
+          let name = formData.name;
+          $('.text-data.text-data-name').text(name);
         }
       })
     });
   });
+  
+  
+  
 </script>
 
 <?php
@@ -117,6 +175,7 @@ catch(Exception $e)
    ?>
  </div>
  <?php
+}
 }
 
 require_once "inc/footer.php";
