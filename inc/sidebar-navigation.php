@@ -18,6 +18,14 @@
             <span class="hide-menu">Data</span>
         </li>
         <li class="sidebar-item">
+            <a class="sidebar-link" href="midi.php" aria-expanded="false">
+                <span>
+                    <i class="ti ti-article"></i>
+                </span>
+                <span class="hide-menu">Midi</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
             <a class="sidebar-link" href="song.php" aria-expanded="false">
                 <span>
                     <i class="ti ti-article"></i>
