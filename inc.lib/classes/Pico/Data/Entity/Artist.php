@@ -27,6 +27,12 @@ class Artist extends DynamicObject
 	protected $name;
 
 	/**
+	 * @Column(name="stage_name", type="varchar(100)", length=100, nullable=true)
+	 * @var string
+	 */
+	protected $stageName;
+
+	/**
 	 * @Column(name="gender", type="varchar(2)", length=2, nullable=true)
 	 * @var string
 	 */

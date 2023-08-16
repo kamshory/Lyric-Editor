@@ -121,7 +121,7 @@ if($data != null && !empty($data))
   </tbody>
 </table>
 
-<div class="lazy-dom modal-container" data-url="lib.ajax/album-edit-dialog.php"></div>
+<div class="lazy-dom modal-container" data-url="lib.ajax/album-update-dialog.php"></div>
 
 <script>
   let editAlbumModal;

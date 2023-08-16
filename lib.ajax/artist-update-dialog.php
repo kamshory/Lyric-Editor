@@ -29,14 +29,22 @@ $artist = new Artist(null, $database);
                             </tr>
                             <tr>
                                 <td>Gender</td>
-                                <td><input type="text" class="form-control" name="sex" value="<?php echo $artist->getGender();?>"></td>
+                                <td><select class="form-control" name="gender" id="gender">
+                                <option value="M"<?php echo $artist->equalsGender("M")?" selected":"";?>>Man</option>
+                                <option value="W"<?php echo $artist->equalsGender("W")?" selected":"";?>>Woman</option>
+                                </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Birtth Day</td>
+                                <td><input type="date" class="form-control" name="birth_day" value="<?php echo $artist->getBirthDay();?>"></td>
                             </tr>
                             <tr>
                                 <td>Active</td>
                                 <td><label></label><input type="checkbox" name="active" value="1" <?php echo $artist->getActive() == 1 ?' checked':'';?>> Active</label></td>
                             </tr>
                         </tbody>
-                        <input type="hidden" name="artist_id" value="<?php echo $artist->getAlbumId();?>">
+                        <input type="hidden" name="artist_id" value="<?php echo $artist->getArtistId();?>">
                     </table>
                     <?php
                     }

@@ -148,7 +148,7 @@ class Getter extends stdClass
             $var = lcfirst(substr($method, 3));
             return isset($this->$var) ? $this->$var : null;
         }
-        if (strncasecmp($method, "equals", 6) === 0) {
+        else if (strncasecmp($method, "equals", 6) === 0) {
             $var = lcfirst(substr($method, 6));
             $value = isset($this->$var) ? $this->$var : null;
             return isset($params[0]) && $params[0] == $value;

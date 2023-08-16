@@ -3,11 +3,13 @@
 use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Dto\AlbumDto;
 use Pico\Data\Entity\Album;
+use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 $id = $database->generateNewId();
-$name = htmlspecialchars(trim(@$_POST['name']));
+$inputPost = new PicoRequest(INPUT_POST);
+$name = htmlspecialchars(trim($inputPost->getName()));
 
 if(empty($name))
 {
