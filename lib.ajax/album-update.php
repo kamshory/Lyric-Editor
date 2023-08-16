@@ -10,7 +10,8 @@ use Pico\Response\PicoResponse;
 require_once dirname(__DIR__)."/inc/auth.php";
 
 $inputPost = new PicoRequest(INPUT_POST);
-
+$inputPost->filterName(FILTER_SANITIZE_SPECIAL_CHARS);
+$inputPost->checkboxActive(false);
 $album = new Album($inputPost, $database);
 
 try

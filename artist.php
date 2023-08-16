@@ -78,7 +78,10 @@ if($data != null && !empty($data))
     <tr>
       <th scope="col" width="20"><i class="ti ti-edit"></i></th>
       <th scope="col" width="20">#</th>
-      <th scope="col">Name</th>
+      <th scope="col">Real Name</th>
+      <th scope="col">Stage Name</th>
+      <th scope="col">Gender</th>
+      <th scope="col">Active</th>
     </tr>
   </thead>
   <tbody>
@@ -94,7 +97,10 @@ if($data != null && !empty($data))
     <tr data-id="<?php echo $artist->getArtistId();?>">
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo $linkDetail;?>"><?php echo $artist->getName();?></a></td>
+      <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $artist->getName();?></a></td>
+      <td class="text-data text-data-stage_name"><?php echo $artist->getStageName();?></td>
+      <td class="text-data text-data-gender"><?php echo $artist->getGender() == 'M' ? 'Man' : 'Woman';?></td>
+      <td class="text-data text-data-active"><?php echo $artist->getActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
     }
@@ -131,8 +137,17 @@ if($data != null && !empty($data))
         dataType:'html',
         success: function(data)
         {
-          console.log(data)
           editArtistModal.hide();
+          let formData = getFormData(dataSet);
+          let dataId = formData.artist_id;
+          let name = formData.name;
+          let stage_name = formData.stage_name;
+          let gender = formData.gender;
+          let active = $('[name="active"]')[0].checked;
+          $('[data-id="'+dataId+'"] .text-data.text-data-name').text(name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-stage_name').text(stage_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-gender').text(gender=='M'?'Man':'Woman');
+          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(active?'Yes':'No');
         }
       })
     });

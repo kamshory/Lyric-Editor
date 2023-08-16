@@ -112,7 +112,7 @@ if($data != null && !empty($data))
       <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $album->getName();?></a></td>
       <td><?php echo $album->getDuration();?></td>
       <td><?php echo $album->getNumberOfSong();?></td>
-      <td><?php echo $album->getActive() ? 'Yes' : 'No';?></td>
+      <td class="text-data text-data-active"><?php echo $album->getActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
     }
@@ -151,9 +151,11 @@ if($data != null && !empty($data))
         {
           editAlbumModal.hide();
           let formData = getFormData(dataSet);
-          console.log(formData)
+          let dataId = formData.album_id;
           let name = formData.name;
-          $('.text-data.text-data-name').text(name);
+          let active = $('[name="active"]')[0].checked;
+          $('[data-id="'+dataId+'"] .text-data.text-data-name').text(name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(active?'Yes':'No');
         }
       })
     });
