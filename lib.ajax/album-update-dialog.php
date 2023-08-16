@@ -6,6 +6,7 @@ use Pico\Request\PicoRequest;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 $inputGet = new PicoRequest(INPUT_GET);
+$inputGet->setActive($inputGet->equalsActive("1"));
 $album = new Album(null, $database);
 ?>
 <form action="">

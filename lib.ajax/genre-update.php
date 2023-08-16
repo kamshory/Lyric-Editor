@@ -3,27 +3,29 @@
 use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Dto\GenreDto;
 use Pico\Data\Entity\Genre;
+use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
-$genre_id = htmlspecialchars(trim(@$_POST['genre_id']));
-$name = htmlspecialchars(trim(@$_POST['name']));
-$active = trim(@$_POST['active']) == '1' || trim(@$_POST['active']) == 'true';
 
-if(empty($genre_id) || empty($name))
+$inputPost = new PicoRequest(INPUT_POST);
+$inputPost->filterName(FILTER_SANITIZE_SPECIAL_CHARS);
+$inputPost->checkboxActive(false);
+
+$genreId = $inputPost->getGenreId();
+$name = $inputPost->getName();
+if(empty($genreId) || empty($name))
 {
     exit();
 }
 
-$data = new Genre(null, $database);
-$data->setGenreId($genre_id);
-$data->setName($name);
-$data->setActive($active);
+$genre = new Genre($inputPost, $database);
+
 try
 {
-    $data->update();
+    $genre->update();
     $restResponse = new PicoResponse();
-    $response = GenreDto::valueOf($data);
+    $response = GenreDto::valueOf($genre);
     $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);
 }
 catch(Exception $e)

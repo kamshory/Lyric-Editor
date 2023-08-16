@@ -2,12 +2,15 @@
 
 use Pico\Constants\PicoHttpStatus;
 use Pico\Database\PicoDatabaseQueryBuilder;
+use Pico\Request\PicoRequest;
 use Pico\Response\Generated\PicoSelectOption;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 
-$defautValue = trim(@$_GET['current_value']);
+$inputGet = new PicoRequest(INPUT_GET);
+
+$defautValue = $inputGet->getCurrentValue();
 $queryBuilder = new PicoDatabaseQueryBuilder($database);
 $queryBuilder
     ->newQuery()

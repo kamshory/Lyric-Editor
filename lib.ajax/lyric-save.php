@@ -1,26 +1,18 @@
 <?php
 
 use Pico\Data\Entity\Song;
+use Pico\Request\PicoRequest;
 
 require_once dirname(__DIR__)."/inc/auth.php";
-$song_id = trim(@$_POST['song_id']);
-$lyric = @$_POST['lyric'];
-$duration = trim(@$_POST['duration']);
 
-if(empty($song_id))
+$inputPost = new PicoRequest(INPUT_POST);
+$songId = $inputPost->getSongId();
+
+if(empty($songId))
 {
     exit();
 }
-
-$song = new Song(null, $database);
-$song->setSongId($song_id);
-$song->setLyric($lyric);
-
-if($duration != '')
-{
-    $song->setDuration($duration * 1);
-}
-
+$song = new Song($inputPost, $database);
 try
 {
     $song->update();

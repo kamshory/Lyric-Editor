@@ -2,9 +2,7 @@
 
 namespace Pico\Request;
 
-use Pico\DynamicObject\Getter;
-
-class PicoRequest extends Getter
+class PicoRequest extends PicoRequestTool
 {
     const ACTION_DETAIL = "detail";
     const ACTION_EDIT = "edit";
@@ -23,5 +21,6 @@ class PicoRequest extends Getter
         {
             $this->loadData($_COOKIE);
         }
-    }    
+    }
+        
 }

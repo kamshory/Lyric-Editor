@@ -3,37 +3,38 @@
 use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Dto\GenreDto;
 use Pico\Data\Entity\Genre;
+use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
-$id = $database->generateNewId();
-$name = htmlspecialchars(trim(@$_POST['name']));
+$inputPost = new PicoRequest(INPUT_POST);
+// check box only sent if it checeked
+// if active is null, then set to false
+$inputPost->checkboxActive(false);
+// filter name
+$inputPost->filterName(FILTER_SANITIZE_SPECIAL_CHARS);
+// filter stage name
+$inputPost->filterStageName(FILTER_SANITIZE_SPECIAL_CHARS);
+$genre = new Genre($inputPost, $database);
 
-if(empty($name))
-{
-    exit();
-}
-
-$data = new Genre(null, $database);
-$data->setGenreId($id);
-$data->setName($name);
-$data->setActive(true);
 try
 {
-    $saved = $data->findByName($name);
-    if($saved && !empty($saved))
+    $savedData = new Genre(null, $database);
+    $saved = $savedData->findOneByName($name);
+    if($saved->getGenreId() != "")
     {
-       $data->setGenreId($saved[0]->getGenreId());
+        $genre->setGenreId($saved->getGenreId());
     }
     else
     {
         $data->save();
-    }
-    $restResponse = new PicoResponse();
-    $response = GenreDto::valueOf($data);
-    $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);
+    }  
 }
 catch(Exception $e)
 {
-    // do nothing
+    $genre->update();
 }
+
+$restResponse = new PicoResponse();
+$response = GenreDto::valueOf($genre);
+$restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);

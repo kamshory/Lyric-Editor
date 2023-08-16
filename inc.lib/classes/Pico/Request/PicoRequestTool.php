@@ -1,12 +1,12 @@
 <?php
 
-namespace Pico\DynamicObject;
+namespace Pico\Request;
 
 use Pico\Util\PicoAnnotationParser;
 use ReflectionClass;
 use stdClass;
 
-class SetterGetter
+class PicoRequestTool
 {
     /**
      * Class parameter
@@ -201,6 +201,27 @@ class SetterGetter
             $this->$var = isset($this->$var) ? $this->$var : $params[0];
             return $this;
         }
+        else if (strncasecmp($method, "filter", 6) === 0) {
+            $var = lcfirst(substr($method, 6));
+            $this->$var = $this->applyFilter($this->$var, $params[0]);
+            return $this;
+        }
+    }
+    
+    private function applyFilter($value, $filterType)
+    {
+        if(isset($value))
+        {
+            if($filterType == FILTER_SANITIZE_SPECIAL_CHARS)
+            {
+                return htmlspecialchars($value);
+            }
+            else
+            {
+                return $value;
+            }
+        }
+        return null;
     }
 
     /**

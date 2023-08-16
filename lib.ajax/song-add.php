@@ -4,14 +4,16 @@ use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Entity\Song;
 use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Exception\NoRecordFoundException;
+use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
-$id = $database->generateNewId();
+$songId = $database->generateNewId();
 
-$_POST['title'] = htmlspecialchars(trim(@$_POST['title']));
+$inputPost = new PicoRequest(INPUT_POST);
+$inputPost->filterTitle(FILTER_SANITIZE_SPECIAL_CHARS);
 
-$randomSongId = trim(@$_POST['random_song_id']);
+$randomSongId = $inputPost->getRandomSongId();
 
 $data = new Song();
 if(!empty($randomSongId))
@@ -21,26 +23,26 @@ if(!empty($randomSongId))
     {
         $saved = $savedData->findByRandomSongId($randomSongId);
         $data = $saved[0];
-        $id = $data->getSongId();
+        $songId = $data->getSongId();
     }
     catch(NoRecordFoundException $e)
     {
         // do nothing
-        $data = new Song($_POST, $database); 
-        $data->setSongId($id);
+        $data = new Song($inputPost, $database); 
+        $data->setSongId($songId);
         $data->setActive(true);    
     }
 }
 else
 {
     $data = new Song($_POST, $database);
-    $data->setSongId($id);
+    $data->setSongId($songId);
     $data->setActive(true);
 }
 
 try
 {
-    $postData = $data->removePropertyExcept($_POST, 
+    $postData = $data->removePropertyExcept($inputPost, 
         array(
             'title',
             'artist_vocal',
@@ -50,7 +52,7 @@ try
             'genre_id'
         )
     );
- 
+
     foreach($postData as $key=>$val)
     {
         $data->set($key, $val);

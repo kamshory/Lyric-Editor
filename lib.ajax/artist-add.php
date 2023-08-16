@@ -3,34 +3,26 @@
 use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Dto\ArtistDto;
 use Pico\Data\Entity\Artist;
+use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
-$id = $database->generateNewId();
-$name = htmlspecialchars(trim(@$_POST['name']));
 
-if(empty($name))
-{
-    exit();
-}
+$inputPost = new PicoRequest(INPUT_POST);
+// check box only sent if it checeked
+// if active is null, then set to false
+$inputPost->checkboxActive(false);
+// filter name
+$inputPost->filterName(FILTER_SANITIZE_SPECIAL_CHARS);
+// filter stage name
+$inputPost->filterStageName(FILTER_SANITIZE_SPECIAL_CHARS);
+$artist = new Artist($inputPost, $database);
 
-$data = new Artist(null, $database);
-$data->setArtistId($id);
-$data->setName($name);
-$data->setActive(true);
 try
 {
-    $saved = $data->findByName($name);
-    if($saved && !empty($saved))
-    {
-        $data->setArtistId($saved[0]->getArtistId());
-    }
-    else
-    {
-        $data->save();
-    }
+    $artist->save();
     $restResponse = new PicoResponse();
-    $response = ArtistDto::valueOf($data);
+    $response = ArtistDto::valueOf($artist);
     $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);
 }
 catch(Exception $e)

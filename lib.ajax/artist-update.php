@@ -9,6 +9,13 @@ use Pico\Response\PicoResponse;
 require_once dirname(__DIR__)."/inc/auth.php";
 
 $inputPost = new PicoRequest(INPUT_POST);
+// check box only sent if it checeked
+// if active is null, then set to false
+$inputPost->checkboxActive(false);
+// filter name
+$inputPost->filterName(FILTER_SANITIZE_SPECIAL_CHARS);
+// filter stage name
+$inputPost->filterStageName(FILTER_SANITIZE_SPECIAL_CHARS);
 $artist = new Artist($inputPost, $database);
 
 try
