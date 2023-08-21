@@ -25,7 +25,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getMidiId() !
 
   <div class="srt-editor editor1">
       <div class="row">
-          <div class="col col-7">
+          <div class="col col-7" style="display: none;">
               <ul class="nav nav-tabs" id="myTab" role="tablist">
                   <li class="nav-item" role="presentation">
                       <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Timeline</button>
@@ -55,7 +55,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getMidiId() !
           </div>
           <div class="col col-5">
               <div class="player">
-                  <div class="text-display-container">
+                  <div class="text-display-container" style="display: none;">
                       <div class="text-display">
                           <div class="text-display-inner d-flex align-items-center justify-content-center"></div>
                       </div>
