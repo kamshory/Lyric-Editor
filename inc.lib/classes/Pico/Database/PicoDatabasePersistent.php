@@ -1279,7 +1279,15 @@ class PicoDatabasePersistent // NOSONAR
     {
         $info = $this->getTableInfo();
         $primaryKeys = array_values($info->primaryKeys);
-        $primaryKey = $primaryKeys[0][self::KEY_NAME];
+        if(is_array($primaryKeys) && isset($primaryKeys[0][self::KEY_NAME]))
+        {
+            // it will be faster than asterisk
+            $agg = $primaryKeys[0][self::KEY_NAME];
+        }
+        else
+        {
+            $agg = "*";
+        }
         $where = $this->createWhereFromArgs($info, $propertyName, $propertyValue);
         if(!$this->isValidFilter($where))
         {
@@ -1288,7 +1296,7 @@ class PicoDatabasePersistent // NOSONAR
         $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
         $sqlQuery = $queryBuilder
             ->newQuery()
-            ->select($primaryKey)
+            ->select($agg)
             ->from($info->tableName)
             ->where($where);
         try
