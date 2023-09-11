@@ -3,6 +3,10 @@ namespace Pico\Database;
 
 class PicoDatabaseQueryBuilder // NOSONAR
 {
+	const DATABASE_TYPE_MYSQL = "mysql";
+	const DATABASE_TYPE_MARIADB = "mariadb";
+	const DATABASE_TYPE_POSTGRESQL = "postgresql";
+	
 	/**
 	 * Buffer
 	 *
@@ -37,6 +41,13 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 * @var string
 	 */
 	private $databaseType = "mysql";
+	
+	/**
+	 * Flag that value has been set
+	 *
+	 * @var boolean
+	 */
+	private $hasValues = false;
 
 	/**
 	 * Database
@@ -52,7 +63,15 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		else
 		{
 			$this->databaseType = $databaseType;
-		}	
+		}
+	}
+	
+	/**
+	 * Get the value of databaseType
+	 */
+	public function getDatabaseType()
+	{
+		return $this->databaseType;
 	}
 
 	/**
@@ -62,7 +81,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function isMySql()
 	{
-		return strcasecmp($this->databaseType, "mysql") == 0 || strcasecmp($this->databaseType, "mariadb") == 0;
+		return strcasecmp($this->databaseType, self::DATABASE_TYPE_MYSQL) == 0 || strcasecmp($this->databaseType, self::DATABASE_TYPE_MARIADB) == 0;
 	}
 
 	/**
@@ -72,7 +91,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function isPgSql()
 	{
-		return strcasecmp($this->databaseType, "postgresql") == 0;
+		return strcasecmp($this->databaseType, self::DATABASE_TYPE_POSTGRESQL) == 0;
 	}
 
 	/**
@@ -84,6 +103,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	{
 		$this->buffer = "";
 		$this->limitOffset = false;
+		$this->hasValues = false;
 		return $this;
 	}
 
@@ -137,38 +157,72 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	/**
 	 * Create field statement
 	 *
-	 * @param string $query
+	 * @param mixed $query
 	 * @return self
 	 */
 	public function fields($query)
 	{
-		$this->buffer .= "$query \r\n";
+		if(is_array($query))
+		{
+			$this->buffer .= "(".implode(", ", $query).") \r\n";
+		}
+		else
+		{
+			$this->buffer .= "$query \r\n";
+		}
 		return $this;
 	}
 
 	/**
 	 * Create values statement
 	 *
-	 * @param string $query
+	 * @param mixed $query
 	 * @return self
 	 */
 	public function values($query)
-	{	
+	{
 		$count = func_num_args();
-		if($count > 1)
+		$isArray = is_array($query) && $count == 1;
+		$values = "";
+		if($isArray)
 		{
-			$params = array();
-			for($i = 0; $i<$count; $i++)
+			$vals = array();
+			foreach($query as $key=>$val)
 			{
-				$params[] = func_get_arg($i);
+				$vals[$key] = $this->escapeValue($val);
 			}
-			$buffer = $this->createMatchedValue($params);
-			$this->buffer .= "values $buffer \r\n";
+			$buffer = "(".implode(", ", $vals).")";
+			$values = $buffer;
+			
 		}
 		else
 		{
-			$this->buffer .= "values $query \r\n";
+			if($count > 1)
+			{
+				$params = array();
+				for($i = 0; $i<$count; $i++)
+				{
+					$params[] = func_get_arg($i);
+				}
+				$buffer = $this->createMatchedValue($params);
+				$values = $buffer;
+			}
+			else
+			{
+				$values = $query;				
+			}
 		}
+		
+		if($this->hasValues)
+		{
+			$this->buffer .= ",\r\n$values";
+		}
+		else 
+		{
+			$this->buffer .= "values $values";
+		}
+		
+		$this->hasValues = true;
 		return $this;
 	}
 
@@ -232,6 +286,18 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	}
 
 	/**
+	 * Create left outer join statement
+	 *
+	 * @param string $query
+	 * @return self
+	 */
+	public function leftOuterJoin($query)
+	{
+		$this->buffer .= "left outer join $query \r\n";
+		return $this;
+	}
+
+	/**
 	 * Create left join statement
 	 *
 	 * @param string $query
@@ -258,12 +324,26 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	/**
 	 * Create on statement
 	 *
-	 * @param string $query
+	 * @param mixed $query
 	 * @return self
 	 */
 	public function on($query)
 	{
-		$this->buffer .= "on $query \r\n";
+		$count = func_num_args();
+		if($count > 1)
+		{
+			$params = array();
+			for($i = 0; $i<$count; $i++)
+			{
+				$params[] = func_get_arg($i);
+			}
+			$buffer = $this->createMatchedValue($params);
+			$this->buffer .= "on $buffer \r\n";
+		}
+		else
+		{
+			$this->buffer .= "on $query \r\n";
+		}
 		return $this;
 	}
 
@@ -301,7 +381,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		else
 		{
 			$this->buffer .= "set $query \r\n";
-		}	
+		}
 		return $this;
 	}
 
@@ -327,7 +407,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		else
 		{
 			$this->buffer .= "where $query \r\n";
-		}		
+		}
 		return $this;
 	}
 
@@ -357,10 +437,68 @@ class PicoDatabaseQueryBuilder // NOSONAR
 				if($j <= $len)
 				{
 					$result .= $values[$i];
-				}			
+				}
 			}
+			$result .= $formats[$i];
 		}
 		return $result;
+	}
+
+	/**
+	 * Create insert query
+	 *
+	 * @param string $table
+	 * @param array $data
+	 * @return string
+	 */
+	public function createInsertQuery($table, $data)
+	{
+		$fileds = array_keys($data);
+		$values = array_values($data);
+
+		$valuesFixed = array();
+		foreach($values as $value)
+		{
+			$valuesFixed[] = $this->escapeValue($value);
+		}
+
+		$fieldList = implode(", ", $fileds);
+		$valueList = implode(", ", $valuesFixed);
+		return "insert into $table \r\n(".$fieldList.")\r\nvalues(".$valueList.")\r\n";
+	}
+
+	/**
+	 * Create update query
+	 *
+	 * @param string $table
+	 * @param array $data
+	 * @param array $primaryKey
+	 * @return string
+	 */
+	public function createUpdateQuery($table, $data, $primaryKey)
+	{
+		$set = array();
+		$condition = array();
+		foreach($data as $field=>$value)
+		{
+			$set[] = $field . " = ". $this->escapeValue($value);
+		}
+
+		foreach($primaryKey as $field=>$value)
+		{
+			if($value === null)
+			{
+				$condition[] = $field . " is null ";
+			}
+			else
+			{
+				$condition[] = $field . " = ". $this->escapeValue($value);
+			}
+		}
+
+		$sets = implode(", ", $set);
+		$where = implode(" and ", $condition);
+		return "update $table \r\nset $sets \r\nwhere $where\r\n";
 	}
 
 	/**
@@ -373,33 +511,35 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		if($value === null)
 		{
 			// null
-			return 'null';
+			$ret = 'null';
 		}
 		else if(is_string($value))
 		{
 			// escape the value
-			return "'".$this->escapeSQL($value)."'";
+			$ret = "'".$this->escapeSQL($value)."'";
 		}
 		else if(is_bool($value))
 		{
 			// true or false
-			return $value?'true':'false';
+			$ret = $value?'true':'false';
 		}
 		else if(is_numeric($value))
 		{
 			// convert number to string
-			return $value."";
+			$ret = $value."";
 		}
 		else if(is_array($value) || is_object($value))
 		{
 			// encode to JSON and escapethe value
-			return "'".$this->escapeSQL(json_encode($value))."'";
+			$ret = "'".$this->escapeSQL(json_encode($value))."'";
 		}
 		else
 		{
 			// force convert to string and escapethe value
-			return "'".$this->escapeSQL($value)."'";
+			$ret = "'".$this->escapeSQL($value)."'";
 		}
+		
+		return $ret;
 	}
 
 	/**
@@ -410,7 +550,21 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function having($query)
 	{
-		$this->buffer .= "having $query \r\n";
+		$count = func_num_args();
+		if($count > 1)
+		{
+			$params = array();
+			for($i = 0; $i<$count; $i++)
+			{
+				$params[] = func_get_arg($i);
+			}
+			$buffer = $this->createMatchedValue($params);
+			$this->buffer .= "having $buffer \r\n";
+		}
+		else if(!empty($query))
+		{
+			$this->buffer .= "having $query \r\n";
+		}
 		return $this;
 	}
 
@@ -422,7 +576,10 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function orderBy($query)
 	{
-		$this->buffer .= "order by $query \r\n";
+		if(!empty($query))
+		{
+			$this->buffer .= "order by $query \r\n";
+		}
 		return $this;
 	}
 
@@ -434,7 +591,10 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function groupBy($query)
 	{
-		$this->buffer .= "group by $query \r\n";
+		if(!empty($query))
+		{
+			$this->buffer .= "group by $query \r\n";
+		}
 		return $this;
 	}
 
@@ -508,11 +668,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function startTransaction()
 	{
-		if($this->isMySql())
-		{
-			return "start transaction";
-		}
-		if($this->isPgSql())
+		if($this->isMySql() || $this->isPgSql())
 		{
 			return "start transaction";
 		}
@@ -526,11 +682,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function commit()
 	{
-		if($this->isMySql())
-		{
-			return "commit";
-		}
-		if($this->isPgSql())
+		if($this->isMySql() || $this->isPgSql())
 		{
 			return "commit";
 		}
@@ -544,11 +696,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function rollback()
 	{
-		if($this->isMySql())
-		{
-			return "rollback";
-		}
-		if($this->isPgSql())
+		if($this->isMySql() || $this->isPgSql())
 		{
 			return "rollback";
 		}
@@ -564,11 +712,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function executeFunction($name, $params)
 	{
-		if($this->isMySql())
-		{
-			return "select $name($params)";
-		}
-		if($this->isPgSql())
+		if($this->isMySql() || $this->isPgSql())
 		{
 			return "select $name($params)";
 		}
@@ -621,11 +765,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function currentDate()
 	{
-		if($this->isMySql())
-		{
-			return "CURRENT_DATE";
-		}
-		if($this->isPgSql())
+		if($this->isMySql() || $this->isPgSql())
 		{
 			return "CURRENT_DATE";
 		}
@@ -639,11 +779,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function currentTime()
 	{
-		if($this->isMySql())
-		{
-			return "CURRENT_TIME";
-		}
-		if($this->isPgSql())
+		if($this->isMySql() || $this->isPgSql())
 		{
 			return "CURRENT_TIME";
 		}
@@ -657,11 +793,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function currentTimestamp()
 	{
-		if($this->isMySql())
-		{
-			return "CURRENT_TIMESTAMP";
-		}
-		if($this->isPgSql())
+		if($this->isMySql() || $this->isPgSql())
 		{
 			return "CURRENT_TIMESTAMP";
 		}
@@ -669,7 +801,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	}
 	
 	/**
-	 * Create cow statement
+	 * Create now statement
 	 *
 	 * @param integer $precission
 	 * @return string
@@ -698,11 +830,11 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function escapeSQL($query)
 	{
-		if(stripos($this->databaseType, "mysql") !== false || stripos($this->databaseType, "mariadb") !== false)
+		if(stripos($this->databaseType, self::DATABASE_TYPE_MYSQL) !== false || stripos($this->databaseType, self::DATABASE_TYPE_MARIADB) !== false)
 		{
 			return str_replace(array("\r", "\n"), array("\\r", "\\n"), addslashes($query));
 		}
-		if(stripos($this->databaseType, "postgresql") !== false)
+		if(stripos($this->databaseType, self::DATABASE_TYPE_POSTGRESQL) !== false)
 		{
 			return str_replace(array("\r", "\n"), array("\\r", "\\n"), $this->replaceQuote($query));
 		}
@@ -719,7 +851,33 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 */
 	public function replaceQuote($query)
 	{
-		return str_replace("'", "''", $query); 
+		return str_replace("'", "''", $query);
+	}
+	
+	/**
+	 * Add query parameter
+	 *
+	 * @param string $query
+	 * @return string
+	 */
+	public function addQueryParameters($query)
+	{
+		$count = func_num_args();
+		$buffer = "";
+		if($count > 1)
+		{
+			$params = array();
+			for($i = 0; $i<$count; $i++)
+			{
+				$params[] = func_get_arg($i);
+			}
+			$buffer = $this->createMatchedValue($params);
+		}
+		else
+		{
+			$buffer = $query;
+		}
+		return $buffer;
 	}
 
 	/**
@@ -754,11 +912,5 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		return $sql;
 	}
 
-	/**
-	 * Get the value of databaseType
-	 */ 
-	public function getDatabaseType()
-	{
-		return $this->databaseType;
-	}
+	
 }
