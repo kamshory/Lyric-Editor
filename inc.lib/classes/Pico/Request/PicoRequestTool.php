@@ -91,13 +91,23 @@ class PicoRequestTool
      * Get property value
      *
      * @param string $propertyName
+     * @param array $params
      * @return mixed|null
      */
-    public function get($propertyName)
+    public function get($propertyName, $params = null)
     {
         $var = lcfirst($propertyName);
         $var = $this->camelize($var);
-        return isset($this->$var) ? $this->$var : null;
+        $value = isset($this->$var) ? $this->$var : null;
+        if(isset($params) && !empty($params))
+        {
+            $filter = $params[0];
+            return $this->filterValue($filter);
+        }
+        else
+        {
+            return $value;
+        }
     }
 
     /**
@@ -165,6 +175,201 @@ class PicoRequestTool
             return $properties;
         }
     }
+    
+    public function filterValue($val, $filter=FILTER_DEFAULT, $escapeSQL=false, $nullIfEmpty=false) // NOSONAR
+    {
+        if(!is_scalar($val))
+        {
+            unset($val);
+            $val = "";
+            // ignore
+        }
+
+        // add filter
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_EMAIL)
+        {
+            $val = trim(strtolower($val));
+            $val = filter_var($val, FILTER_VALIDATE_EMAIL);
+            if($val === false)
+            {
+                $val = "";
+            }
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_URL)
+        {
+            // filter url
+            $val = trim($val);
+            if(stripos($val, "://") === false && strlen($val)>2)
+            {
+                $val = "http://".$val;
+            }
+            $val = filter_var($val, FILTER_VALIDATE_URL);
+            if($val === false)
+            {
+                $val = "";
+            }
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_ALPHA){
+            $val = preg_replace("/[^A-Za-z]/i", "", $val); // NOSONAR
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERIC){
+
+            $val = preg_replace("/[^A-Za-z\d]/i", "", $val); // NOSONAR
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERICPUNC){
+            $val = preg_replace("/[^A-Za-z\.\-\d_]/i", "", $val); // NOSONAR
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT){
+            $val = preg_replace("/[^Ee\+\-\.\d]/i", "", $val); // NOSONAR
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT){
+            $val = preg_replace("/[^\+\-\d]/i", "", $val); // NOSONAR
+            if(empty($val))
+            {
+                $val = 0;
+            }
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT){
+            $val = preg_replace("/[^\+\-\d]/i", "", $val); // NOSONAR
+            if(empty($val))
+            {
+                $val = 0;
+            }
+            $val = abs($val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_NUMBER_OCTAL){
+            $val = preg_replace("/[^0-7]/i", "", $val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_NUMBER_HEXADECIMAL){
+            $val = preg_replace("/[^A-Fa-f\d]/i", "", $val); // NOSONAR
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_COLOR){
+            $val = preg_replace("/[^A-Fa-f\d]/i", "", $val); // NOSONAR
+            if(strlen($val) < 3){
+                $val = "";
+            }
+            else if(strlen($val) > 3 && strlen($val) != 3 && strlen($val) < 6){
+                $val = substr($val, 0, 3);
+            }
+            else if(strlen($val) > 6){
+                $val = substr($val, 0, 6);
+            }
+            if(strlen($val) >= 3){
+                $val = strtoupper("#".$val);
+            }
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_NO_DOUBLE_SPACE){
+            $val = trim(preg_replace("/\s+/"," ",$val)); // NOSONAR
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_PASSWORD){
+            $val = trim(preg_replace("/\s+/"," ",$val)); // NOSONAR
+            $val = str_ireplace(array('"',"'","`","\\","\0","\r","\n","\t"), "", $val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS){
+            $val = htmlspecialchars($val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_ENCODED){
+            $val = rawurlencode($val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_STRING_NEW){
+            $val = trim(strip_tags($val),"\r\n\t ");
+            $val = str_replace(array('<','>','"'), array('&lt;','&gt;','&quot;'), $val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_STRING_INLINE){
+            $val = trim(strip_tags($val),"\r\n\t ");
+            $val = str_replace(array('<','>','"'), array('&lt;','&gt;','&quot;'), $val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_STRING_BASE64){
+            $val = preg_replace("/[^A-Za-z0-9\+\/\=]/", "", $val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_POINT){
+            $val = preg_replace("/[^0-9\-\+\/\.,]/", "", $val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_IP){
+            $val = filter_var($val, FILTER_VALIDATE_IP);
+            if($val === false)
+            {
+                $val = "";
+            }
+        }
+        if(
+            $escapeSQL && 
+            (
+                $filter == PicoFilterConstant::FILTER_SANITIZE_EMAIL ||
+                $filter == PicoFilterConstant::FILTER_SANITIZE_ENCODED ||
+                $filter == PicoFilterConstant::FILTER_SANITIZE_IP ||
+                $filter == PicoFilterConstant::FILTER_SANITIZE_NO_DOUBLE_SPACE ||
+                $filter == PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS ||
+                $filter == PicoFilterConstant::FILTER_SANITIZE_STRING_NEW ||
+                $filter == PicoFilterConstant::FILTER_SANITIZE_STRING_INLINE ||
+                $filter == PicoFilterConstant::FILTER_SANITIZE_URL
+            )
+            )
+        {
+            $val = $this->addslashes($val);
+        }
+        if($filter == PicoFilterConstant::FILTER_SANITIZE_BOOL){
+            $val = trim(preg_replace("/\s+/"," ",$val)); // NOSONAR
+            return ($val != null && !empty($val)) && ($val === true || $val == 1 || $val == "1"); 
+        }
+
+        if(is_string($val) && empty($val) && $nullIfEmpty)
+        {
+            return null;
+        }
+
+        return $val;
+    }
+    public function addslashes($inp)
+    {
+        return addslashes($inp);
+    }
+    public function my_stripslashes($inp){
+        $inp = str_replace(array("\\'"), array("'"), $inp);
+        $inp = str_replace(array("\\\""), array("\""), $inp);
+        $inp = str_replace(array("\\\\","\\0", "\\n", "\\r", "\\Z"), array("\\","\0", "\n", "\r", "\x1a"), $inp);
+        return $inp;
+    }
+    public function array_addslashes(&$item, $key) // NOSONAR
+    {
+        $item = $this->addslashes($item);
+    }
+    public function array_stripslashes(&$item, $key) // NOSONAR
+    {
+        $item = $this->my_stripslashes($item);
+    }
+
+    public function _get_value($cfg, $input)
+    {
+        if($input === null || $input == '' || $input == 'undefined')
+        {
+            return 0;
+        }
+        $output = $input;
+
+        $decimal_separator = $cfg->getAppDecimalSeparator();
+        $thousand_separator = $cfg->getAppThousandSeparator();
+
+        if($thousand_separator != "")
+        {
+            $output = str_replace($thousand_separator, '', $output);
+        }
+        if($decimal_separator != ".")
+        {
+            $output = str_replace(".", "_", $output);
+            $output = str_replace(",", ".", $output);
+            $output = str_replace("_", "", $output);
+        }
+        if(empty($output))
+        {
+            return 0;
+        }
+        return $output * 1;
+    }
+    public function getValue($cfg, $input)
+    {
+        return $this->get_value($cfg, $input);
+    }
 
     /**
      * Magic method called when user call any undefined method
@@ -183,7 +388,7 @@ class PicoRequestTool
         else if (strncasecmp($method, "get", 3) === 0)
         {
             $var = lcfirst(substr($method, 3));
-            return isset($this->$var) ? $this->$var : null;
+            return $this->get($var, $params);
         }
         else if (strncasecmp($method, "set", 3) === 0)
         {

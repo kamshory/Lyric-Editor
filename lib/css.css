@@ -322,3 +322,11 @@ input[type=range]+datalist option:last-child {
     text-decoration: none;
     color: #555555;
 }
+
+.filter-container .form-control{
+    display: inline;
+    width: auto;
+}
+.filter-group{
+    display: inline-block;
+}

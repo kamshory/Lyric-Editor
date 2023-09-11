@@ -8,6 +8,7 @@ use Pico\Data\Entity\Genre;
 use Pico\Data\Entity\Midi;
 use Pico\Data\Tools\SelectOption;
 use Pico\Exceptions\NoRecordFoundException;
+use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 
 require_once "inc/auth.php";
@@ -269,25 +270,15 @@ else if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getMid
   }
   catch(Exception $e)
   {
-    
+    // do nothing
   }
 }
 else
 {
-
 ?>
 
-<style>
-    .filter-container .form-control{
-        display: inline;
-        width: auto;
-    }
-    .filter-group{
-        display: inline-block;
-    }
-</style>
-
 <div class="filter-container">
+    <form action="" method="get">
     <div class="filter-group">
         <span>Genre</span>
         <select class="form-control" name="genre_id" id="genre_id">
@@ -311,9 +302,11 @@ else
     </div>
     <div class="filter-group">
         <span>Title</span>
-        <input class="form-control" type="text" name="title" id="title" value="<?php echo htmlspecialchars($inputGet->getTitle());?>">
+        <input class="form-control" type="text" name="title" id="title" autocomplete="off" value="<?php echo $inputGet->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
     </div>
+    </form>
 </div>
+
 <?php
 $pagination = new PicoPagination($cfg->getResultPerPage()); 
 $subquery = new PicoDatabaseQueryBuilder($database);
