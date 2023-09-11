@@ -3,7 +3,7 @@
 namespace Pico\DynamicObject;
 
 use Pico\Util\PicoAnnotationParser;
-use Pico\Util\PicoEnvironmentVariable;
+use PicoEnvironmentVariable;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\Yaml\Yaml;
@@ -14,9 +14,13 @@ class PicoSecretObject extends stdClass //NOSONAR
     const RANDOM_KEY_2 = "6619f3e7a1a9f0e75838d41ff368f728";
     const KEY_NAME = "name";
     const KEY_VALUE = "value";
+    
     const KEY_PROPERTY_TYPE = "propertyType";
     const KEY_DEFAULT_VALUE = "default_value";
+    
     const ANNOTATION_ENCRYPT_IN = "EncryptIn";
+    const ANNOTATION_DECRYPT_IN = "DecryptIn";
+    const ANNOTATION_ENCRYPT_OUT = "EncryptOut";
     const ANNOTATION_DECRYPT_OUT = "DecryptOut";
     
     /**
@@ -32,6 +36,20 @@ class PicoSecretObject extends stdClass //NOSONAR
      * @var string[]
      */
     private $decryptOutProperties = array();
+
+    /**
+     * List of propertis to be encrypted when call GET
+     *
+     * @var string[]
+     */
+    private $encryptOutProperties = array();
+    
+    /**
+     * List of propertis to be decrypted when call SET
+     *
+     * @var string[]
+     */
+    private $decryptInProperties = array();
 
     /**
      * Read only
@@ -77,6 +95,14 @@ class PicoSecretObject extends stdClass //NOSONAR
                 {
                     $this->decryptOutProperties[] = $prop->name;
                 }
+                if(strcasecmp($param, self::ANNOTATION_ENCRYPT_OUT) == 0)
+                {
+                    $this->encryptOutProperties[] = $prop->name;
+                }
+                if(strcasecmp($param, self::ANNOTATION_DECRYPT_IN) == 0)
+                {
+                    $this->decryptInProperties[] = $prop->name;
+                }
             }
         }
     }
@@ -107,9 +133,13 @@ class PicoSecretObject extends stdClass //NOSONAR
     
     private function _set($var, $value)
     {
-        if($this->needEncryption($var))
+        if($this->needInputEncryption($var))
         {
             $value = $this->encryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+        }
+        if($this->needInputDecryption($var))
+        {
+            $value = $this->decryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
         }
         $this->$var = $value;
     }
@@ -123,7 +153,11 @@ class PicoSecretObject extends stdClass //NOSONAR
     private function _get($var)
     {
         $value = $this->_getValue($var);
-        if($this->needDecryption($var))
+        if($this->needOutputEncryption($var))
+        {
+            $value = $this->encryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+        }
+        if($this->needOutputDecryption($var))
         {
             $value = $this->decryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
         }
@@ -186,7 +220,7 @@ class PicoSecretObject extends stdClass //NOSONAR
      * @param string $var
      * @return bool
      */
-    private function needEncryption($var)
+    private function needInputEncryption($var)
     {
         return in_array($var, $this->encryptInProperties);
     }
@@ -197,9 +231,31 @@ class PicoSecretObject extends stdClass //NOSONAR
      * @param string $var
      * @return bool
      */
-    private function needDecryption($var)
+    private function needOutputDecryption($var)
     {
         return in_array($var, $this->decryptOutProperties);
+    }
+    
+    /**
+     * Check if value is required to be encrypted after read
+     *
+     * @param string $var
+     * @return bool
+     */
+    private function needOutputEncryption($var)
+    {
+        return in_array($var, $this->encryptOutProperties);
+    }
+    
+    /**
+     * Check if value is required to be decrypted before stored
+     *
+     * @param string $var
+     * @return bool
+     */
+    private function needInputDecryption($var)
+    {
+        return in_array($var, $this->decryptInProperties);
     }
 
     /**
