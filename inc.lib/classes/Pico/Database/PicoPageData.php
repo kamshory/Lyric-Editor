@@ -83,7 +83,10 @@ class PicoPageData
         $this->result = $result;
         $this->pagable = $pagable;
         $this->totalResult = $totalResult;
-        $this->calculateContent();
+        if($pagable != null && $pagable instanceof PicoPagable)
+        {
+            $this->calculateContent();
+        }
         $this->endTime = microtime(true);
         $this->executionTime = $this->endTime - $this->startTime;
     }

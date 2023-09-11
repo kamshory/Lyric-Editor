@@ -51,14 +51,18 @@ class SelectOption
         try
         {           
             $result = $this->object->findByActive(true);
-            foreach($result as $row)
+            foreach($result->getResult() as $row)
             {
                 $value = $row->get($this->map['value']);
                 $label = $row->get($this->map['label']);
+                $attributes = array('value'=>$value);
+                if($value == $this->value)
+                {
+                    $attributes['selected'] = 'selected';
+                }
                 $this->rows[] = array(
-                    'value'=>$value,
-                    'label'=>$label,
-                    'selected'=>$value == $this->value
+                    'attribute'=>$attributes,
+                    'textNode'=>$label
                 );
             }
         }
@@ -68,8 +72,24 @@ class SelectOption
         }
     }
 
+    private function arrayToAttribute($array)
+    {
+        $attributes = array();
+        foreach($array as $key=>$value)
+        {
+            $attributes[] = $key."=\"".htmlspecialchars($value)."\"";
+        }
+        return rtrim(" ".implode(" ", $attributes));
+    }
+
     public function __toString()
     {
-        return json_encode($this->rows);
+        $texts = array();
+        foreach($this->rows as $row)
+        {
+            $attributes = $this->arrayToAttribute($row['attribute']);
+            $texts[] = "<option".$attributes.">".$row['textNode']."</option>";
+        }
+        return implode("\r\n", $texts);
     }
 }

@@ -3,6 +3,7 @@ use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
 use Pico\Data\Entity\Album;
+use Pico\Data\Entity\Artist;
 use Pico\Data\Entity\Midi;
 use Pico\Data\Tools\SelectOption;
 use Pico\Exception\NoRecordFoundException;
@@ -280,14 +281,24 @@ else
         display: inline;
         width: auto;
     }
+    .filter-group{
+        display: inline-block;
+    }
 </style>
 
 <div class="filter-container">
     <div class="filter-group">
+        <span>Album</span>
         <select name="album_id" id="album_id" class="form-control">
             <option value="">- All -</option>
-            <?php 
-            echo (new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId())); ?>
+            <?php echo new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId()); ?>
+        </select>
+    </div>
+    <div class="filter-group">
+        <span>Artist Vocal</span>
+        <select name="artist_vocal_id" id="artist_vocal_id" class="form-control">
+            <option value="">- All -</option>
+            <?php echo new SelectOption(new Artist(null, $database), array('value'=>'artistId', 'label'=>'name'), $inputGet->getArtistVocalId()); ?>
         </select>
     </div>
 </div>
