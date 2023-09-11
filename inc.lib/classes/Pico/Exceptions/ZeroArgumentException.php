@@ -1,7 +1,7 @@
 <?php
-namespace Pico\Exception;
+namespace Pico\Exceptions;
 
-class NoRecordFoundException extends \Exception
+class ZeroArgumentException extends \Exception
 {
     /**
      * Previous exception

@@ -3,10 +3,15 @@
 namespace Pico\DynamicObject;
 
 use PDOException;
+use PDOStatement;
 use Pico\Database\PicoDatabase;
 use Pico\Database\PicoDatabasePersistent;
-use Pico\Exception\NoDatabaseConnectionException;
-use Pico\Exception\NoRecordFoundException;
+use Pico\Database\PicoPagable;
+use Pico\Database\PicoPageData;
+use Pico\Database\PicoSortable;
+use Pico\Database\PicoSpecification;
+use Pico\Exceptions\NoDatabaseConnectionException;
+use Pico\Exceptions\NoRecordFoundException;
 use Pico\Util\PicoAnnotationParser;
 use Pico\Util\PicoEnvironmentVariable;
 use ReflectionClass;
@@ -16,12 +21,13 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Class to create dynamic object. 
  * Dynamic object is and object created from any class so that user can add any property with any name and value, load data from INI file, Yaml file, JSON file and database. 
- * User can also create entity from a table of database, insert, select, update and delete record from database. 
+ * User can create entity from a table of database, insert, select, update and delete record from database. 
+ * User can also create property from other entity with full name of class (namespace + class name)
  */
 class DynamicObject extends stdClass // NOSONAR
 {
-    const NO_DATABASE_CONNECTION = "No database connection provided";
-    const NO_RECORD_FOUND = "No record found";
+    const MESSAGE_NO_DATABASE_CONNECTION = "No database connection provided";
+    const MESSAGE_NO_RECORD_FOUND = "No record found";
     const KEY_PROPERTY_TYPE = "propertyType";
     const KEY_DEFAULT_VALUE = "default_value";
     const KEY_NAME = "name";
@@ -30,7 +36,7 @@ class DynamicObject extends stdClass // NOSONAR
     /**
      * Flag readonly
      *
-     * @var boolean
+     * @var bool
      */
     private $readonly = false; // NOSONAR
 
@@ -67,7 +73,7 @@ class DynamicObject extends stdClass // NOSONAR
     /**
      * Constructor
      *
-     * @param mixed $data
+     * @param self|array|object $data
      * @param PicoDatabase $database
      */
     public function __construct($data = null, $database = null)
@@ -92,46 +98,60 @@ class DynamicObject extends stdClass // NOSONAR
     /**
      * Load data to object
      * @param mixed $data
+     * @return self
      */
     public function loadData($data)
     {
-        if (is_array($data) || is_object($data)) {
-            foreach ($data as $key => $value) {
-                $key2 = $this->camelize($key);
-                $this->set($key2, $value, true);
+        if($data != null)
+        {
+            if($data instanceof self)
+            {
+                $values = $data->value();
+                foreach ($values as $key => $value) {
+                    $key2 = $this->camelize($key);
+                    $this->set($key2, $value, true);
+                }
+            }
+            else if (is_array($data) || is_object($data)) {
+                foreach ($data as $key => $value) {
+                    $key2 = $this->camelize($key);
+                    $this->set($key2, $value, true);
+                }
             }
         }
+        return $this;
     }
 
     /**
      * Load data from INI file
      *
-     * @param string $ini_file
+     * @param string $path
      * @param bool $systemEnv
-     * @return void
+     * @return self
      */
-    public function loadIniFile($ini_file, $systemEnv = false)
+    public function loadIniFile($path, $systemEnv = false)
     {
         // Parse without sections
-        $data = parse_ini_file($ini_file);
+        $data = parse_ini_file($path);
         if($systemEnv)
         {
             $env = new PicoEnvironmentVariable();
             $data = $env->replaceSysEnvAll($data, true);
         }
         $this->loadData($data);
+        return $this;
     }
 
     /**
      * Load data from Yaml file
      *
-     * @param string $yml_file
+     * @param string $path
      * @param bool $systemEnv
-     * @return void
+     * @return self
      */
-    public function loadYamlFile($yml_file, $systemEnv = false, $asObject = false)
+    public function loadYamlFile($path, $systemEnv = false, $asObject = false)
     {
-        $data = Yaml::parseFile($yml_file);
+        $data = Yaml::parseFile($path);
         if($systemEnv)
         {
             $env = new PicoEnvironmentVariable();
@@ -140,25 +160,26 @@ class DynamicObject extends stdClass // NOSONAR
         if($asObject)
         {
             // convert to object
-            $obj = json_decode(json_encode($data));
+            $obj = json_decode(json_encode((object) $data), false);
             $this->loadData($obj);
         }
         else
         {
             $this->loadData($data);
         }
+        return $this;
     }
 
     /**
      * Load data from JSON file
      *
-     * @param string $json_file
+     * @param string $path
      * @param bool $systemEnv
-     * @return void
+     * @return self
      */
-    public function loadJsonFile($json_file, $systemEnv = false, $asObject = false)
+    public function loadJsonFile($path, $systemEnv = false, $asObject = false)
     {
-        $data = json_decode(file_get_contents($json_file));
+        $data = json_decode(file_get_contents($path));
         if($systemEnv)
         {
             $env = new PicoEnvironmentVariable();
@@ -167,29 +188,32 @@ class DynamicObject extends stdClass // NOSONAR
         if($asObject)
         {
             // convert to object
-            $obj = json_decode(json_encode($data));
+            $obj = json_decode(json_encode((object) $data), false);
             $this->loadData($obj);
         }
         else
         {
             $this->loadData($data);
         }
+        return $this;
     }
 
     /**
      * Set readonly. When object is set to readonly, setter will not change value of its properties but loadData still works fine
      *
      * @param bool $readonly
-     * @return void
+     * @return self
      */
     protected function readOnly($readonly)
     {
         $this->readonly = $readonly;
+        return $this;
     }
 
     /**
      * Set database connection
-     * @var $database
+     * @var PicoDatabase $database
+     * @return self
      */
     public function withDatabase($database)
     {
@@ -237,27 +261,28 @@ class DynamicObject extends stdClass // NOSONAR
 
     /**
      * Save to database
-     * @param bool $includeNull
-     *
-     * @return void
+     * @param bool $includeNull If TRUE, all column will be saved to database include null. If FALSE, only column with not null value will be saved to database
+     * @return PDOStatement
+     * NoDatabaseConnectionException|NoRecordFoundException|PDOException
      */
     public function save($includeNull = false)
     {
         if($this->database != null && $this->database->isConnected())
         {
             $persist = new PicoDatabasePersistent($this->database, $this);
-            $persist->save($includeNull);
+            return $persist->save($includeNull);
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
 
     /**
      * Select data from database
      *
-     * @return void
+     * @return self
+     * @throws NoDatabaseConnectionException|NoRecordFoundException|PDOException
      */
     public function select()
     {
@@ -267,21 +292,22 @@ class DynamicObject extends stdClass // NOSONAR
             $data = $persist->select();
             if($data == null)
             {
-                throw new NoRecordFoundException(self::NO_RECORD_FOUND);
+                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
             }
             $this->loadData($data);
+            return $this;
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
 
     /**
      * Insert into database
      *
-     * @param bool $includeNull
-     * @return void
+     * @param bool $includeNull If TRUE, all column will be saved to database include null. If FALSE, only column with not null value will be saved to database
+     * @return PDOStatement
      * @throws NoDatabaseConnectionException|PDOException
      */
     public function insert($includeNull = false)
@@ -289,48 +315,50 @@ class DynamicObject extends stdClass // NOSONAR
         if($this->database != null && $this->database->isConnected())
         {
             $persist = new PicoDatabasePersistent($this->database, $this);
-            $persist->insert($includeNull);
+            return $persist->insert($includeNull);
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
 
     /**
      * Update data on database
      *
-     * @param bool $includeNull
-     * @return void
+     * @param bool $includeNull If TRUE, all column will be saved to database include null. If FALSE, only column with not null value will be saved to database
+     * @return PDOStatement
+     * @throws NoDatabaseConnectionException|PDOException
      */
     public function update($includeNull = false)
     {
         if($this->database != null && $this->database->isConnected())
         {
             $persist = new PicoDatabasePersistent($this->database, $this);
-            $persist->update($includeNull);
+            return $persist->update($includeNull);
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
 
     /**
      * Delete data from database
      *
-     * @return void
+     * @return PDOStatement
+     * @throws NoDatabaseConnectionException|PDOException
      */
     public function delete()
     {
         if($this->database != null && $this->database->isConnected())
         {
             $persist = new PicoDatabasePersistent($this->database, $this);
-            $persist->delete();
+            return $persist->delete();
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
 
@@ -402,11 +430,37 @@ class DynamicObject extends stdClass // NOSONAR
     }
     
     /**
+     * Get property value
+     *
+     * @param string $propertyName
+     * @return mixed|null
+     */
+    public function get($propertyName)
+    {
+        $var = lcfirst($propertyName);
+        $var = $this->camelize($var);
+        return isset($this->$var) ? $this->$var : null;
+    }
+    
+    /**
+     * Get property value 
+     *
+     * @param string $propertyName
+     * @return mixed|null
+     */
+    public function getOrDefault($propertyName, $defaultValue = null)
+    {
+        $var = lcfirst($propertyName);
+        $var = $this->camelize($var);
+        return isset($this->$var) ? $this->$var : $defaultValue;
+    }
+    
+    /**
      * Copy value from other object
      *
      * @param self|mixed $source
      * @param array $filter
-     * @param boolean $includeNull
+     * @param bool $includeNull
      * @return void
      */
     public function copyValueFrom($source, $filter = null, $includeNull = false)
@@ -414,9 +468,11 @@ class DynamicObject extends stdClass // NOSONAR
         if($filter != null)
         {
             $tmp = array();
+            $index = 0;
             foreach($filter as $val)
             {
-                $tmp[] = trim($this->camelize($val));
+                $tmp[$index] = trim($this->camelize($val));               
+                $index++;
             }
             $filter = $tmp;
         }
@@ -445,24 +501,11 @@ class DynamicObject extends stdClass // NOSONAR
     {
         return $this->set($propertyName, null, $skipModifyNullProperties);
     }
-
-    /**
-     * Get property value
-     *
-     * @param string $propertyName
-     * @return mixed|null
-     */
-    public function get($propertyName)
-    {
-        $var = lcfirst($propertyName);
-        $var = $this->camelize($var);
-        return isset($this->$var) ? $this->$var : null;
-    }
     
     /**
      * Get default value
      *
-     * @param boolean $snakeCase
+     * @param bool $snakeCase
      * @return stdClass
      */
     public function defatultValue($snakeCase = false)
@@ -499,7 +542,7 @@ class DynamicObject extends stdClass // NOSONAR
      * @param string $type
      * @return mixed
      */
-    private function fixValue($value, $type) // NOSONAR
+    protected function fixValue($value, $type) // NOSONAR
     {
         if(strtolower($value) === 'true')
         {
@@ -592,9 +635,9 @@ class DynamicObject extends stdClass // NOSONAR
     /**
      * Check if JSON naming strategy is snake case or not
      *
-     * @return boolean
+     * @return bool
      */
-    private function isSnake()
+    protected function _snake()
     {
         return isset($this->classParams['JSON'])
             && isset($this->classParams['JSON']['property-naming-strategy'])
@@ -605,9 +648,9 @@ class DynamicObject extends stdClass // NOSONAR
     /**
      *  Check if JSON naming strategy is upper camel case or not
      *
-     * @return boolean
+     * @return bool
      */
-    private function isUpperCamel()
+    protected function isUpperCamel()
     {
         return isset($this->classParams['JSON'])
             && isset($this->classParams['JSON']['property-naming-strategy'])
@@ -618,16 +661,41 @@ class DynamicObject extends stdClass // NOSONAR
     /**
      * Check if JSON naming strategy is camel case or not
      *
-     * @return boolean
+     * @return bool
      */
-    protected function isCamel()
+    protected function _camel()
     {
-        return !$this->isSnake();
+        return !$this->_snake();
     }
 
     /**
+     * Check if JSON naming strategy is snake case or not
+     *
+     * @return bool
+     */
+    protected function _pretty()
+    {
+        return isset($this->classParams['JSON'])
+            && isset($this->classParams['JSON']['prettify'])
+            && strcasecmp($this->classParams['JSON']['prettify'], 'true') == 0
+            ;
+    }
+    
+    /**
+     * Check if data is not null and not empty
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private function _notNullAndNotEmpty($value)
+    {
+        return $value != null && !empty($value);
+    }
+    
+    /**
      * Property list
      * @var bool $reflectSelf
+     * @var bool $asArrayProps
      * @return array
      */
     protected function propertyList($reflectSelf = false, $asArrayProps = false)
@@ -636,6 +704,7 @@ class DynamicObject extends stdClass // NOSONAR
         $class = new ReflectionClass($reflectionClass);
 
         // filter only the calling class properties
+        // skip parent properties
         $properties = array_filter(
             $class->getProperties(),
             function($property) use($class) {
@@ -645,9 +714,12 @@ class DynamicObject extends stdClass // NOSONAR
         if($asArrayProps)
         {
             $result = array();
+            $index = 0;
             foreach ($properties as $key) {
                 $prop = $key->name;
-                $result[] = $prop;
+                $result[$index] = $prop;
+                
+                $index++;
             }
             return $result;
         }
@@ -656,39 +728,59 @@ class DynamicObject extends stdClass // NOSONAR
             return $properties;
         }
     }
+    
+    /**
+     * List all
+     *
+     * @param PicoSpecification $specification
+     * @param PicoPagable|string $pagable
+     * @return PicoPageData
+     * @throws NoRecordFoundException if no record found
+     * @throws NoDatabaseConnectionException if no database connection
+     */
+    public function listAll($specification = null, $pagable = null)
+    {
+        return $this->findAll($specification, $pagable, true);
+    }
 
     /**
      * Find all
      *
-     * @param string $orderType
+     * @param PicoSpecification $specification
+     * @param PicoPagable|string $pagable
      * @param bool $passive
-     * @return array
+     * @param float $startTime
+     * @return PicoPageData
+     * @throws NoRecordFoundException if no record found
+     * @throws NoDatabaseConnectionException if no database connection
      */
-    private function _findAll($orderType = null, $passive = false)
+    public function findAll($specification = null, $pagable = null, $passive = false)
     {
+        $startTime = microtime(true);
         if($this->database != null && $this->database->isConnected())
         {
             $persist = new PicoDatabasePersistent($this->database, $this);
-            $result = $persist->findAll($orderType);
-            if($result != null && !empty($result))
+            $result = $persist->findAll($specification, $pagable);
+            $match = $persist->countAll($specification);
+            if($this->_notNullAndNotEmpty($result))
             {
-                return $this->toArrayObject($result, $passive);
+                return new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
             }
             else
             {
-                throw new NoRecordFoundException(self::NO_RECORD_FOUND);
+                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
             }
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
-    
+
     /**
-     * Find one record by primary key value
+     * Find one record by primary key value. 
      * 
-     * @param mixed $params
+     * @param array $params
      * @return self
      */
     public function find($params)
@@ -697,19 +789,19 @@ class DynamicObject extends stdClass // NOSONAR
         {
             $persist = new PicoDatabasePersistent($this->database, $this);
             $result = $persist->find($params);
-            if($result != null && !empty($result))
+            if($this->_notNullAndNotEmpty($result))
             {
                 $this->loadData($result);
                 return $this;
             }
             else
             {
-                throw new NoRecordFoundException(self::NO_RECORD_FOUND);
+                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
             }
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
 
@@ -718,28 +810,32 @@ class DynamicObject extends stdClass // NOSONAR
      *
      * @param string $method
      * @param mixed $params
-     * @param string $orderType
+     * @param PicoPagable $pagable
+     * @param PicoSortable|string $sortable
      * @param bool $passive
-     * @return array
+     * @return PicoPageData
+     * @throws NoRecordFoundException|NoDatabaseConnectionException
      */
-    private function findBy($method, $params, $orderType = null, $passive = false)
+    private function findBy($method, $params, $pagable = null, $sortable = null, $passive = false)
     {
+        $startTime = microtime(true);
         if($this->database != null && $this->database->isConnected())
         {
             $persist = new PicoDatabasePersistent($this->database, $this);
-            $result = $persist->findBy($method, $params, $orderType);
-            if($result != null && !empty($result))
+            $result = $persist->findBy($method, $params, $pagable, $sortable);
+            $match = $persist->countBy($method, $params);
+            if($this->_notNullAndNotEmpty($result))
             {
-                return $this->toArrayObject($result, $passive);
+                return new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
             }
             else
             {
-                throw new NoRecordFoundException(self::NO_RECORD_FOUND);
+                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
             }
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
     
@@ -748,7 +844,7 @@ class DynamicObject extends stdClass // NOSONAR
      *
      * @param string $method
      * @param mixed $params
-     * @return bool
+     * @return integer
      */
     private function deleteBy($method, $params)
     {
@@ -759,7 +855,7 @@ class DynamicObject extends stdClass // NOSONAR
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
 
@@ -768,27 +864,28 @@ class DynamicObject extends stdClass // NOSONAR
      *
      * @param string $method
      * @param mixed $params
+     * @param PicoSortable|string $sortable
      * @return object
      */
-    private function findOneBy($method, $params, $orderType = null)
+    private function findOneBy($method, $params, $sortable = null)
     {
         if($this->database != null && $this->database->isConnected())
         {
             $persist = new PicoDatabasePersistent($this->database, $this);
-            $result = $persist->findOneBy($method, $params, $orderType);
-            if($result != null && !empty($result))
+            $result = $persist->findOneBy($method, $params, $sortable);
+            if($this->_notNullAndNotEmpty($result))
             {
                 $this->loadData($result);
                 return $this;
             }
             else
             {
-                throw new NoRecordFoundException(self::NO_RECORD_FOUND);
+                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
             }
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
     
@@ -798,7 +895,7 @@ class DynamicObject extends stdClass // NOSONAR
      * @param string $method
      * @param mixed $params
      * @param string $orderType
-     * @return array
+     * @return bool
      */
     private function existsBy($method, $params)
     {
@@ -809,12 +906,12 @@ class DynamicObject extends stdClass // NOSONAR
         }
         else
         {
-            throw new NoDatabaseConnectionException(self::NO_DATABASE_CONNECTION);
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
     }
     
     /**
-     * Convert boolean to text
+     * Convert bool to text
      *
      * @param string $propertyName
      * @param string[] $params
@@ -844,10 +941,12 @@ class DynamicObject extends stdClass // NOSONAR
     private function toArrayObject($result, $passive = false)
     {
         $instance = array();
+        $index = 0;
         foreach($result as $value)
         {
             $className = get_class($this);
-            $instance[] = new $className($value, $passive ? null : $this->database);
+            $instance[$index] = new $className($value, $passive ? null : $this->database);
+            $index++;
         }
         return $instance;
     }
@@ -871,34 +970,32 @@ class DynamicObject extends stdClass // NOSONAR
     }
 
     /**
-     * Magic method called when user call any undefined method
-     * is &raquo; get property value as boolean
-     * get &raquo; get property value
-     * set &raquo; set property value
-     * unset &raquo; unset property value
-     * findOneBy &raquo; search data from database and return one record
-     * findFirstBy &raquo; search data from database and return first record
-     * findLastBy &raquo; search data from database and return last record
-     * findBy &raquo; search data from database
-     * findAscBy &raquo; search data from database order by primary keys ascending
-     * findDescBy &raquo; search data from database order by primary keys descending
-     * findAll &raquo; search data from database without filter
-     * findAllAsc &raquo; search data from database without filter order by primary keys ascending
-     * findAllDesc &raquo; search data from database without filter order by primary keys descending
-     * listBy &raquo; search data from database. Similar to findBy but does not contain a connection to the database so objects cannot be saved directly to the database
-     * listAscBy &raquo; search data from database order by primary keys ascending. Similar to findAscBy but does not contain a connection to the database so objects cannot be saved directly to the database
-     * listDescBy &raquo; search data from database order by primary keys descending. Similar to findDescBy but does not contain a connection to the database so objects cannot be saved directly to the database
-     * listAll &raquo; search data from database without filter. Similar to findAll but does not contain a connection to the database so objects cannot be saved directly to the database
-     * listAllAsc &raquo; search data from database without filter order by primary keys ascending. Similar to findAllAsc but does not contain a connection to the database so objects cannot be saved directly to the database
-     * listAllDesc &raquo; search data from database without filter order by primary keys descending. Similar to findAllDesc but does not contain a connection to the database so objects cannot be saved directly to the database
-     * deleteBy &raquo; delete data from database without read it first
-     * booleanToTextBy &raquo; convert boolean value to yes/no or true/false depend on parameters given. Example: $result = booleanToTextByActive("Yes", "No"); If $obj->active is true, $result will be "Yes" otherwise "No"
-     * booleanToSelectedBy &raquo; Create selected="selected" for form
-     * booleanToCheckedBy &raquo; Create checked="checked" for form
-     * existsBy &raquo; check data from database
+     * Magic method called when user call any undefined method. __call method will check the prefix of called method and call appropriated method according to its name and its parameters.
+     * is &raquo; get property value as bool. Number will true if it's value is 1. String will be convert to number first. This method not require database connection.
+     * get &raquo; get property value. This method not require database connection.
+     * set &raquo; set property value. This method not require database connection.
+     * unset &raquo; unset property value. This method not require database connection.
+     * findOneBy &raquo; search data from database and return one record. This method require database connection.
+     * findFirstBy &raquo; search data from database and return first record. This method require database connection.
+     * findLastBy &raquo; search data from database and return last record. This method require database connection.
+     * findBy &raquo; search data from database. This method require database connection.
+     * findAscBy &raquo; search data from database order by primary keys ascending. This method require database connection.
+     * findDescBy &raquo; search data from database order by primary keys descending. This method require database connection.
+     * findAllAsc &raquo; search data from database without filter order by primary keys ascending. This method require database connection.
+     * findAllDesc &raquo; search data from database without filter order by primary keys descending. This method require database connection.
+     * listBy &raquo; search data from database. Similar to findBy but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
+     * listAscBy &raquo; search data from database order by primary keys ascending. Similar to findAscBy but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
+     * listDescBy &raquo; search data from database order by primary keys descending. Similar to findDescBy but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
+     * listAllAsc &raquo; search data from database without filter order by primary keys ascending. Similar to findAllAsc but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
+     * listAllDesc &raquo; search data from database without filter order by primary keys descending. Similar to findAllDesc but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
+     * deleteBy &raquo; delete data from database without read it first. This method require database connection.
+     * existsBy &raquo; check data from database. This method require database connection.
+     * booleanToTextBy &raquo; convert bool value to yes/no or true/false depend on parameters given. Example: $result = booleanToTextByActive("Yes", "No"); If $obj->active is true, $result will be "Yes" otherwise "No". This method not require database connection.
+     * booleanToSelectedBy &raquo; Create attribute selected="selected" for form. This method not require database connection.
+     * booleanToCheckedBy &raquo; Create attribute checked="checked" for form. This method not require database connection.
      *
-     * @param string $method
-     * @param mixed $params
+     * @param string $method Method name
+     * @param mixed $params Parameters
      * @return mixed|null
      */    
     public function __call($method, $params) // NOSONAR
@@ -923,7 +1020,10 @@ class DynamicObject extends stdClass // NOSONAR
         }
         else if (strncasecmp($method, "findOneBy", 9) === 0) {
             $var = lcfirst(substr($method, 9));
-            return $this->findOneBy($var, $params);
+            $sortable = $this->sortableFromParams($params);
+            // filter param
+            $parameters = $this->valuesFromParams($params);
+            return $this->findOneBy($var, $parameters, $sortable);
         }
         else if (strncasecmp($method, "findFirstBy", 11) === 0) {
             $var = lcfirst(substr($method, 11));
@@ -935,49 +1035,65 @@ class DynamicObject extends stdClass // NOSONAR
         }
         else if (strncasecmp($method, "findBy", 6) === 0) {
             $var = lcfirst(substr($method, 6));
-            return $this->findBy($var, $params);
+            // get pagable
+            $pagable = $this->pagableFromParams($params);
+            // filter param
+            $parameters = $this->valuesFromParams($params);
+            return $this->findBy($var, $parameters, $pagable);
         }
         else if (strncasecmp($method, "findAscBy", 9) === 0) {
             $var = lcfirst(substr($method, 9));
-            return $this->findBy($var, $params, PicoDatabasePersistent::ORDER_ASC);
+            // get pagable
+            $pagable = $this->pagableFromParams($params);
+            // filter param
+            $parameters = $this->valuesFromParams($params);
+            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistent::ORDER_ASC);
         }
         else if (strncasecmp($method, "findDescBy", 10) === 0) {
             $var = lcfirst(substr($method, 10));
-            return $this->findBy($var, $params, PicoDatabasePersistent::ORDER_DESC);
+            // get pagable
+            $pagable = $this->pagableFromParams($params);
+            // filter param
+            $parameters = $this->valuesFromParams($params);
+            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistent::ORDER_DESC);
         }
-        else if ($method == "findAll") {
-            return $this->_findAll();
-        }
-        else if ($method == "findAllAsc") {
-            return $this->_findAll(PicoDatabasePersistent::ORDER_ASC);
-        }
-        else if ($method == "findAllDesc") {
-            return $this->_findAll(PicoDatabasePersistent::ORDER_DESC);
-        }     
         else if (strncasecmp($method, "listBy", 6) === 0) {
             $var = lcfirst(substr($method, 6));
-            return $this->findBy($var, $params, null, true);
+            // get pagable
+            $pagable = $this->pagableFromParams($params);
+            // filter param
+            $parameters = $this->valuesFromParams($params);
+            return $this->findBy($var, $parameters, $pagable, true);
         }
         else if (strncasecmp($method, "listAscBy", 9) === 0) {
             $var = lcfirst(substr($method, 9));
-            return $this->findBy($var, $params, PicoDatabasePersistent::ORDER_ASC, true);
+            // get pagable
+            $pagable = $this->pagableFromParams($params);
+            // filter param
+            $parameters = $this->valuesFromParams($params);
+            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistent::ORDER_ASC, true);
         }
         else if (strncasecmp($method, "listDescBy", 10) === 0) {
             $var = lcfirst(substr($method, 10));
-            return $this->findBy($var, $params, PicoDatabasePersistent::ORDER_DESC, true);
-        }
-        else if ($method == "listAll") {
-            return $this->_findAll(null, true);
+            // get pagable
+            $pagable = $this->pagableFromParams($params);
+            // filter param
+            $parameters = $this->valuesFromParams($params);
+            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistent::ORDER_DESC, true);
         }
         else if ($method == "listAllAsc") {
-            return $this->_findAll(PicoDatabasePersistent::ORDER_ASC, true);
+            // get pagable
+            $pagable = $this->pagableFromParams($params);
+            return $this->findAll($pagable, PicoDatabasePersistent::ORDER_ASC, true);
         }
         else if ($method == "listAllDesc") {
-            return $this->_findAll(PicoDatabasePersistent::ORDER_DESC, true);
+            // get pagable
+            $pagable = $this->pagableFromParams($params);
+            return $this->findAll($pagable, PicoDatabasePersistent::ORDER_DESC, true);
         }
         else if (strncasecmp($method, "deleteBy", 8) === 0) {
             $var = lcfirst(substr($method, 8));
-            return $this->deleteBy($var, $params, null, true);
+            return $this->deleteBy($var, $params);
         }
         else if (strncasecmp($method, "booleanToTextBy", 15) === 0) {
             $prop = lcfirst(substr($method, 15));
@@ -995,11 +1111,68 @@ class DynamicObject extends stdClass // NOSONAR
             $var = lcfirst(substr($method, 8));
             return $this->existsBy($var, $params);
         }
-        else if (strncasecmp($method, "equals", 6) === 0) {
-            $var = lcfirst(substr($method, 6));
-            $value = isset($this->$var) ? $this->$var : null;
-            return isset($params[0]) && $params[0] == $value;
+    }
+
+    /**
+     * Get pagable from parameters
+     * @param array $params
+     * @return PicoPagable|null
+     */
+    private function pagableFromParams($params)
+    {
+        if(isset($params) && is_array($params))
+        {
+            foreach($params as $param)
+            {
+                if($param instanceof PicoPagable)
+                {
+                    return $param;
+                }
+            }
         }
+        return null;
+    }
+    
+    /**
+     * Get sortable from parameters
+     * @param array $params
+     * @return PicoSortable|null
+     */
+    private function sortableFromParams($params)
+    {
+        if(isset($params) && is_array($params))
+        {
+            foreach($params as $param)
+            {
+                if($param instanceof PicoSortable)
+                {
+                    return $param;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get pagable from parameters
+     * @param array $params
+     * @return array
+     */
+    private function valuesFromParams($params)
+    {
+        $ret = array();
+        if(isset($params) && is_array($params))
+        {
+            foreach($params as $param)
+            {
+                if($param instanceof PicoPagable)
+                {
+                    break;
+                }
+                $ret[] = $param;
+            }
+        }
+        return $ret;
     }
 
     /**
@@ -1009,17 +1182,60 @@ class DynamicObject extends stdClass // NOSONAR
      */
     public function __toString()
     {
+        $snake = $this->_snake();
+        $pretty = $this->_pretty();
+        $flag = $pretty ? JSON_PRETTY_PRINT : 0;
         $obj = clone $this;
-        $snake = $this->isSnake();
+        foreach($obj as $key=>$value)
+        {
+            if($value instanceof self)
+            {
+                $value = $this->stringifyObject($value, $snake);
+                $obj->set($key, $value);
+            }
+        }
         $upperCamel = $this->isUpperCamel();
         if($upperCamel)
         {         
             $value = $this->valueArrayUpperCamel();
-            return json_encode($value);
+            return json_encode($value, $flag);
         }
         else 
         {
-            return json_encode($obj->value($snake));
+            return json_encode($obj->value($snake), $flag);
         }
+    }
+    
+    /**
+     * Stringify object
+     *
+     * @param self $value
+     * @param bool $snake
+     * @return mixed
+     */
+    private function stringifyObject($value, $snake)
+    {
+        if(is_array($value))
+        {
+            foreach($value as $key2=>$val2)
+            {
+                if($val2 instanceof self)
+                {
+                    $value[$key2] = $val2->stringifyObject($val2, $snake);
+                }
+            }
+        }
+        else if(is_object($value))
+        {
+            foreach($value as $key2=>$val2)
+            {
+                if($val2 instanceof self)
+                {
+                    
+                    $value->{$key2} = $val2->stringifyObject($val2, $snake);
+                }
+            }
+        }
+        return $value->value($snake);
     }
 }

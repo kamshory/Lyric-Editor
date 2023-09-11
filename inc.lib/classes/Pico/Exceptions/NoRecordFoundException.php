@@ -1,7 +1,7 @@
 <?php
-namespace Pico\Exception;
+namespace Pico\Exceptions;
 
-class NoColumnUpdatedException extends \Exception
+class NoRecordFoundException extends \Exception
 {
     /**
      * Previous exception

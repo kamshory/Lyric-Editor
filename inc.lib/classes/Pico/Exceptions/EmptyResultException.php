@@ -1,7 +1,7 @@
 <?php
-namespace Pico\Exception;
+namespace Pico\Exceptions;
 
-class NoColumnMatchException extends \Exception
+class EmptyResultException extends \Exception
 {
     /**
      * Previous exception

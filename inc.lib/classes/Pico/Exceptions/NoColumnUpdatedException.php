@@ -1,7 +1,7 @@
 <?php
-namespace Pico\Exception;
+namespace Pico\Exceptions;
 
-class NoDatabaseConnectionException extends \Exception
+class NoColumnUpdatedException extends \Exception
 {
     /**
      * Previous exception

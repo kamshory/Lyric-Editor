@@ -1,7 +1,7 @@
 <?php
-namespace Pico\Exception;
+namespace Pico\Exceptions;
 
-class NotNullColumnException extends \Exception
+class NoInsertableColumnException extends \Exception
 {
     /**
      * Previous exception

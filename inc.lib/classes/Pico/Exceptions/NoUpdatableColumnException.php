@@ -1,7 +1,7 @@
 <?php
-namespace Pico\Exception;
+namespace Pico\Exceptions;
 
-class NullPointerException extends \Exception
+class NoUpdatableColumnException extends \Exception
 {
     /**
      * Previous exception

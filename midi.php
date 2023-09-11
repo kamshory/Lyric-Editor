@@ -2,7 +2,9 @@
 use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
+use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Midi;
+use Pico\Data\Tools\SelectOption;
 use Pico\Exception\NoRecordFoundException;
 use Pico\Request\PicoRequest;
 
@@ -271,7 +273,25 @@ else if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getMid
 else
 {
 
+?>
 
+<style>
+    .filter-container .form-control{
+        display: inline;
+        width: auto;
+    }
+</style>
+
+<div class="filter-container">
+    <div class="filter-group">
+        <select name="album_id" id="album_id" class="form-control">
+            <option value="">- All -</option>
+            <?php 
+            echo (new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId())); ?>
+        </select>
+    </div>
+</div>
+<?php
 $pagination = new PicoPagination($cfg->getResultPerPage()); 
 $subquery = new PicoDatabaseQueryBuilder($database);
 $queryBuilder = new PicoDatabaseQueryBuilder($database);
