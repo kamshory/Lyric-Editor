@@ -840,6 +840,26 @@ class DynamicObject extends stdClass // NOSONAR
     }
     
     /**
+     * Count data from database
+     *
+     * @param string $method
+     * @param mixed $params
+     * @return integer
+     */
+    private function countBy($method, $params)
+    {
+        if($this->database != null && $this->database->isConnected())
+        {
+            $persist = new PicoDatabasePersistent($this->database, $this);
+            return $persist->countBy($method, $params);
+        }
+        else
+        {
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
+        }
+    }
+    
+    /**
      * Delete by params
      *
      * @param string $method
@@ -988,6 +1008,7 @@ class DynamicObject extends stdClass // NOSONAR
      * listDescBy &raquo; search data from database order by primary keys descending. Similar to findDescBy but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
      * listAllAsc &raquo; search data from database without filter order by primary keys ascending. Similar to findAllAsc but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
      * listAllDesc &raquo; search data from database without filter order by primary keys descending. Similar to findAllDesc but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
+     * countBy &raquo; count data from database.
      * deleteBy &raquo; delete data from database without read it first. This method require database connection.
      * existsBy &raquo; check data from database. This method require database connection.
      * booleanToTextBy &raquo; convert bool value to yes/no or true/false depend on parameters given. Example: $result = booleanToTextByActive("Yes", "No"); If $obj->active is true, $result will be "Yes" otherwise "No". This method not require database connection.
@@ -1063,9 +1084,11 @@ class DynamicObject extends stdClass // NOSONAR
             $var = lcfirst(substr($method, 6));
             // get pagable
             $pagable = $this->pagableFromParams($params);
+            // get sortable
+            $sortable = $this->sortableFromParams($params);
             // filter param
             $parameters = $this->valuesFromParams($params);
-            return $this->findBy($var, $parameters, $pagable, true);
+            return $this->findBy($var, $parameters, $pagable, $sortable, true);
         }
         else if (strncasecmp($method, "listAscBy", 9) === 0) {
             $var = lcfirst(substr($method, 9));
@@ -1092,6 +1115,11 @@ class DynamicObject extends stdClass // NOSONAR
             // get pagable
             $pagable = $this->pagableFromParams($params);
             return $this->findAll($pagable, PicoDatabasePersistent::ORDER_DESC, true);
+        }
+        else if (strncasecmp($method, "countBy", 6) === 0) {
+            $var = lcfirst(substr($method, 6));
+            $parameters = $this->valuesFromParams($params);
+            return $this->countBy($var, $parameters);
         }
         else if (strncasecmp($method, "deleteBy", 8) === 0) {
             $var = lcfirst(substr($method, 8));
