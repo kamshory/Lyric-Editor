@@ -6,6 +6,8 @@ class PicoDataComparation
 {
     const EQUALS = "=";
     const NOT_EQUALS = "!=";
+    const LIKE = "like";
+    const NOT_LIKE = "not like";
     const LESS_THAN = "<";
     const GREATER_THAN = ">";
     const LESS_THAN_OR_EQUALS = "<=";
@@ -15,8 +17,25 @@ class PicoDataComparation
     const TYPE_NUMERIC = "numeric";
     const TYPE_NULL = "null";
     
+    /**
+     * Value comparator
+     *
+     * @var string
+     */
     private $comparison = "=";
+    
+    /**
+     * Value
+     *
+     * @var mixed
+     */
     private $value = null;
+    
+    /**
+     * Stype
+     *
+     * @var string
+     */
     private $type = "null";
 
     /**
@@ -35,6 +54,24 @@ class PicoDataComparation
     public static function notEquals($value)
     {
         return new PicoDataComparation($value, self::NOT_EQUALS);
+    }
+
+    /**
+     * Like
+     * @param mixed $value
+     */
+    public static function like($value)
+    {
+        return new PicoDataComparation($value, self::LIKE);
+    }
+
+    /**
+     * Not like
+     * @param mixed $value
+     */
+    public static function notLike($value)
+    {
+        return new PicoDataComparation($value, self::NOT_LIKE);
     }
 
     /**
@@ -104,14 +141,7 @@ class PicoDataComparation
      */
     private function _equals()
     {
-        if($this->value === null || $this->type == self::TYPE_NULL)
-        {
-            return "is";
-        }
-        else
-        {
-            return "=";
-        }
+        return ($this->value === null || $this->type == self::TYPE_NULL) ? "is" : "=";
     }
 
     /**
@@ -121,14 +151,7 @@ class PicoDataComparation
      */
     private function _notEquals()
     {
-        if($this->value === null || $this->type == self::TYPE_NULL)
-        {
-            return "is not";
-        }
-        else
-        {
-            return "!=";
-        }
+        return ($this->value === null || $this->type == self::TYPE_NULL) ? "is not" : "!=";
     }
 
     /**
@@ -176,32 +199,34 @@ class PicoDataComparation
      *
      * @return string
      */
-    public function getComparison() // NOSONAR
+    public function getComparison()
     {
+        $ret = $this->_equals();
         if($this->comparison === self::NOT_EQUALS)
         {
-            return $this->_notEquals();
+            $ret = $this->_notEquals();
         }
-        if($this->comparison === self::LESS_THAN)
+        else if($this->comparison === self::LESS_THAN)
         {
-            return $this->_lessThan();
+            $ret = $this->_lessThan();
         }
-        if($this->comparison === self::GREATER_THAN)
+        else if($this->comparison === self::GREATER_THAN)
         {
-            return $this->_greaterThan();
+            $ret = $this->_greaterThan();
         }
-        if($this->comparison === self::LESS_THAN_OR_EQUALS)
+        else if($this->comparison === self::LESS_THAN_OR_EQUALS)
         {
-            return $this->_lessThanOrEquals();
+            $ret = $this->_lessThanOrEquals();
         }
-        if($this->comparison === self::GREATER_THAN_OR_EQUALS)
+        else if($this->comparison === self::GREATER_THAN_OR_EQUALS)
         {
-            return $this->_greaterThanOrEquals();
+            $ret = $this->_greaterThanOrEquals();
         }
-        else
+        else if($this->comparison == self::LIKE || $this->comparison == self::NOT_LIKE)
         {
-            return $this->_equals();
+            $ret = $this->comparison;
         }
+        return $ret;
     }
 
     /**
