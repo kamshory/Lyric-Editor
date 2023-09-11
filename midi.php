@@ -4,9 +4,10 @@ use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
 use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Artist;
+use Pico\Data\Entity\Genre;
 use Pico\Data\Entity\Midi;
 use Pico\Data\Tools\SelectOption;
-use Pico\Exception\NoRecordFoundException;
+use Pico\Exceptions\NoRecordFoundException;
 use Pico\Request\PicoRequest;
 
 require_once "inc/auth.php";
@@ -288,18 +289,29 @@ else
 
 <div class="filter-container">
     <div class="filter-group">
+        <span>Genre</span>
+        <select class="form-control" name="genre_id" id="genre_id">
+            <option value="">- All -</option>
+            <?php echo new SelectOption(new Genre(null, $database), array('value'=>'genreId', 'label'=>'name'), $inputGet->getGenreId()); ?>
+        </select>
+    </div>
+    <div class="filter-group">
         <span>Album</span>
-        <select name="album_id" id="album_id" class="form-control">
+        <select class="form-control" name="album_id" id="album_id">
             <option value="">- All -</option>
             <?php echo new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId()); ?>
         </select>
     </div>
     <div class="filter-group">
         <span>Artist Vocal</span>
-        <select name="artist_vocal_id" id="artist_vocal_id" class="form-control">
+        <select class="form-control" name="artist_vocal_id" id="artist_vocal_id">
             <option value="">- All -</option>
             <?php echo new SelectOption(new Artist(null, $database), array('value'=>'artistId', 'label'=>'name'), $inputGet->getArtistVocalId()); ?>
         </select>
+    </div>
+    <div class="filter-group">
+        <span>Title</span>
+        <input class="form-control" type="text" name="title" id="title" value="<?php echo htmlspecialchars($inputGet->getTitle());?>">
     </div>
 </div>
 <?php

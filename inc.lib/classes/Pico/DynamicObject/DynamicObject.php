@@ -1037,9 +1037,11 @@ class DynamicObject extends stdClass // NOSONAR
             $var = lcfirst(substr($method, 6));
             // get pagable
             $pagable = $this->pagableFromParams($params);
+            // get sortable
+            $sortable = $this->sortableFromParams($params);
             // filter param
             $parameters = $this->valuesFromParams($params);
-            return $this->findBy($var, $parameters, $pagable);
+            return $this->findBy($var, $parameters, $pagable, $sortable);
         }
         else if (strncasecmp($method, "findAscBy", 9) === 0) {
             $var = lcfirst(substr($method, 9));

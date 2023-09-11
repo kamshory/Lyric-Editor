@@ -1,7 +1,7 @@
 <?php
 
 use Pico\Data\Entity\Album;
-use Pico\Exception\NoRecordFoundException;
+use Pico\Exceptions\NoRecordFoundException;
 use Pico\Request\PicoRequest;
 
 require_once dirname(__DIR__)."/inc/auth.php";

@@ -3,7 +3,7 @@
 use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Entity\Song;
 use Pico\Database\PicoDatabaseQueryBuilder;
-use Pico\Exception\NoRecordFoundException;
+use Pico\Exceptions\NoRecordFoundException;
 use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
 

@@ -3,7 +3,7 @@ use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
 use Pico\Data\Entity\Song;
-use Pico\Exception\NoRecordFoundException;
+use Pico\Exceptions\NoRecordFoundException;
 use Pico\Request\PicoRequest;
 
 require_once "inc/auth.php";

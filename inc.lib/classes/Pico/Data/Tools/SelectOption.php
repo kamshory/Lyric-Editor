@@ -3,6 +3,8 @@
 namespace Pico\Data\Tools;
 
 use Exception;
+use Pico\Database\PicoSort;
+use Pico\Database\PicoSortable;
 use Pico\DynamicObject\DynamicObject;
 
 class SelectOption
@@ -27,6 +29,13 @@ class SelectOption
      * @var mixed
      */
     private $value;
+    
+    /**
+     * Rows
+     *
+     * @var array
+     */
+    private $rows = array();
 
     /**
      * Constructor
@@ -40,17 +49,17 @@ class SelectOption
         $this->object = $object;
         $this->map = $map;
         $this->value = $value;
-
         $this->findAll();
     }
 
-    private $rows = array();
+    
 
     private function findAll()
     {
         try
-        {           
-            $result = $this->object->findByActive(true);
+        {  
+            $sortable = new PicoSortable(array('name', PicoSortable::ORDER_TYPE_ASC));         
+            $result = $this->object->findByActive(true, $sortable);
             foreach($result->getResult() as $row)
             {
                 $value = $row->get($this->map['value']);
@@ -68,7 +77,7 @@ class SelectOption
         }
         catch(Exception $e)
         {
-
+            // do nothing
         }
     }
 
