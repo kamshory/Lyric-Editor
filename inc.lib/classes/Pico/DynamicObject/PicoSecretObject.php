@@ -1,0 +1,607 @@
+<?php
+
+namespace Pico\DynamicObject;
+
+use Pico\Util\PicoAnnotationParser;
+use Pico\Util\PicoEnvironmentVariable;
+use ReflectionClass;
+use stdClass;
+use Symfony\Component\Yaml\Yaml;
+
+class PicoSecretObject extends stdClass //NOSONAR
+{
+    const RANDOM_KEY_1 = "68e656b251e67e8358bef8483ab0d51c";
+    const RANDOM_KEY_2 = "6619f3e7a1a9f0e75838d41ff368f728";
+    const KEY_NAME = "name";
+    const KEY_VALUE = "value";
+    const KEY_PROPERTY_TYPE = "propertyType";
+    const KEY_DEFAULT_VALUE = "default_value";
+    const ANNOTATION_ENCRYPT_IN = "EncryptIn";
+    const ANNOTATION_DECRYPT_OUT = "DecryptOut";
+    
+    /**
+     * List of propertis to be encrypted when call SET
+     *
+     * @var string[]
+     */
+    private $encryptInProperties = array();
+    
+    /**
+     * List of propertis to be decrypted when call GET
+     *
+     * @var string[]
+     */
+    private $decryptOutProperties = array();
+
+    /**
+     * Read only
+     *
+     * @var boolean
+     */
+    private $readonly = false;
+    
+    /**
+     * Constructor
+     *
+     * @param self|array|object $data
+     */
+    public function __construct($data = null)
+    {
+        $this->_objectInfo();
+        if($data != null)
+        {
+            $this->loadData($data);
+        }
+    }
+    
+    private function _objectInfo()
+    {
+        $className = get_class($this);
+        $reflexClass = new PicoAnnotationParser($className);
+        $props = $reflexClass->getProperties();
+        
+        // iterate each properties of the class
+        foreach($props as $prop)
+        {
+            $reflexProp = new PicoAnnotationParser($className, $prop->name, 'property');
+            $parameters = $reflexProp->getParameters();
+
+            // get column name of each parameters
+            foreach($parameters as $param=>$val)
+            {
+                if(strcasecmp($param, self::ANNOTATION_ENCRYPT_IN) == 0)
+                {
+                    $this->encryptInProperties[] = $prop->name;
+                }
+                if(strcasecmp($param, self::ANNOTATION_DECRYPT_OUT) == 0)
+                {
+                    $this->decryptOutProperties[] = $prop->name;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Magic method
+     *
+     * @param string $method
+     * @param mixed $params
+     * @return self|bool|mixed|null
+     */
+    public function __call($method, $params) // NOSONAR
+    {
+        if (strncasecmp($method, "is", 2) === 0) {
+            $var = lcfirst(substr($method, 2));
+            return isset($this->$var) ? $this->$var == 1 : false;
+        } else if (strncasecmp($method, "get", 3) === 0) {
+            $var = lcfirst(substr($method, 3));
+            return $this->_get($var);
+        }
+        else if (strncasecmp($method, "set", 3) === 0 && !$this->readonly) {
+            $var = lcfirst(substr($method, 3));
+            $this->_set($var, $params[0]);
+            $this->modifyNullProperties($var, $params[0]);
+            return $this;
+        }
+    }
+    
+    private function _set($var, $value)
+    {
+        if($this->needEncryption($var))
+        {
+            $value = $this->encryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+        }
+        $this->$var = $value;
+    }
+    
+    /**
+     * Get value
+     *
+     * @param string $var
+     * @return mixed
+     */
+    private function _get($var)
+    {
+        $value = $this->_getValue($var);
+        if($this->needDecryption($var))
+        {
+            $value = $this->decryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+        }
+        return $value;
+    }
+    
+    /**
+     * Get value
+     *
+     * @param string $var
+     * @return mixed
+     */
+    private function _getValue($var)
+    {
+        return isset($this->$var) ? $this->$var : null;
+    }
+    
+    /**
+     * Encrypt data
+     *
+     * @param string $plaintext
+     * @param string $hexKey
+     * @return string
+     */
+    private function encryptValue($plaintext, $hexKey) 
+    {
+        $key = hex2bin($hexKey);
+        $method = "AES-256-CBC";
+        $iv = openssl_random_pseudo_bytes(16);   
+        $ciphertext = openssl_encrypt($plaintext, $method, $key, OPENSSL_RAW_DATA, $iv);
+        $hash = hash_hmac('sha256', $ciphertext . $iv, $key, true);
+        return base64_encode($iv . $hash . $ciphertext);
+    }
+    
+    /**
+     * Decrypt data
+     *
+     * @param string $ciphertext
+     * @param string $hexKey
+     * @return string
+     */
+    private function decryptValue($ciphertext, $hexKey) 
+    {
+        $ivHashCiphertext = base64_decode($ciphertext);
+        $key = hex2bin($hexKey);
+        $method = "AES-256-CBC";
+        $iv = substr($ivHashCiphertext, 0, 16);
+        $hash = substr($ivHashCiphertext, 16, 32);
+        $ciphertext = substr($ivHashCiphertext, 48);
+        if (!hash_equals(hash_hmac('sha256', $ciphertext . $iv, $key, true), $hash)) 
+        {
+            return null;
+        }
+        return openssl_decrypt($ciphertext, $method, $key, OPENSSL_RAW_DATA, $iv);
+    }
+    
+    /**
+     * Check if value is required to be encrypted before stored
+     *
+     * @param string $var
+     * @return bool
+     */
+    private function needEncryption($var)
+    {
+        return in_array($var, $this->encryptInProperties);
+    }
+    
+    /**
+     * Check if value is required to be decrypted after read
+     *
+     * @param string $var
+     * @return bool
+     */
+    private function needDecryption($var)
+    {
+        return in_array($var, $this->decryptOutProperties);
+    }
+
+    /**
+     * Load data to object
+     * @param mixed $data
+     * @return self
+     */
+    public function loadData($data)
+    {
+        if($data != null)
+        {
+            if($data instanceof self)
+            {
+                $values = $data->value();
+                foreach ($values as $key => $value) {
+                    $key2 = $this->camelize($key);
+                    $this->_set($key2, $value);
+                }
+            }
+            else if (is_array($data) || is_object($data)) {
+                foreach ($data as $key => $value) {
+                    $key2 = $this->camelize($key);
+                    $this->_set($key2, $value);
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Load data from INI file
+     *
+     * @param string $path
+     * @param bool $systemEnv
+     * @return self
+     */
+    public function loadIniFile($path, $systemEnv = false)
+    {
+        // Parse without sections
+        $data = parse_ini_file($path);
+        if($systemEnv)
+        {
+            $env = new PicoEnvironmentVariable();
+            $data = $env->replaceSysEnvAll($data, true);
+        }
+        $this->loadData($data);
+        return $this;
+    }
+
+    /**
+     * Load data from Yaml file
+     *
+     * @param string $path
+     * @param bool $systemEnv
+     * @return self
+     */
+    public function loadYamlFile($path, $systemEnv = false, $asObject = false)
+    {
+        $data = Yaml::parseFile($path);
+        if($systemEnv)
+        {
+            $env = new PicoEnvironmentVariable();
+            $data = $env->replaceSysEnvAll($data, true);
+        }
+        if($asObject)
+        {
+            // convert to object
+            $obj = json_decode(json_encode((object) $data), false);
+            $this->loadData($obj);
+        }
+        else
+        {
+            $this->loadData($data);
+        }
+        return $this;
+    }
+
+    /**
+     * Load data from JSON file
+     *
+     * @param string $path
+     * @param bool $systemEnv
+     * @return self
+     */
+    public function loadJsonFile($path, $systemEnv = false, $asObject = false)
+    {
+        $data = json_decode(file_get_contents($path));
+        if($systemEnv)
+        {
+            $env = new PicoEnvironmentVariable();
+            $data = $env->replaceSysEnvAll($data, true);
+        }
+        if($asObject)
+        {
+            // convert to object
+            $obj = json_decode(json_encode((object) $data), false);
+            $this->loadData($obj);
+        }
+        else
+        {
+            $this->loadData($data);
+        }
+        return $this;
+    }
+    
+    /**
+     * Set property value
+     *
+     * @param string $propertyName
+     * @param mixed|null
+     * @param bool $skipModifyNullProperties
+     * @return self
+     */
+    public function set($propertyName, $propertyValue, $skipModifyNullProperties = false)
+    {
+        $var = lcfirst($propertyName);
+        $var = $this->camelize($var);
+        $this->{$var} = $propertyValue;
+        if(!$skipModifyNullProperties && $propertyValue === null)
+        {
+            $this->modifyNullProperties($var, $propertyValue);
+        }
+        return $this;
+    }
+    
+    /**
+     * Get property value
+     *
+     * @param string $propertyName
+     * @return mixed|null
+     */
+    public function get($propertyName)
+    {
+        $var = lcfirst($propertyName);
+        $var = $this->camelize($var);
+        return isset($this->$var) ? $this->$var : null;
+    }
+    
+    /**
+     * Get property value 
+     *
+     * @param string $propertyName
+     * @return mixed|null
+     */
+    public function getOrDefault($propertyName, $defaultValue = null)
+    {
+        $var = lcfirst($propertyName);
+        $var = $this->camelize($var);
+        return isset($this->$var) ? $this->$var : $defaultValue;
+    }
+    
+    /**
+     * Copy value from other object
+     *
+     * @param self|mixed $source
+     * @param array $filter
+     * @param bool $includeNull
+     * @return void
+     */
+    public function copyValueFrom($source, $filter = null, $includeNull = false)
+    {
+        if($filter != null)
+        {
+            $tmp = array();
+            $index = 0;
+            foreach($filter as $val)
+            {
+                $tmp[$index] = trim($this->camelize($val));               
+                $index++;
+            }
+            $filter = $tmp;
+        }
+        $values = $source->value();
+        foreach($values as $property=>$value)
+        {
+            if(
+                ($filter == null || (is_array($filter) && !empty($filter) && in_array($property, $filter))) 
+                && 
+                ($includeNull || $value != null)
+                )
+            {
+                $this->set($property, $value);
+            }
+        }
+    }
+    
+    /**
+     * Fix value
+     *
+     * @param string $value
+     * @param string $type
+     * @return mixed
+     */
+    protected function fixValue($value, $type) // NOSONAR
+    {
+        if(strtolower($value) === 'true')
+        {
+            return true;
+        }
+        else if(strtolower($value) === 'false')
+        {
+            return false;
+        }
+        else if(strtolower($value) === 'null')
+        {
+            return false;
+        }
+        else if(is_numeric($value) && strtolower($type) != 'string')
+        {
+            return $value + 0;
+        }
+        else 
+        {
+            return $value;
+        }
+    }
+
+    /**
+     * Get object value
+     * @return stdClass
+     */
+    public function value($snakeCase = false)
+    {
+        $parentProps = $this->propertyList(true, true);
+        $value = new stdClass;
+        foreach ($this as $key => $val) {
+            if(!in_array($key, $parentProps))
+            {
+                $value->$key = $val;
+            }
+        }
+        if($snakeCase)
+        {
+            $value2 = new stdClass;
+            foreach ($value as $key => $val) {
+                $key2 = $this->snakeize($key);
+                $value2->$key2 = $val;
+            }
+            return $value2;
+        }
+        return $value;
+    }
+    
+    /**
+     * Get object value
+     * @return stdClass
+     */
+    public function valueObject($snakeCase = false)
+    {
+        return $this->value($snakeCase);
+    }
+
+    /**
+     * Get object value as associative array
+     * @return array
+     */
+    public function valueArray($snakeCase = false)
+    {
+        $value = $this->value($snakeCase);
+        return json_decode(json_encode($value), true);
+    }
+    
+    /**
+     * Get object value as associated array with upper case first
+     *
+     * @return array
+     */
+    public function valueArrayUpperCamel()
+    {
+        $obj = clone $this;
+        $array = (array) $obj->value();
+        $renameMap = array();
+        $keys = array_keys($array);
+        foreach($keys as $key)
+        {
+            $renameMap[$key] = ucfirst($key);
+        }          
+        $array = array_combine(array_map(function($el) use ($renameMap) {
+            return $renameMap[$el];
+        }, array_keys($array)), array_values($array));
+        return $array;
+    }
+    
+    /**
+     * Check if JSON naming strategy is snake case or not
+     *
+     * @return bool
+     */
+    protected function _snake()
+    {
+        return isset($this->classParams['JSON'])
+            && isset($this->classParams['JSON']['property-naming-strategy'])
+            && strcasecmp($this->classParams['JSON']['property-naming-strategy'], 'SNAKE_CASE') == 0
+            ;
+    }
+    
+    /**
+     *  Check if JSON naming strategy is upper camel case or not
+     *
+     * @return bool
+     */
+    protected function isUpperCamel()
+    {
+        return isset($this->classParams['JSON'])
+            && isset($this->classParams['JSON']['property-naming-strategy'])
+            && strcasecmp($this->classParams['JSON']['property-naming-strategy'], 'UPPER_CAMEL_CASE') == 0
+            ;
+    }
+    
+    /**
+     * Check if JSON naming strategy is camel case or not
+     *
+     * @return bool
+     */
+    protected function _camel()
+    {
+        return !$this->_snake();
+    }
+    
+    /**
+     * Convert snake case to camel case
+     *
+     * @param string $input
+     * @param string $separator
+     * @return string
+     */
+    protected function camelize($input, $separator = '_')
+    {
+        return lcfirst(str_replace($separator, '', ucwords($input, $separator)));
+    }
+
+    /**
+     * Convert camel case to snake case
+     *
+     * @param string $input
+     * @param string $glue
+     * @return string
+     */
+    protected function snakeize($input, $glue = '_') {
+        return ltrim(
+            preg_replace_callback('/[A-Z]/', function ($matches) use ($glue) {
+                return $glue . strtolower($matches[0]);
+            }, $input),
+            $glue
+        );
+    } 
+    
+    
+    /**
+     * Property list
+     * @var bool $reflectSelf
+     * @var bool $asArrayProps
+     * @return array
+     */
+    protected function propertyList($reflectSelf = false, $asArrayProps = false)
+    {
+        $reflectionClass = $reflectSelf ? self::class : get_called_class();
+        $class = new ReflectionClass($reflectionClass);
+
+        // filter only the calling class properties
+        // skip parent properties
+        $properties = array_filter(
+            $class->getProperties(),
+            function($property) use($class) {
+                return $property->getDeclaringClass()->getName() == $class->getName();
+            }
+        );
+        if($asArrayProps)
+        {
+            $result = array();
+            $index = 0;
+            foreach ($properties as $key) {
+                $prop = $key->name;
+                $result[$index] = $prop;
+                
+                $index++;
+            }
+            return $result;
+        }
+        else
+        {
+            return $properties;
+        }
+    }
+    
+    /**
+     * Modify null properties
+     *
+     * @param string $propertyName
+     * @param mixed $propertyValue
+     * @return void
+     */
+    private function modifyNullProperties($propertyName, $propertyValue)
+    {
+        if($propertyValue === null && !isset($this->nullProperties[$propertyName]))
+        {
+            $this->nullProperties[$propertyName] = true; 
+        }
+        if($propertyValue != null && isset($this->nullProperties[$propertyName]))
+        {
+            unset($this->nullProperties[$propertyName]); 
+        }
+    }
+
+}

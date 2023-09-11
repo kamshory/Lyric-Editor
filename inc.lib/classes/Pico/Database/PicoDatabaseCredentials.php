@@ -1,9 +1,10 @@
 <?php
 
 namespace Pico\Database;
-use Pico\DynamicObject\DynamicObject;
 
-class PicoDatabaseCredentials extends DynamicObject
+use Pico\DynamicObject\PicoSecretObject;
+
+class PicoDatabaseCredentials extends PicoSecretObject
 {
 	/**
 	 * Database driver
@@ -15,6 +16,8 @@ class PicoDatabaseCredentials extends DynamicObject
 	/**
 	 * Database server host
 	 *
+	 * @EncryptIn
+	 * @DecryptOut
 	 * @var string
 	 */
 	protected $host = 'localhost';
@@ -28,6 +31,8 @@ class PicoDatabaseCredentials extends DynamicObject
 	/**
 	 * Database username
 	 *
+	 * @EncryptIn
+	 * @DecryptOut
 	 * @var string
 	 */
 	protected $username = "";
@@ -35,6 +40,8 @@ class PicoDatabaseCredentials extends DynamicObject
 	/**
 	 * Database user password
 	 *
+	 * @EncryptIn
+	 * @DecryptOut
 	 * @var string
 	 */
 	protected $password = "";
@@ -42,9 +49,20 @@ class PicoDatabaseCredentials extends DynamicObject
 	/**
 	 * Database name
 	 *
+	 * @EncryptIn
+	 * @DecryptOut
 	 * @var string
 	 */
 	protected $databaseName = "";
+	
+	/**
+	 * Database schema
+	 *
+	 * @EncryptIn
+	 * @DecryptOut
+	 * @var string
+	 */
+	protected $databseSchema = "public";
 
 	/**
 	 * Application time zone
