@@ -3,7 +3,7 @@
 namespace Pico\DynamicObject;
 
 use Pico\Util\PicoAnnotationParser;
-use PicoEnvironmentVariable;
+use Pico\Util\PicoEnvironmentVariable;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\Yaml\Yaml;
