@@ -318,12 +318,12 @@ else
 </div>
 
 <?php
-$pagination = new PicoPagination($cfg->getResultPerPage()); 
+$pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createMidiSpecification($inputGet);
 
 $sortable = new PicoSortable('title', PicoSortable::ORDER_TYPE_DESC);
-$pagable = new PicoPagable(new PicoPage(1, $cfg->getResultPerPage()), $sortable);
+$pagable = new PicoPagable(new PicoPage($pagination->getPageNumber(), $pagination->getLimit()), $sortable);
 $midi = new EntityMidi(null, $database);
 $rowData = $midi->findAll($spesification, $pagable, true);
 

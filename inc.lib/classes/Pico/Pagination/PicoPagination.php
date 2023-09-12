@@ -18,6 +18,13 @@ class PicoPagination
      * @var integer
      */
     private $limit = 0;
+    
+    /**
+     * Page number
+     *
+     * @var integer
+     */
+    private $pageNumber = 1;
 
     /**
      * Order by
@@ -38,6 +45,7 @@ class PicoPagination
         $this->offset = $this->parseOffset();
         $this->orderBy = @$_GET['orderby'];
         $this->orderType = @$_GET['ordertype'];
+        $this->pageNumber = floor($this->offset / $limit) + 1;
     }
 
     /**
@@ -152,5 +160,29 @@ class PicoPagination
             $orderType = 'asc';
         }
         return $orderType;
+    }
+
+    /**
+     * Get page number
+     *
+     * @return  integer
+     */ 
+    public function getPageNumber()
+    {
+        return $this->pageNumber;
+    }
+
+    /**
+     * Set page number
+     *
+     * @param  integer  $pageNumber  Page number
+     *
+     * @return  self
+     */ 
+    public function setPageNumber($pageNumber)
+    {
+        $this->pageNumber = $pageNumber;
+
+        return $this;
     }
 }
