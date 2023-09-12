@@ -748,19 +748,19 @@ class DynamicObject extends stdClass // NOSONAR
      *
      * @param PicoSpecification $specification
      * @param PicoPagable|string $pagable
+     * @param PicoSortable|string $sortable
      * @param bool $passive
-     * @param float $startTime
      * @return PicoPageData
      * @throws NoRecordFoundException if no record found
      * @throws NoDatabaseConnectionException if no database connection
      */
-    public function findAll($specification = null, $pagable = null, $passive = false)
+    public function findAll($specification = null, $pagable = null, $sortable = null, $passive = false)
     {
         $startTime = microtime(true);
         if($this->database != null && $this->database->isConnected())
         {
             $persist = new PicoDatabasePersistent($this->database, $this);
-            $result = $persist->findAll($specification, $pagable);
+            $result = $persist->findAll($specification, $pagable, $sortable);
             $match = $persist->countAll($specification);
             if($this->_notNullAndNotEmpty($result))
             {

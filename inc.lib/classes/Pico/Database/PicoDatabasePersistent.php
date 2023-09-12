@@ -1125,9 +1125,10 @@ class PicoDatabasePersistent // NOSONAR
      *
      * @param PicoSpecification $specification
      * @param PicoPagable $pagable
+     * @param PicoSortable|string $sortable
      * @return array|null
      */
-    public function findAll($specification, $pagable = null)
+    public function findAll($specification, $pagable = null, $sortable = null)
     {
         $info = $this->getTableInfo();
         $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
@@ -1144,7 +1145,7 @@ class PicoDatabasePersistent // NOSONAR
         }
         if($pagable != null)
         {
-            $sqlQuery = $this->setPagable($sqlQuery, $pagable, null, $info);      
+            $sqlQuery = $this->setPagable($sqlQuery, $pagable, $sortable, $info);      
         }
         try
         {

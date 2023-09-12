@@ -87,6 +87,12 @@ class PicoPageData
         {
             $this->calculateContent();
         }
+        else
+        {
+            $this->pageNumber = 1;
+            $this->totalPage = 1;
+            $this->pageSize = $totalResult;
+        }
         $this->endTime = microtime(true);
         $this->executionTime = $this->endTime - $this->startTime;
     }
