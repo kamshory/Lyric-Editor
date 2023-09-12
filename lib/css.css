@@ -37,7 +37,9 @@
     width: 100%;
     position: relative;
     box-sizing: border-box;
+    position: relative;
 }
+
 
 .srt-waveform {
     width: 100%;
@@ -143,10 +145,6 @@
     width: 100%;
     box-sizing: border-box;
     padding: 5px 10px;
-}
-
-.srt-edit-area {
-    position: relative;
 }
 
 .srt-map-srt-container {
