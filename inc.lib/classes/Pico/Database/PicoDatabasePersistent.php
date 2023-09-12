@@ -1014,7 +1014,7 @@ class PicoDatabasePersistent // NOSONAR
     }
 
     /**
-     * Add specification
+     * Add specification to query builder
      *
      * @param PicoDatabaseQueryBuilder $sqlQuery
      * @param PicoSpecification|array $specification
@@ -1033,25 +1033,57 @@ class PicoDatabasePersistent // NOSONAR
         }
         return $sqlQuery;
     }
-        
+
     /**
-     * Add pagable
+     * Add pagable to query builder
      *
      * @param PicoDatabaseQueryBuilder $sqlQuery
      * @param PicoPagable $pagable
-     * @param PicoSortable|string $sortable
-     * @param stdClass $info
      * @return PicoDatabaseQueryBuilder
      */
-    private function setPagable($sqlQuery, $pagable, $sortable, $info)
+    private function setPagable($sqlQuery, $pagable)
     {
         if($pagable instanceof PicoPagable)
         {
-            $sortOrder = $pagable->createOrderBy($info);
-            if($sortOrder == null && $sortable != null && $sortable instanceof PicoSortable)
+            $offsetLimit = $pagable->getOffsetLimit();
+            if($offsetLimit != null)
+            {
+                $limit = $offsetLimit->getLimit();
+                $offset = $offsetLimit->getOffset();
+                $sqlQuery->limit($limit);
+                $sqlQuery->offset($offset);
+            }
+        }
+        return $sqlQuery;
+    }
+        
+    /**
+     * Add sortable to query builder
+     *
+     * @param PicoDatabaseQueryBuilder $sqlQuery
+     * @param PicoPagable|null $pagable
+     * @param PicoSortable|string|null $pagable
+     * @param stdClass $info
+     * @return PicoDatabaseQueryBuilder
+     */
+    private function setSortable($sqlQuery, $pagable, $sortable, $info)
+    {
+        if($sortable != null)
+        {
+            if($sortable instanceof PicoSortable)
             {
                 $sortOrder = $sortable->createOrderBy($info);
+                $sqlQuery = $this->setOrdeBy($sqlQuery, $sortOrder);
             }
+            else if(is_string($sortable))
+            {
+                $sortOrder = $this->createOrderBy($info, $sortable);
+                $sqlQuery = $this->setOrdeBy($sqlQuery, $sortOrder);
+            }
+        } 
+        else if($pagable != null && $pagable instanceof PicoPagable)
+        {
+            $sortOrder = $pagable->createOrderBy($info);
             if($this->notNullAndNotEmpty($sortOrder))
             {
                 $sqlQuery->orderBy($sortOrder);
@@ -1093,39 +1125,13 @@ class PicoDatabasePersistent // NOSONAR
         }
         return $sqlQuery;
     }
-    
-    /**
-     * Set sortable
-     *
-     * @param PicoDatabaseQueryBuilder $sqlQuery
-     * @param PicoSortable $sortable
-     * @param stdClass $info
-     * @return PicoDatabaseQueryBuilder
-     */
-    private function setSortable($sqlQuery, $sortable, $info)
-    {
-        if($sortable != null)
-        {
-            if($sortable instanceof PicoSortable)
-            {
-                $sortOrder = $sortable->createOrderBy($info);
-                $sqlQuery = $this->setOrdeBy($sqlQuery, $sortOrder);
-            }
-            else if(is_string($sortable))
-            {
-                $sortOrder = $this->createOrderBy($info, $sortable);
-                $sqlQuery = $this->setOrdeBy($sqlQuery, $sortOrder);
-            }
-        } 
-        return $sqlQuery;
-    }
 
     /**
      * Get all record from database wihout filter
      *
      * @param PicoSpecification $specification
-     * @param PicoPagable $pagable
-     * @param PicoSortable|string $sortable
+     * @param PicoPagable|null $pagable
+     * @param PicoSortable|string|null $sortable
      * @return array|null
      */
     public function findAll($specification, $pagable = null, $sortable = null)
@@ -1145,7 +1151,11 @@ class PicoDatabasePersistent // NOSONAR
         }
         if($pagable != null)
         {
-            $sqlQuery = $this->setPagable($sqlQuery, $pagable, $sortable, $info);      
+            $sqlQuery = $this->setPagable($sqlQuery, $pagable);      
+        }
+        if($pagable != null && $sortable != null)
+        {
+            $sqlQuery = $this->setSortable($sqlQuery, $pagable, $sortable, $info);        
         }
         try
         {
@@ -1200,7 +1210,11 @@ class PicoDatabasePersistent // NOSONAR
             ->where($where);
         if($pagable != null)
         {
-            $sqlQuery = $this->setPagable($sqlQuery, $pagable, $sortable, $info);        
+            $sqlQuery = $this->setPagable($sqlQuery, $pagable);        
+        }
+        if($pagable != null && $sortable != null)
+        {
+            $sqlQuery = $this->setSortable($sqlQuery, $pagable, $sortable, $info);        
         }
         try
         {
@@ -1362,7 +1376,7 @@ class PicoDatabasePersistent // NOSONAR
      *
      * @param string $propertyName
      * @param array $propertyValues
-     * @param PicoSortable|string $sortable
+     * @param PicoSortable|string|null $sortable
      * @return array|null
      */
     public function findOneBy($propertyName, $propertyValue, $sortable = null)
@@ -1380,7 +1394,7 @@ class PicoDatabasePersistent // NOSONAR
             ->select($info->tableName.".*")
             ->from($info->tableName)
             ->where($where);
-        $sqlQuery = $this->setSortable($sqlQuery, $sortable, $info);  
+        $sqlQuery = $this->setSortable($sqlQuery, null, $sortable, $info);  
         $sqlQuery->limit(1)
             ->offset(0);
         try
