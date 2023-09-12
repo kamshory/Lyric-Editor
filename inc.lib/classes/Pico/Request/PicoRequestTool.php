@@ -102,7 +102,7 @@ class PicoRequestTool
         if(isset($params) && !empty($params))
         {
             $filter = $params[0];
-            return $this->filterValue($filter);
+            return $this->filterValue($value, $filter);
         }
         else
         {

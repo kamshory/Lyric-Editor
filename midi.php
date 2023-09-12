@@ -304,6 +304,9 @@ else
         <span>Title</span>
         <input class="form-control" type="text" name="title" id="title" autocomplete="off" value="<?php echo $inputGet->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
     </div>
+    
+    <input class="btn btn-success" type="submit" value="Show">
+    
     </form>
 </div>
 
