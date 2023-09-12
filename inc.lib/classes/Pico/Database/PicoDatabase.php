@@ -6,7 +6,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use Pico\Constants\PicoConstants;
-use Pico\Exception\NullPointerException;
+use Pico\Exceptions\NullPointerException;
 
 class PicoDatabase
 {

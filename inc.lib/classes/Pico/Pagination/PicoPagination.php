@@ -1,7 +1,7 @@
 <?php
 namespace Pico\Pagination;
 
-use Pico\Exception\NullPointerException;
+use Pico\Exceptions\NullPointerException;
 
 class PicoPagination
 {

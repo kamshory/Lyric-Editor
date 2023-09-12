@@ -180,4 +180,19 @@ class PicoPredicate
 
         return $this;
     }
+    
+    public static function generateLeftLike($value)
+    {
+        return "%".$value;
+    }
+    
+    public static function generateCenterLike($value)
+    {
+        return "%".$value."%";
+    }
+    
+    public static function generateRightLike($value)
+    {
+        return $value."%";
+    }
 }

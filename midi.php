@@ -4,12 +4,19 @@ use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
 use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Artist;
+use Pico\Data\Entity\EntityMidi;
 use Pico\Data\Entity\Genre;
 use Pico\Data\Entity\Midi;
 use Pico\Data\Tools\SelectOption;
+use Pico\Database\PicoPagable;
+use Pico\Database\PicoPage;
+use Pico\Database\PicoPredicate;
+use Pico\Database\PicoSortable;
+use Pico\Database\PicoSpecification;
 use Pico\Exceptions\NoRecordFoundException;
 use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
+use Pico\Utility\SpecificationUtil;
 
 require_once "inc/auth.php";
 require_once "inc/header.php";
@@ -312,17 +319,72 @@ else
 
 <?php
 $pagination = new PicoPagination($cfg->getResultPerPage()); 
+
+$spesification = SpecificationUtil::createMidiSpecification($inputGet);
+
+$sortable = new PicoSortable('title', PicoSortable::ORDER_TYPE_DESC);
+$pagable = new PicoPagable(new PicoPage(1, $cfg->getResultPerPage()), $sortable);
+$midi = new EntityMidi(null, $database);
+$rowData = $midi->findAll($spesification, $pagable, true);
+
+$result = $rowData->getResult();
+
+?>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+      <th scope="col" width="20">#</th>
+      <th scope="col">Title</th>
+      <th scope="col">Genre</th>
+      <th scope="col">Artist</th>
+      <th scope="col">Album</th>
+      <th scope="col">Duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php
+    $no = $pagination->getOffset();
+    foreach($result as $midi)
+    {
+      $no++;
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&midi_id=".$midi->getMidiId();
+      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&midi_id=".$midi->getMidiId();
+    ?>
+    <tr data-id="<?php echo $midi->getMidiId();?>">
+      <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
+      <th scope="row"><?php echo $no;?></th>
+      <td><a href="<?php echo $linkDetail;?>"><?php echo $midi->getTitle();?></a></td>
+      <td><?php echo $midi->getGenre() != null ? $midi->getGenre()->getName() : "";?></td>
+      <td><?php echo $midi->getArtistVocal() != null ? $midi->getArtistVocal()->getName() : "";?></td>
+      <td><?php echo $midi->getAlbum() != null ? $midi->getAlbum()->getName() : "";?></td>
+      <td><?php echo $midi->getDuration();?></td>
+    </tr>
+    <?php
+    }
+    ?>
+    
+  </tbody>
+</table>
+<?php
+
+
+
+/*
+
 $subquery = new PicoDatabaseQueryBuilder($database);
 $queryBuilder = new PicoDatabaseQueryBuilder($database);
 
-$order = $pagination->createOrder(array(
-  'time_create'=>'midi.time_create',
-  'title'=>'midi.title',
-  'duration'=>'midi.duration',
-  'artist_vocal'=>'artist.name',
-  'genre'=>'genre.name',
-  'album'=>'album.name'
-), array(
+$map = array(
+    'time_create'=>'midi.time_create',
+    'title'=>'midi.title',
+    'duration'=>'midi.duration',
+    'artist_vocal'=>'artist.name',
+    'genre'=>'genre.name',
+    'album'=>'album.name'
+);
+
+$order = $pagination->createOrder($map, array(
   'time_create',
   'title',
   'duration',
@@ -404,6 +466,7 @@ catch(Exception $e)
  </div>
  <?php
 }
+*/
 }
 
 require_once "inc/footer.php";

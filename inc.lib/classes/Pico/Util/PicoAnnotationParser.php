@@ -2,7 +2,7 @@
 
 namespace Pico\Util;
 
-use Pico\Exception\ZeroArgumentException;
+use Pico\Exceptions\ZeroArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
