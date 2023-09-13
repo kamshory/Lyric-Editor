@@ -6,26 +6,26 @@ use Pico\Exceptions\NullPointerException;
 class PicoPagination
 {
     /**
+     * Current page
+     *
+     * @var integer
+     */
+    private $currentPage = 0;
+
+    /**
+     * Page size
+     *
+     * @var integer
+     */
+    private $pageSize = 0;
+
+    /**
      * Offset
      *
      * @var integer
      */
     private $offset = 0;
-
-    /**
-     * Limit
-     *
-     * @var integer
-     */
-    private $limit = 0;
     
-    /**
-     * Page number
-     *
-     * @var integer
-     */
-    private $pageNumber = 1;
-
     /**
      * Order by
      *
@@ -39,13 +39,16 @@ class PicoPagination
      * @var string
      */
     private $orderType = "";
-    public function __construct($limit = 20)
+
+
+
+    public function __construct($pageSize = 20)
     {
-        $this->limit = $limit;
-        $this->offset = $this->parseOffset();
+        $this->pageSize = $pageSize;
+        $this->currentPage = $this->parseCurrentPage();
+        $this->offset = $this->pageSize * ($this->currentPage - 1);
         $this->orderBy = @$_GET['orderby'];
         $this->orderType = @$_GET['ordertype'];
-        $this->pageNumber = floor($this->offset / $limit) + 1;
     }
 
     /**
@@ -53,42 +56,26 @@ class PicoPagination
      *
      * @return integer
      */
-    private function parseOffset()
+    private function parseCurrentPage()
     {
-        if(isset($_GET['offset']))
+        if(isset($_GET['page']))
         {
-            $offsetStr = preg_replace("/\D/", "", $_GET['offset']);
-            if($offsetStr == "")
+            $pageStr = preg_replace("/\D/", "", $_GET['page']);
+            if($pageStr == "")
             {
-                $offset = 0;
+                $page = 0;
             }
             else
             {
-                $offset = abs((int) $offsetStr);
+                $page = abs((int) $pageStr);
             }
-            return $offset;
+            if($page < 1)
+            {
+                $page = 1;
+            }
+            return $page;
         }
-        return 0;
-    }
-
-    /**
-     * Get offset
-     *
-     * @return  integer
-     */ 
-    public function getOffset()
-    {
-        return $this->offset;
-    }
-
-    /**
-     * Get limit
-     *
-     * @return  integer
-     */ 
-    public function getLimit()
-    {
-        return $this->limit;
+        return 1;
     }
 
     /**
@@ -162,27 +149,35 @@ class PicoPagination
         return $orderType;
     }
 
+   
+
     /**
-     * Get page number
+     * Get current page
      *
      * @return  integer
      */ 
-    public function getPageNumber()
+    public function getCurrentPage()
     {
-        return $this->pageNumber;
+        return $this->currentPage;
     }
 
     /**
-     * Set page number
+     * Get page size
      *
-     * @param  integer  $pageNumber  Page number
-     *
-     * @return  self
+     * @return  integer
      */ 
-    public function setPageNumber($pageNumber)
+    public function getPageSize()
     {
-        $this->pageNumber = $pageNumber;
+        return $this->pageSize;
+    }
 
-        return $this;
+    /**
+     * Get offset
+     *
+     * @return  integer
+     */ 
+    public function getOffset()
+    {
+        return $this->offset;
     }
 }

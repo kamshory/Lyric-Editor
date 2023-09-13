@@ -323,13 +323,19 @@ $pagination = new PicoPagination($cfg->getResultPerPage());
 $spesification = SpecificationUtil::createMidiSpecification($inputGet);
 
 $sortable = new PicoSortable('title', PicoSortable::ORDER_TYPE_DESC);
-$pagable = new PicoPagable(new PicoPage($pagination->getPageNumber(), $pagination->getLimit()), $sortable);
+$pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 $midi = new EntityMidi(null, $database);
 $rowData = $midi->findAll($spesification, $pagable, true);
 
 $result = $rowData->getResult();
 
 ?>
+
+<div class="pagination">
+
+</div>
+
+
 <table class="table">
   <thead>
     <tr>

@@ -286,18 +286,100 @@ else
     </form>
 </div>
 <?php
-$pagination = new PicoPagination($cfg->getResultPerPage());
+$pagination = new PicoPagination(2);
 
 $spesification = SpecificationUtil::createMidiSpecification($inputGet);
 
 $sortable = new PicoSortable('title', PicoSortable::ORDER_TYPE_DESC);
-$pagable = new PicoPagable(new PicoPage($pagination->getPageNumber(), $pagination->getLimit()), $sortable);
+$pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 $song = new EntitySong(null, $database);
 $rowData = $song->findAll($spesification, $pagable, true);
 
 $result = $rowData->getResult();
 
 ?>
+
+<style>
+    .pagination .page-selector{
+        border: solid #DDDDDD;
+        border-top-width: 1px;
+        border-bottom-width: 1px;
+        border-left-width: 0;
+        border-right-width: 1px;
+        display: inline-block;
+        background-color: #FAFAFA;
+    }
+    .pagination .page-selector:first-child{
+        border-left-width: 1px;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+    .pagination .page-selector:last-child{
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+    .pagination .page-selector a{
+        display: block;
+        padding: 5px 10px;
+    }
+    .pagination .page-selector.page-selected{
+        background-color: #FFFFFF;
+    }
+</style>
+
+<div class="pagination">
+    <?php
+    foreach($rowData->getPagination() as $pg)
+    {
+        ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
+    }
+    ?>
+</div>
+
+<script>
+    $(document).ready(function(e){
+        let apathName = baseName(window.location.pathname);
+        let params = {};
+        let queryString = window.location.search;
+        let urlParams = new URLSearchParams(queryString);
+        const
+        keys = urlParams.keys(),
+        values = urlParams.values(),
+        entries = urlParams.entries();
+
+        for(const entry of entries) {
+            params[entry[0]] = entry[1];
+        }
+        if($('.pagination').length)
+        {
+            $('.pagination').each(function(e2){
+                let pagination = $(this);
+                if(pagination.find('.page-selector').length)
+                {
+                    pagination.find('.page-selector').each(function(e3){
+                        let pageSelector = $(this);
+                        pageSelector.find('a').attr('href', generateUrl(apathName, params, 'page', pageSelector.attr('data-page-number')));
+                    });
+                }
+            });
+        }
+    });
+    function baseName(str)
+    {
+        let li = Math.max(str.lastIndexOf('/'), str.lastIndexOf('\\'));
+        return new String(str).substring(li + 1);
+    }
+    function generateUrl(apathName, params, pageKey, pageValue)
+    {
+        params[pageKey] = pageValue;
+        let parameters = [];
+        for(let i in params)
+        {
+            parameters.push(i+'='+encodeURIComponent(params[i]));
+        }
+        return apathName+'?'+parameters.join('&');
+    }
+</script>
 
 <table class="table">
     <thead>
@@ -337,6 +419,16 @@ $result = $rowData->getResult();
         
     </tbody>
     </table>
+
+
+    <div class="pagination">
+    <?php
+    foreach($rowData->getPagination() as $pg)
+    {
+        ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
+    }
+    ?>
+</div>
 
 <?php
 /*

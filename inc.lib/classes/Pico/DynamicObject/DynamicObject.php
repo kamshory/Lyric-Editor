@@ -2,6 +2,7 @@
 
 namespace Pico\DynamicObject;
 
+use Exception;
 use PDOException;
 use PDOStatement;
 use Pico\Database\PicoDatabase;
@@ -757,23 +758,30 @@ class DynamicObject extends stdClass // NOSONAR
     public function findAll($specification = null, $pagable = null, $sortable = null, $passive = false)
     {
         $startTime = microtime(true);
-        if($this->database != null && $this->database->isConnected())
+        try
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
-            $result = $persist->findAll($specification, $pagable, $sortable);
-            $match = $persist->countAll($specification);
-            if($this->_notNullAndNotEmpty($result))
+            if($this->database != null && $this->database->isConnected())
             {
-                return new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
+                $persist = new PicoDatabasePersistent($this->database, $this);
+                $result = $persist->findAll($specification, $pagable, $sortable);
+                $match = $persist->countAll($specification);
+                if($this->_notNullAndNotEmpty($result))
+                {
+                    return new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
+                }
+                else
+                {
+                    return new PicoPageData(array(), $pagable, 0, $startTime);
+                }
             }
             else
             {
-                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
+                return new PicoPageData(array(), $pagable, 0, $startTime);
             }
         }
-        else
+        catch(Exception $e)
         {
-            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
+            return new PicoPageData(array(), $pagable, 0, $startTime);
         }
     }
 
@@ -819,23 +827,30 @@ class DynamicObject extends stdClass // NOSONAR
     private function findBy($method, $params, $pagable = null, $sortable = null, $passive = false)
     {
         $startTime = microtime(true);
-        if($this->database != null && $this->database->isConnected())
+        try
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
-            $result = $persist->findBy($method, $params, $pagable, $sortable);
-            $match = $persist->countBy($method, $params);
-            if($this->_notNullAndNotEmpty($result))
+            if($this->database != null && $this->database->isConnected())
             {
-                return new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
+                $persist = new PicoDatabasePersistent($this->database, $this);
+                $result = $persist->findBy($method, $params, $pagable, $sortable);
+                $match = $persist->countBy($method, $params);
+                if($this->_notNullAndNotEmpty($result))
+                {
+                    return new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
+                }
+                else
+                {
+                    return new PicoPageData(array(), $pagable, 0, $startTime);
+                }
             }
             else
             {
-                throw new NoRecordFoundException(self::MESSAGE_NO_RECORD_FOUND);
+                return new PicoPageData(array(), $pagable, 0, $startTime);
             }
         }
-        else
+        catch(Exception $e)
         {
-            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
+            return new PicoPageData(array(), $pagable, 0, $startTime);
         }
     }
     

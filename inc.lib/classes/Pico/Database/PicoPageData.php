@@ -71,6 +71,14 @@ class PicoPageData
     private $executionTime = 0.0;
 
     /**
+     * Pagination
+     *
+     * @var array
+     */
+    private $pagination = array();
+
+
+    /**
      * Constructor
      *
      * @param array $result
@@ -97,11 +105,32 @@ class PicoPageData
         $this->executionTime = $this->endTime - $this->startTime;
     }
 
+
     private function calculateContent()
     {
         $this->pageNumber = $this->pagable->getPage()->getPageNumber();
         $this->totalPage = ceil($this->totalResult / $this->pagable->getPage()->getPageSize());
         $this->pageSize = $this->pagable->getPage()->getPageSize();
+
+        $curPage = $this->pageNumber;
+        $totalPage = $this->totalPage;
+
+        $minPage = $curPage - 3;
+        if($minPage < 1)
+        {
+            $minPage = 1;
+        }
+        $maxPage = $curPage + 3;
+        if($maxPage > $totalPage)
+        {
+            $maxPage = $totalPage;
+        }
+        $this->pagination = array();
+        for($i = $minPage; $i<=$maxPage; $i++)
+        {
+            $this->pagination[] = array('page'=>$i, 'selected'=>$i == $curPage);
+        }
+
     }
 
     /**
@@ -165,5 +194,13 @@ class PicoPageData
     public function getExecutionTime()
     {
         return $this->executionTime;
+    }
+
+    /**
+     * Get the value of pagination
+     */ 
+    public function getPagination()
+    {
+        return $this->pagination;
     }
 }
