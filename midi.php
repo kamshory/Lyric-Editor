@@ -355,9 +355,9 @@ $result = $rowData->getResult();
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkDetail;?>"><?php echo $midi->getTitle();?></a></td>
-      <td><?php echo $midi->getGenre() != null ? $midi->getGenre()->getName() : "";?></td>
-      <td><?php echo $midi->getArtistVocal() != null ? $midi->getArtistVocal()->getName() : "";?></td>
-      <td><?php echo $midi->getAlbum() != null ? $midi->getAlbum()->getName() : "";?></td>
+      <td><?php echo $midi->hasValueGenre() ? $midi->getGenre()->getName() : "";?></td>
+      <td><?php echo $midi->hasValueArtistVocal() ? $midi->getArtistVocal()->getName() : "";?></td>
+      <td><?php echo $midi->hasValueAlbum() ? $midi->getAlbum()->getName() : "";?></td>
       <td><?php echo $midi->getDuration();?></td>
     </tr>
     <?php

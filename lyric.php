@@ -1,8 +1,19 @@
 <?php
 
+use Pico\Data\Entity\Album;
+use Pico\Data\Entity\Artist;
+use Pico\Data\Entity\EntitySong;
+use Pico\Data\Entity\Genre;
 use Pico\Data\Entity\Song;
+use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoDatabaseQueryBuilder;
+use Pico\Database\PicoPagable;
+use Pico\Database\PicoPage;
+use Pico\Database\PicoSortable;
 use Pico\Pagination\PicoPagination;
+use Pico\Request\PicoFilterConstant;
+use Pico\Request\PicoRequest;
+use Pico\Utility\SpecificationUtil;
 
 require_once "inc/auth.php";
 require_once "inc/header.php";
@@ -11,10 +22,12 @@ require_once "inc/header.php";
 <script src="lib/script.js"></script>
 <script src="lib/ajax.js"></script>
 <link rel="stylesheet" href="lib/icon.css">
-
 <?php
-$song_id = @$_GET['song_id'];
-if($song_id != '')
+require_once "inc/auth.php";
+require_once "inc/header.php";
+
+$inputGet = new PicoRequest(INPUT_GET);
+if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getSongId() != null)
 {
 ?>
 <div class="srt-editor editor1">
@@ -239,6 +252,94 @@ catch(Exception $e)
 }
 else
 {
+    ?>
+    <div class="filter-container">
+    <form action="" method="get">
+    <div class="filter-group">
+        <span>Genre</span>
+        <select class="form-control" name="genre_id" id="genre_id">
+            <option value="">- All -</option>
+            <?php echo new SelectOption(new Genre(null, $database), array('value'=>'genreId', 'label'=>'name'), $inputGet->getGenreId()); ?>
+        </select>
+    </div>
+    <div class="filter-group">
+        <span>Album</span>
+        <select class="form-control" name="album_id" id="album_id">
+            <option value="">- All -</option>
+            <?php echo new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId()); ?>
+        </select>
+    </div>
+    <div class="filter-group">
+        <span>Artist Vocal</span>
+        <select class="form-control" name="artist_vocal_id" id="artist_vocal_id">
+            <option value="">- All -</option>
+            <?php echo new SelectOption(new Artist(null, $database), array('value'=>'artistId', 'label'=>'name'), $inputGet->getArtistVocalId()); ?>
+        </select>
+    </div>
+    <div class="filter-group">
+        <span>Title</span>
+        <input class="form-control" type="text" name="title" id="title" autocomplete="off" value="<?php echo $inputGet->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
+    </div>
+    
+    <input class="btn btn-success" type="submit" value="Show">
+    
+    </form>
+</div>
+<?php
+$pagination = new PicoPagination($cfg->getResultPerPage());
+
+$spesification = SpecificationUtil::createMidiSpecification($inputGet);
+
+$sortable = new PicoSortable('title', PicoSortable::ORDER_TYPE_DESC);
+$pagable = new PicoPagable(new PicoPage($pagination->getPageNumber(), $pagination->getLimit()), $sortable);
+$song = new EntitySong(null, $database);
+$rowData = $song->findAll($spesification, $pagable, true);
+
+$result = $rowData->getResult();
+
+?>
+
+<table class="table">
+    <thead>
+        <tr>
+        <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+        <th scope="col" width="20">#</th>
+        <th scope="col">Title</th>
+        <th scope="col">Album</th>
+        <th scope="col">Genre</th>
+        <th scope="col">Vocalist</th>
+        <th scope="col">Composer</th>
+        <th scope="col">Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        $no = $pagination->getOffset();
+        foreach($result as $song)
+        {
+        $no++;
+        $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&song_id=".$song->getSongId();
+        $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&song_id=".$song->getSongId();
+          ?>
+        <tr>
+        <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
+        <th class="text-right" scope="row"><?php echo $no;?></th>
+        <td><a href="<?php echo $linkDetail;?>"><?php echo $song->getTitle();?></a></td>
+        <td><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>
+        <td><?php echo $song->hasValueGenre() ? $song->getGenre()->getName() : "";?></td>
+        <td><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
+        <td><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
+        <td><?php echo $song->getDuration();?></td>
+        </tr>
+        <?php
+        }
+        ?>
+        
+    </tbody>
+    </table>
+
+<?php
+/*
     $pagination = new PicoPagination($cfg->getResultPerPage()); 
     $subquery = new PicoDatabaseQueryBuilder($database);
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
@@ -328,6 +429,7 @@ else
     </div>
     <?php
     }
+    */
 }
 require_once "inc/footer.php";
 ?>

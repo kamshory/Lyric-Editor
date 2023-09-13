@@ -1021,6 +1021,10 @@ class DynamicObject extends stdClass // NOSONAR
      */    
     public function __call($method, $params) // NOSONAR
     {
+        if (strncasecmp($method, "hasValue", 8) === 0) {
+            $var = lcfirst(substr($method, 8));
+            return isset($this->$var);
+        } 
         if (strncasecmp($method, "is", 2) === 0) {
             $var = lcfirst(substr($method, 2));
             return isset($this->$var) ? $this->$var == 1 : false;
