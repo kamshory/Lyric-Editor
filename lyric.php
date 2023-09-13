@@ -6,7 +6,6 @@ use Pico\Data\Entity\EntitySong;
 use Pico\Data\Entity\Genre;
 use Pico\Data\Entity\Song;
 use Pico\Data\Tools\SelectOption;
-use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
 use Pico\Database\PicoSortable;
@@ -338,47 +337,9 @@ $result = $rowData->getResult();
 
 <script>
     $(document).ready(function(e){
-        let apathName = baseName(window.location.pathname);
-        let params = {};
-        let queryString = window.location.search;
-        let urlParams = new URLSearchParams(queryString);
-        const
-        keys = urlParams.keys(),
-        values = urlParams.values(),
-        entries = urlParams.entries();
-
-        for(const entry of entries) {
-            params[entry[0]] = entry[1];
-        }
-        if($('.pagination').length)
-        {
-            $('.pagination').each(function(e2){
-                let pagination = $(this);
-                if(pagination.find('.page-selector').length)
-                {
-                    pagination.find('.page-selector').each(function(e3){
-                        let pageSelector = $(this);
-                        pageSelector.find('a').attr('href', generateUrl(apathName, params, 'page', pageSelector.attr('data-page-number')));
-                    });
-                }
-            });
-        }
+        let pg = new Pagination('.pagination', '.page-selector', 'data-page-number', 'page');
+        pg.init();
     });
-    function baseName(str)
-    {
-        let li = Math.max(str.lastIndexOf('/'), str.lastIndexOf('\\'));
-        return new String(str).substring(li + 1);
-    }
-    function generateUrl(apathName, params, pageKey, pageValue)
-    {
-        params[pageKey] = pageValue;
-        let parameters = [];
-        for(let i in params)
-        {
-            parameters.push(i+'='+encodeURIComponent(params[i]));
-        }
-        return apathName+'?'+parameters.join('&');
-    }
 </script>
 
 <table class="table">
