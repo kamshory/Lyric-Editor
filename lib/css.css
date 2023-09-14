@@ -321,10 +321,3 @@ input[type=range]+datalist option:last-child {
     color: #555555;
 }
 
-.filter-container .form-control{
-    display: inline;
-    width: auto;
-}
-.filter-group{
-    display: inline-block;
-}

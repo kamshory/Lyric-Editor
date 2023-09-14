@@ -310,46 +310,6 @@ $result = $rowData->getResult();
 
 ?>
 
-<style>
-    .pagination{
-        text-align: center;
-        padding: 10px 0;;
-        width: auto;
-        margin: auto;
-    }
-    .pagination-number{
-        display: inline-block;
-        margin: auto;
-    }
-    .pagination .page-selector{
-        border: solid #DDDDDD;
-        border-top-width: 1px;
-        border-bottom-width: 1px;
-        border-left-width: 0;
-        border-right-width: 1px;
-        display: inline-block;
-        background-color: #FAFAFA;
-    }
-    .pagination .page-selector:first-child{
-        border-left-width: 1px;
-        border-top-left-radius: 4px;
-        border-bottom-left-radius: 4px;
-    }
-    .pagination .page-selector:last-child{
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 4px;
-    }
-    .pagination .page-selector a{
-        display: block;
-        padding: 5px 10px;
-    }
-    .pagination .page-selector.page-selected{
-        background-color: #FFFFFF;
-    }
-</style>
-
-
-
 <script>
     $(document).ready(function(e){
         let pg = new Pagination('.pagination', '.page-selector', 'data-page-number', 'page');
