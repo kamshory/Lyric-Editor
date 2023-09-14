@@ -1044,7 +1044,7 @@ class DynamicObject extends stdClass // NOSONAR
             $var = lcfirst(substr($method, 8));
             return isset($this->$var);
         } 
-        if (strncasecmp($method, "is", 2) === 0) {
+        else if (strncasecmp($method, "is", 2) === 0) {
             $var = lcfirst(substr($method, 2));
             return isset($this->$var) ? $this->$var == 1 : false;
         } else if (strncasecmp($method, "get", 3) === 0) {

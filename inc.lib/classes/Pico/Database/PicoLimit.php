@@ -7,12 +7,30 @@ namespace Pico\Database;
  */
 class PicoLimit
 {
+    /**
+     * Limit
+     *
+     * @var integer
+     */
     private $limit = 0;
+    
+    /**
+     * Offset
+     *
+     * @var integer
+     */
     private $offset = 0;
+    
+    /**
+     * Constructor
+     *
+     * @param integer $offset
+     * @param integer $limit
+     */
     public function __construct($offset = 0, $limit = 0)
     {
-        $this->offset = $offset;
-        $this->limit = $limit;
+        $this->setOffset($offset);
+        $this->setLimit($limit);
     }
 
     /**
@@ -30,6 +48,10 @@ class PicoLimit
      */ 
     public function setLimit($limit)
     {
+        if($limit < 0)
+        {
+            $limit = 0;
+        }
         $this->limit = $limit;
 
         return $this;
@@ -50,6 +72,10 @@ class PicoLimit
      */ 
     public function setOffset($offset)
     {
+        if($offset < 0)
+        {
+            $offset = 0;
+        }
         $this->offset = $offset;
 
         return $this;

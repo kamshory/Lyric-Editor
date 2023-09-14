@@ -148,17 +148,8 @@ class PicoPagable
     {
         $this->page = $page;
         $offset = ($page->getPageNumber()-1) * $page->getPageSize();
-        if($offset < 0)
-        {
-            $offset = 0;
-        }
         $limit = $page->getPageSize();
-        if($limit < 0)
-        {
-            $limit = 0;
-        }
-        $offsetLimit = new PicoLimit($offset, $limit);
-        $this->setOffsetLimit($offsetLimit);
+        $this->setOffsetLimit(new PicoLimit($offset, $limit));
         return $this;
     }
 

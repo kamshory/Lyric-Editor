@@ -126,7 +126,6 @@ class PicoPredicate
         $this->comparation = new PicoDataComparation($value, PicoDataComparation::GREATER_THAN_OR_EQUALS);
     }
 
-
     /**
      * Get the value of filed
      *
@@ -181,16 +180,34 @@ class PicoPredicate
         return $this;
     }
     
+    /**
+     * Generate LEFT LIKE wildcard
+     *
+     * @param string $value
+     * @return void
+     */
     public static function generateLeftLike($value)
     {
         return "%".$value;
     }
     
+    /**
+     * Generate CENTER LIKE wildcard
+     *
+     * @param string $value
+     * @return void
+     */
     public static function generateCenterLike($value)
     {
         return "%".$value."%";
     }
     
+    /**
+     * Generate RIGHT LIKE wildcard
+     *
+     * @param string $value
+     * @return void
+     */
     public static function generateRightLike($value)
     {
         return $value."%";

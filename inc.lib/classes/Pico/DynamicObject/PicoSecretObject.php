@@ -72,6 +72,11 @@ class PicoSecretObject extends stdClass //NOSONAR
         }
     }
     
+    /**
+     * Process object information
+     *
+     * @return void
+     */
     private function _objectInfo()
     {
         $className = get_class($this);
@@ -131,6 +136,13 @@ class PicoSecretObject extends stdClass //NOSONAR
         }
     }
     
+    /**
+     * Set value
+     *
+     * @param string $var
+     * @param mixed $value
+     * @return void
+     */
     private function _set($var, $value)
     {
         if($this->needInputEncryption($var))
@@ -660,7 +672,12 @@ class PicoSecretObject extends stdClass //NOSONAR
         }
     }
     
-    public function encrypt()
+    /**
+     * Get encrypted value
+     *
+     * @return array
+     */
+    public function encryptedValue()
     {
         $obj = clone $this;
         $obj = $this->encryptValueRecorsive($obj);
@@ -668,6 +685,12 @@ class PicoSecretObject extends stdClass //NOSONAR
         return $this->encryptValueRecursive($array);
     }
 
+    /**
+     * Encrypt value recursively
+     *
+     * @param array $array Value to be encrypted in array
+     * @return array
+     */
     private function encryptValueRecursive($array)
     {
         foreach($array as $key=>$val)
@@ -684,6 +707,11 @@ class PicoSecretObject extends stdClass //NOSONAR
         return $array;
     }
     
+    /**
+     * Convert object to string
+     *
+     * @return string
+     */
     public function __toString()
     {
         $obj = clone $this;
