@@ -147,7 +147,7 @@ class SelectOption
         foreach($this->rows as $row)
         {
             $optAttributes = $this->attributeToString($row['attribute']);
-            $texts[] = "<option".$optAttributes.">".$row['textNode']."</option>";
+            $texts[] = "<option".$optAttributes.">".htmlspecialchars($row['textNode'])."</option>";
         }
         return implode("\r\n", $texts);
     }
