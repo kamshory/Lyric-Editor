@@ -81,7 +81,7 @@ class PicoPageData
     /**
      * Constructor
      *
-     * @param array $result
+     * @param DynamicObject[] $result
      * @param PicoPagable $pagable
      * @param integer $match
      */
@@ -106,6 +106,11 @@ class PicoPageData
     }
 
 
+    /**
+     * Calculate content
+     *
+     * @return void
+     */
     private function calculateContent()
     {
         $this->pageNumber = $this->pagable->getPage()->getPageNumber();
@@ -202,5 +207,15 @@ class PicoPageData
     public function getPagination()
     {
         return $this->pagination;
+    }
+
+    /**
+     * Get total match
+     *
+     * @return  integer
+     */ 
+    public function getTotalResult()
+    {
+        return $this->totalResult;
     }
 }
