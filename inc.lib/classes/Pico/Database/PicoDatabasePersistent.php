@@ -46,6 +46,7 @@ class PicoDatabasePersistent // NOSONAR
 
     const MESSAGE_NO_RECORD_FOUND = "No record found";
     const MESSAGE_INVALID_FILTER = "Invalid filter";
+    const NAMESPACE_SEPARATOR = "\\";
     
     /**
      * Database connection
@@ -1427,7 +1428,7 @@ class PicoDatabasePersistent // NOSONAR
     private function getRealClassName($classNameJoin)
     {
         $result = $classNameJoin;
-        if(stripos($classNameJoin, "\\") === false)
+        if(stripos($classNameJoin, self::NAMESPACE_SEPARATOR) === false)
         {
             if(!$this->processClassList)
             {
@@ -1450,10 +1451,10 @@ class PicoDatabasePersistent // NOSONAR
                 // get from map
                 $result = $this->importedClassList[$classNameJoin];
             }
-            else if(stripos($classNameJoin, "\\") === false)
+            else if(stripos($classNameJoin, self::NAMESPACE_SEPARATOR) === false)
             {
                 // assumpt has same namespace
-                $result = rtrim($this->namespaceName, "\\")."\\". $classNameJoin;
+                $result = rtrim($this->namespaceName, self::NAMESPACE_SEPARATOR).self::NAMESPACE_SEPARATOR. $classNameJoin;
             }
         }
         return $result;
