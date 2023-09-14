@@ -760,6 +760,7 @@ class DynamicObject extends stdClass // NOSONAR
         $startTime = microtime(true);
         try
         {
+            $pageData = null;
             if($this->database != null && $this->database->isConnected())
             {
                 $persist = new PicoDatabasePersistent($this->database, $this);
@@ -767,17 +768,18 @@ class DynamicObject extends stdClass // NOSONAR
                 $match = $persist->countAll($specification);
                 if($this->_notNullAndNotEmpty($result))
                 {
-                    return new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
+                    $pageData = new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
                 }
                 else
                 {
-                    return new PicoPageData(array(), $pagable, 0, $startTime);
+                    $pageData = new PicoPageData(array(), $pagable, 0, $startTime);
                 }
             }
             else
             {
-                return new PicoPageData(array(), $pagable, 0, $startTime);
+                $pageData = new PicoPageData(array(), $pagable, 0, $startTime);
             }
+            return $pageData;
         }
         catch(Exception $e)
         {
@@ -829,6 +831,7 @@ class DynamicObject extends stdClass // NOSONAR
         $startTime = microtime(true);
         try
         {
+            $pageData = null;
             if($this->database != null && $this->database->isConnected())
             {
                 $persist = new PicoDatabasePersistent($this->database, $this);
@@ -836,17 +839,18 @@ class DynamicObject extends stdClass // NOSONAR
                 $match = $persist->countBy($method, $params);
                 if($this->_notNullAndNotEmpty($result))
                 {
-                    return new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
+                    $pageData = new PicoPageData($this->toArrayObject($result, $passive), $pagable, $match, $startTime);
                 }
                 else
                 {
-                    return new PicoPageData(array(), $pagable, 0, $startTime);
+                    $pageData = new PicoPageData(array(), $pagable, 0, $startTime);
                 }
             }
             else
             {
-                return new PicoPageData(array(), $pagable, 0, $startTime);
+                $pageData = new PicoPageData(array(), $pagable, 0, $startTime);
             }
+            return $pageData;
         }
         catch(Exception $e)
         {
