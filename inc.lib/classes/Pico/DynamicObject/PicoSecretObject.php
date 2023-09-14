@@ -84,22 +84,22 @@ class PicoSecretObject extends stdClass //NOSONAR
             $reflexProp = new PicoAnnotationParser($className, $prop->name, 'property');
             $parameters = $reflexProp->getParameters();
 
-            // get column name of each parameters
+            // add property list to be encryped or decrypted
             foreach($parameters as $param=>$val)
             {
                 if(strcasecmp($param, self::ANNOTATION_ENCRYPT_IN) == 0)
                 {
                     $this->encryptInProperties[] = $prop->name;
                 }
-                if(strcasecmp($param, self::ANNOTATION_DECRYPT_OUT) == 0)
+                else if(strcasecmp($param, self::ANNOTATION_DECRYPT_OUT) == 0)
                 {
                     $this->decryptOutProperties[] = $prop->name;
                 }
-                if(strcasecmp($param, self::ANNOTATION_ENCRYPT_OUT) == 0)
+                else if(strcasecmp($param, self::ANNOTATION_ENCRYPT_OUT) == 0)
                 {
                     $this->encryptOutProperties[] = $prop->name;
                 }
-                if(strcasecmp($param, self::ANNOTATION_DECRYPT_IN) == 0)
+                else if(strcasecmp($param, self::ANNOTATION_DECRYPT_IN) == 0)
                 {
                     $this->decryptInProperties[] = $prop->name;
                 }
@@ -137,7 +137,7 @@ class PicoSecretObject extends stdClass //NOSONAR
         {
             $value = $this->encryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
         }
-        if($this->needInputDecryption($var))
+        else if($this->needInputDecryption($var))
         {
             $value = $this->decryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
         }
@@ -157,7 +157,7 @@ class PicoSecretObject extends stdClass //NOSONAR
         {
             $value = $this->encryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
         }
-        if($this->needOutputDecryption($var))
+        else if($this->needOutputDecryption($var))
         {
             $value = $this->decryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
         }
@@ -659,5 +659,34 @@ class PicoSecretObject extends stdClass //NOSONAR
             unset($this->nullProperties[$propertyName]); 
         }
     }
+    
+    public function encrypt()
+    {
+        $obj = clone $this;
+        $obj = $this->encryptValueRecorsive($obj);
+        $array = json_decode(json_encode($obj->value($this->isSnake())), true);
+        return $this->encryptValueRecursive($array);
+    }
 
+    private function encryptValueRecursive($array)
+    {
+        foreach($array as $key=>$val)
+        {
+            if(is_array($val))
+            {
+                $array[$key] = $this->encryptValueRecursive($val);
+            }
+            else if(is_string($val))
+            {
+                $array[$key] = $this->encryptValue($val, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+            }
+        }
+        return $array;
+    }
+    
+    public function __toString()
+    {
+        $obj = clone $this;
+        return json_encode($obj->value($this->isSnake()));
+    }
 }
