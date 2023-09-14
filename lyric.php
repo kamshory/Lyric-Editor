@@ -348,16 +348,7 @@ $result = $rowData->getResult();
     }
 </style>
 
-<div class="pagination">
-    <div class="pagination-number">
-    <?php
-    foreach($rowData->getPagination() as $pg)
-    {
-        ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
-    }
-    ?>
-    </div>
-</div>
+
 
 <script>
     $(document).ready(function(e){
@@ -369,6 +360,20 @@ $result = $rowData->getResult();
     });
 </script>
 
+<?php
+if(!empty($result))
+{
+?>
+<div class="pagination">
+    <div class="pagination-number">
+    <?php
+    foreach($rowData->getPagination() as $pg)
+    {
+        ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
+    }
+    ?>
+    </div>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -388,8 +393,9 @@ $result = $rowData->getResult();
         foreach($result as $song)
         {
         $no++;
-        $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&song_id=".$song->getSongId();
-        $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&song_id=".$song->getSongId();
+        $songId = $song->getSongId();
+        $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&song_id=".$songId;
+        $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&song_id=".$songId;
         ?>
         <tr>
         <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
@@ -420,6 +426,7 @@ $result = $rowData->getResult();
     </div>
 </div>
 <?php
+}
 }
 require_once "inc/footer.php";
 ?>
