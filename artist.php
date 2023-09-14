@@ -155,7 +155,7 @@ if(!empty($result))
   </div>
 </div>
 
-<div class="lazy-dom modal-container" data-url="lib.ajax/artist-update-dialog.php"></div>
+<div class="lazy-dom modal-container" data-url="lib.ajax/artist-edit-dialog.php"></div>
 
 <script>
   let editArtistModal;

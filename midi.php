@@ -30,7 +30,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getMidiId() !
   $midi->findOneByMidiId($inputGet->getMidiId());
   
   ?>
-<link rel="stylesheet" href="lib/css.css">
+<link rel="stylesheet" href="lib/midi-editor.css">
 <script src="lib/midi-editor.js"></script>
 <script src="lib/ajax.js"></script>
 <link rel="stylesheet" href="lib/icon.css">
@@ -329,13 +329,24 @@ $rowData = $midi->findAll($spesification, $pagable, true);
 
 $result = $rowData->getResult();
 
+if(!empty($result))
+{
 ?>
 
 <div class="pagination">
 
 </div>
 
-
+<div class="pagination">
+    <div class="pagination-number">
+    <?php
+    foreach($rowData->getPagination() as $pg)
+    {
+        ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
+    }
+    ?>
+    </div>
+</div>
 <table class="table">
   <thead>
     <tr>
@@ -372,108 +383,18 @@ $result = $rowData->getResult();
     
   </tbody>
 </table>
-<?php
-
-
-
-/*
-
-$subquery = new PicoDatabaseQueryBuilder($database);
-$queryBuilder = new PicoDatabaseQueryBuilder($database);
-
-$map = array(
-    'time_create'=>'midi.time_create',
-    'title'=>'midi.title',
-    'duration'=>'midi.duration',
-    'artist_vocal'=>'artist.name',
-    'genre'=>'genre.name',
-    'album'=>'album.name'
-);
-
-$order = $pagination->createOrder($map, array(
-  'time_create',
-  'title',
-  'duration',
-  'artist_vocal',
-  'genre',
-  'album'
-), 
-'time_create'
-);
-
-$sql = $queryBuilder->newQuery()
-->select("midi.*, 
-  (select artist.name from artist where artist.artist_id = midi.artist_composer) as artist_composer_name,
-  (select artist.name from artist where artist.artist_id = midi.artist_arranger) as artist_arranger_name,
-  artist.name as artist_vocal_name,
-  genre.name as genre_name,
-  album.name as album_name
-  ")
-->from("midi")
-->leftJoin("artist")->on("artist.artist_id = midi.artist_vocal")
-->leftJoin("genre")->on("genre.genre_id = midi.genre_id")
-->leftJoin("album")->on("album.album_id = midi.album_id")
-->orderBy($order)
-->limit($pagination->getLimit())
-->offset($pagination->getOffset());
-try
-{
-$data = $database->fetchAll($sql, PDO::FETCH_OBJ);
-if($data != null && !empty($data))
-{
-?>
-
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col" width="20"><i class="ti ti-edit"></i></th>
-      <th scope="col" width="20">#</th>
-      <th scope="col">Title</th>
-      <th scope="col">Artist</th>
-      <th scope="col">Album</th>
-      <th scope="col">Duration</th>
-    </tr>
-  </thead>
-  <tbody>
+<div class="pagination">
+    <div class="pagination-number">
     <?php
-    $no = $pagination->getOffset();
-    foreach($data as $row)
+    foreach($rowData->getPagination() as $pg)
     {
-      $no++;
-      $midi = new Midi($row);
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&midi_id=".$midi->getMidiId();
-      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&midi_id=".$midi->getMidiId();
-    ?>
-    <tr data-id="<?php echo $midi->getMidiId();?>">
-      <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
-      <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo $linkDetail;?>"><?php echo $midi->getTitle();?></a></td>
-      <td><?php echo $midi->getArtisName();?></td>
-      <td><?php echo $midi->getAlbumName();?></td>
-      <td><?php echo $midi->getDuration();?></td>
-    </tr>
-    <?php
+        ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
     }
     ?>
-    
-  </tbody>
-</table>
-
+    </div>
+</div>
 <?php
 }
 }
-catch(Exception $e)
-{
- ?>
- <div class="alert alert-warning">
-  <?php
-   echo $e->getMessage();
-   ?>
- </div>
- <?php
-}
-*/
-}
-
 require_once "inc/footer.php";
 ?>

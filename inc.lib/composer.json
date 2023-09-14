@@ -5,6 +5,11 @@
         }
     },
     "require": {
-        "symfony/yaml": "^5.4"
+        "symfony/yaml": "^3.4"
+    },
+    "config": {
+        "platform": {
+            "php": "5.6.14"
+        }
     }
 }

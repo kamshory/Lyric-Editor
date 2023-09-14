@@ -17,7 +17,7 @@ use Pico\Utility\SpecificationUtil;
 require_once "inc/auth.php";
 require_once "inc/header.php";
 ?>
-<link rel="stylesheet" href="lib/css.css">
+<link rel="stylesheet" href="lib/lyric-editor.css">
 <script src="lib/dubbing.js"></script>
 <script src="lib/ajax.js"></script>
 <link rel="stylesheet" href="lib/icon.css">

@@ -16,7 +16,7 @@ $genre->findOneByGenreId($inputGet->getGenreId());
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editGenreDialogLabel">Add Genre</h5>
+                    <h5 class="modal-title" id="editGenreDialogLabel">Edit Genre</h5>
                     <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -46,5 +46,9 @@ $genre->findOneByGenreId($inputGet->getGenreId());
 }
 catch(Exception $e)
 {
-
+    ?>
+    <div class="alert alert-warning" role="alert">
+    Unexpected error occured
+    </div>
+    <?php
 }
