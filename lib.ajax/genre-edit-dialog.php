@@ -1,11 +1,15 @@
 <?php
 
 use Pico\Data\Entity\Genre;
+use Pico\Request\PicoRequest;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 
-$genre = new Genre(array('genre_id'=>trim(@$_GET['genre_id'])), $database);
-$genre->select();
+$inputGet = new PicoRequest(INPUT_GET);
+$genre = new Genre(null, $database);
+try
+{
+$genre->findOneByGenreId($inputGet->getGenreId());
 ?>
 <form action="">
     <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="editGenreDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editGenreDialogLabel" aria-hidden="true">
@@ -38,3 +42,9 @@ $genre->select();
         </div>
     </div>
 </form>
+<?php
+}
+catch(Exception $e)
+{
+
+}

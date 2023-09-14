@@ -4,8 +4,14 @@ use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
 use Pico\Data\Dto\AlbumDto;
 use Pico\Data\Entity\Album;
+use Pico\Data\Entity\EntitySong;
+use Pico\Database\PicoPagable;
+use Pico\Database\PicoPage;
+use Pico\Database\PicoSortable;
 use Pico\Exceptions\NoRecordFoundException;
+use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
+use Pico\Utility\SpecificationUtil;
 
 require_once "inc/auth.php";
 require_once "inc/header.php";
@@ -59,32 +65,62 @@ if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getAlbumId(
 }
 else
 {
-$pagination = new PicoPagination($cfg->getResultPerPage()); 
-$subquery = new PicoDatabaseQueryBuilder($database);
-$queryBuilder = new PicoDatabaseQueryBuilder($database);
-
-$order = $pagination->createOrder(array(
-), array(
-  'album_id',
-  'name',
-  'time_create'
-), 
-'name'
+  ?>
+  <div class="filter-container">
+  <form action="" method="get">
+  <div class="filter-group">
+      <span>Name</span>
+      <input class="form-control" type="text" name="name" id="name" autocomplete="off" value="<?php echo $inputGet->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
+  </div>
+  
+  <input class="btn btn-success" type="submit" value="Show">
+  
+  </form>
+</div>
+<?php
+$orderMap = array(
+  'name'=>'name', 
+  'albumId'=>'albumId', 
+  'album'=>'albumId'
 );
+$orderDefault = 'name';
+$pagination = new PicoPagination($cfg->getResultPerPage());
 
-$sql = $queryBuilder->newQuery()
-  ->select("album.*")
-  ->from("album")
-  ->orderBy($order)
-  ->limit($pagination->getLimit())
-  ->offset($pagination->getOffset());
-try
-{
-$data = $database->fetchAll($sql, PDO::FETCH_OBJ);
-if($data != null && !empty($data))
-{
+$spesification = SpecificationUtil::createAlbumSpecification($inputGet);
+$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $orderDefault), $pagination->getOrderType());
+$pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
+
+$albumEntity = new Album(null, $database);
+$rowData = $albumEntity->findAll($spesification, $pagable, $sortable, true);
+
+$result = $rowData->getResult();
+
 ?>
 
+<script>
+  $(document).ready(function(e){
+      let pg = new Pagination('.pagination', '.page-selector', 'data-page-number', 'page');
+      pg.init();
+      $(document).on('change', 'select', function(e2){
+          $(this).closest('form').submit();
+      });
+  });
+</script>
+
+<?php
+if(!empty($result))
+{
+?>
+<div class="pagination">
+  <div class="pagination-number">
+  <?php
+  foreach($rowData->getPagination() as $pg)
+  {
+      ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
+  }
+  ?>
+  </div>
+</div>
 <table class="table">
   <thead>
     <tr>
@@ -99,10 +135,9 @@ if($data != null && !empty($data))
   <tbody>
     <?php
     $no = $pagination->getOffset();
-    foreach($data as $row)
+    foreach($result as $album)
     {
       $no++;
-      $album = AlbumDto::valueOf(new Album($row));
       $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&album_id=".$album->getAlbumId();
       $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&album_id=".$album->getAlbumId();
     ?>
@@ -120,6 +155,17 @@ if($data != null && !empty($data))
     
   </tbody>
 </table>
+<div class="pagination">
+  <div class="pagination-number">
+  <?php
+  foreach($rowData->getPagination() as $pg)
+  {
+      ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
+  }
+  ?>
+  </div>
+</div>
+
 
 <div class="lazy-dom modal-container" data-url="lib.ajax/album-update-dialog.php"></div>
 
@@ -166,17 +212,6 @@ if($data != null && !empty($data))
 </script>
 
 <?php
-}
-}
-catch(Exception $e)
-{
- ?>
- <div class="alert alert-warning">
-  <?php
-   echo $e->getMessage();
-   ?>
- </div>
- <?php
 }
 }
 

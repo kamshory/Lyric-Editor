@@ -1,5 +1,6 @@
 <?php
 use Pico\Database\PicoDatabaseQueryBuilder;
+use Pico\Database\PicoSortable;
 use Pico\Pagination\PicoPagination;
 use \PDO as PDO;
 use Pico\Data\Entity\Album;
@@ -10,7 +11,6 @@ use Pico\Data\Entity\Song;
 use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
-use Pico\Database\PicoSortable;
 use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Utility\SpecificationUtil;
@@ -19,7 +19,6 @@ require_once "inc/auth.php";
 require_once "inc/header.php";
 
 $inputGet = new PicoRequest(INPUT_GET);
-
 if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getSongId() != null)
 {
   $queryBuilder = new PicoDatabaseQueryBuilder($database);
@@ -148,8 +147,8 @@ $spesification = SpecificationUtil::createMidiSpecification($inputGet);
 $sortable = new PicoSortable($pagination->getOrderBy($orderMap, $orderDefault), $pagination->getOrderType());
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
-$song = new EntitySong(null, $database);
-$rowData = $song->findAll($spesification, $pagable, $sortable, true);
+$songEntity = new EntitySong(null, $database);
+$rowData = $songEntity->findAll($spesification, $pagable, $sortable, true);
 
 $result = $rowData->getResult();
 

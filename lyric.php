@@ -303,8 +303,8 @@ $spesification = SpecificationUtil::createMidiSpecification($inputGet);
 $sortable = new PicoSortable($pagination->getOrderBy($orderMap, $orderDefault), $pagination->getOrderType());
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
-$song = new EntitySong(null, $database);
-$rowData = $song->findAll($spesification, $pagable, $sortable, true);
+$songEntity = new EntitySong(null, $database);
+$rowData = $songEntity->findAll($spesification, $pagable, $sortable, true);
 
 $result = $rowData->getResult();
 
