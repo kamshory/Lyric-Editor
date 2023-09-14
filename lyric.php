@@ -296,10 +296,11 @@ $orderMap = array(
     'artistComposerId'=>'artistComposerId',
     'artistComposer'=>'artistComposerId'
 );
+$orderDefault = 'title';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createMidiSpecification($inputGet);
-$sortable = new PicoSortable($pagination->getOrderBy($orderMap, 'title'), $pagination->getOrderType());
+$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $orderDefault), $pagination->getOrderType());
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
 $song = new EntitySong(null, $database);
@@ -389,7 +390,7 @@ $result = $rowData->getResult();
         $no++;
         $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&song_id=".$song->getSongId();
         $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&song_id=".$song->getSongId();
-          ?>
+        ?>
         <tr>
         <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
         <th class="text-right" scope="row"><?php echo $no;?></th>
