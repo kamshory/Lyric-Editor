@@ -3,7 +3,6 @@
 namespace Pico\Data\Tools;
 
 use Exception;
-use Pico\Database\PicoSort;
 use Pico\Database\PicoSortable;
 use Pico\DynamicObject\DynamicObject;
 
@@ -31,6 +30,13 @@ class SelectOption
     private $value;
     
     /**
+     * Attributes
+     *
+     * @var array
+     */
+    private $attributes = array();
+    
+    /**
      * Rows
      *
      * @var array
@@ -43,18 +49,56 @@ class SelectOption
      * @param DynamicObject $object
      * @param array $map
      * @param mixed $value
+     * @param array|null $attributes
      */
-    public function __construct($object, $map, $value)
+    public function __construct($object, $map, $value, $attributes = null)
     {
         $this->object = $object;
         $this->map = $map;
         $this->value = $value;
-        $this->findAll();
+        $this->findAllActive();
+        if(isset($attributes) && is_array($attributes))
+        {
+            $this->attributes = $attributes;
+        }
     }
 
-    
+    /**
+     * Create attributes
+     *
+     * @param DynamicObject $row
+     * @param string $attr
+     * @param string $value
+     * @return array
+     */
+    private function createAttributes($row, $attr, $value)
+    {
+        $optAttributes = array();
+        if(is_array($this->attributes))
+        {
+            foreach($this->attributes as $k=>$v)
+            {
+                $val = $row->get($v);
+                if($val != null)
+                {
+                    $optAttributes[$k] = $val;
+                }
+            }
+        }
+        if($value == $this->value)
+        {
+            $optAttributes['selected'] = 'selected';
+        }
+        $optAttributes[$attr] = $value;
+        return $optAttributes;
+    }
 
-    private function findAll()
+    /**
+     * Find all data from database
+     *
+     * @return void
+     */
+    private function findAllActive()
     {
         try
         {  
@@ -64,13 +108,9 @@ class SelectOption
             {
                 $value = $row->get($this->map['value']);
                 $label = $row->get($this->map['label']);
-                $attributes = array('value'=>$value);
-                if($value == $this->value)
-                {
-                    $attributes['selected'] = 'selected';
-                }
+                $optAttributes = $this->createAttributes($row, 'value', $value);
                 $this->rows[] = array(
-                    'attribute'=>$attributes,
+                    'attribute'=>$optAttributes,
                     'textNode'=>$label
                 );
             }
@@ -81,14 +121,24 @@ class SelectOption
         }
     }
 
-    private function arrayToAttribute($array)
+    /**
+     * Convert associated array to HTML attributes as string
+     *
+     * @param array $array
+     * @return string
+     */
+    private function attributeToString($array)
     {
-        $attributes = array();
+        if($array == null || empty($array))
+        {
+            return "";
+        }
+        $optAttributes = array();
         foreach($array as $key=>$value)
         {
-            $attributes[] = $key."=\"".htmlspecialchars($value)."\"";
+            $optAttributes[] = $key."=\"".htmlspecialchars($value)."\"";
         }
-        return rtrim(" ".implode(" ", $attributes));
+        return rtrim(" ".implode(" ", $optAttributes));
     }
 
     public function __toString()
@@ -96,8 +146,8 @@ class SelectOption
         $texts = array();
         foreach($this->rows as $row)
         {
-            $attributes = $this->arrayToAttribute($row['attribute']);
-            $texts[] = "<option".$attributes.">".$row['textNode']."</option>";
+            $optAttributes = $this->attributeToString($row['attribute']);
+            $texts[] = "<option".$optAttributes.">".$row['textNode']."</option>";
         }
         return implode("\r\n", $texts);
     }
