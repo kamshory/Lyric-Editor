@@ -285,20 +285,41 @@ else
     </form>
 </div>
 <?php
-$pagination = new PicoPagination(2);
+$orderMap = array(
+    'title'=>'title', 
+    'albumId'=>'albumId', 
+    'album'=>'albumId', 
+    'genreId'=>'genreId', 
+    'genre'=>'genreId',
+    'artistVocalId'=>'artistVocalId',
+    'artistVocal'=>'artistVocalId',
+    'artistComposerId'=>'artistComposerId',
+    'artistComposer'=>'artistComposerId'
+);
+$pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createMidiSpecification($inputGet);
-
-$sortable = new PicoSortable('title', PicoSortable::ORDER_TYPE_DESC);
+$sortable = new PicoSortable($pagination->getOrderBy($orderMap, 'title'), $pagination->getOrderType());
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
+
 $song = new EntitySong(null, $database);
-$rowData = $song->findAll($spesification, $pagable, true);
+$rowData = $song->findAll($spesification, $pagable, $sortable, true);
 
 $result = $rowData->getResult();
 
 ?>
 
 <style>
+    .pagination{
+        text-align: center;
+        padding: 10px 0;;
+        width: auto;
+        margin: auto;
+    }
+    .pagination-number{
+        display: inline-block;
+        margin: auto;
+    }
     .pagination .page-selector{
         border: solid #DDDDDD;
         border-top-width: 1px;
@@ -327,12 +348,14 @@ $result = $rowData->getResult();
 </style>
 
 <div class="pagination">
+    <div class="pagination-number">
     <?php
     foreach($rowData->getPagination() as $pg)
     {
         ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
     }
     ?>
+    </div>
 </div>
 
 <script>
@@ -383,12 +406,14 @@ $result = $rowData->getResult();
 
 
     <div class="pagination">
+    <div class="pagination-number">
     <?php
     foreach($rowData->getPagination() as $pg)
     {
         ?><span class="page-selector<?php echo $pg['selected'] ? ' page-selected':'';?>" data-page-number="<?php echo $pg['page'];?>"><a href="#"><?php echo $pg['page'];?></a></span><?php
     }
     ?>
+    </div>
 </div>
 <?php
 }

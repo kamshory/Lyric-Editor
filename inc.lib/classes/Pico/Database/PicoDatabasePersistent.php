@@ -1153,7 +1153,7 @@ class PicoDatabasePersistent // NOSONAR
         {
             $sqlQuery = $this->setPagable($sqlQuery, $pagable);      
         }
-        if($pagable != null && $sortable != null)
+        if($pagable != null || $sortable != null)
         {
             $sqlQuery = $this->setSortable($sqlQuery, $pagable, $sortable, $info);        
         }
@@ -1212,7 +1212,7 @@ class PicoDatabasePersistent // NOSONAR
         {
             $sqlQuery = $this->setPagable($sqlQuery, $pagable);        
         }
-        if($pagable != null && $sortable != null)
+        if($pagable != null || $sortable != null)
         {
             $sqlQuery = $this->setSortable($sqlQuery, $pagable, $sortable, $info);        
         }
