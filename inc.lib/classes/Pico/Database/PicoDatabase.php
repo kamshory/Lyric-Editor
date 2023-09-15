@@ -55,8 +55,7 @@ class PicoDatabase
 	 */
 	public function connect()
 	{
-		
-		date_default_timezone_set($this->databaseCredentials->getTimezone());
+		date_default_timezone_set($this->databaseCredentials->getTimeZone());
 		$timezoneOffset = date("P");
 		$connected = true;
 		try 

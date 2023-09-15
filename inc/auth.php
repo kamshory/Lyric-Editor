@@ -7,12 +7,9 @@ use Pico\Database\PicoDatabaseCredentials;
 require_once dirname(__DIR__)."/inc.lib/vendor/autoload.php";
 
 $cfg = new ConfigApp(null, true);
-$cfg->loadIniFile(dirname(dirname(__DIR__))."/app.ini");
+$cfg->loadYamlFile(dirname(__DIR__)."/.cfg/app.yml", true, true);
 
-$databaseCredentials = new PicoDatabaseCredentials();
-
-$databaseCredentials->loadIniFile(dirname(dirname(__DIR__))."/db.ini");
-
+$databaseCredentials = new PicoDatabaseCredentials($cfg->getDatabase());
 $database = new PicoDatabase($databaseCredentials);
 
 try

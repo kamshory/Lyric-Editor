@@ -107,6 +107,20 @@ class PicoDatabasePersistent // NOSONAR
     private $generatedValue = false;
 
     /**
+     * Flag that entity require database autoincrement
+     *
+     * @var boolean
+     */
+    private $requireDbAutoincrement = false;
+
+    /**
+     * Flag that database autoincrement has been completed
+     *
+     * @var boolean
+     */
+    private $dbAutoinrementCompleted = false;
+
+    /**
      * Database connection
      *
      * @param PicoDatabase $database
@@ -656,8 +670,16 @@ class PicoDatabasePersistent // NOSONAR
         }
         if(strcasecmp($strategy, "GenerationType.IDENTITY") == 0)
         {
-            $generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
-            $this->object->set($prop, $generatedValue);
+            if($fisrtCall)
+            {
+                $this->requireDbAutoincrement = true;
+            }
+            else if($this->requireDbAutoincrement && !$this->dbAutoinrementCompleted)
+            {
+                $generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
+                $this->object->set($prop, $generatedValue);
+                $this->dbAutoinrementCompleted = true;
+            }         
         }
     }
 
