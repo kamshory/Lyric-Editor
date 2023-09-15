@@ -229,6 +229,53 @@ if(!empty($result))
     ?>
     </div>
 </div>
+
+
+<div class="lazy-dom modal-container modal-update-data" data-url="lib.ajax/song-update-dialog.php"></div>
+
+<script>
+  let updateSongModal;
+  
+  $(document).ready(function(e){
+    
+    $(document).on('click', '.edit-data', function(e2){
+      e2.preventDefault();
+      e2.stopPropagation();
+      let songId = $(this).closest('tr').attr('data-id') || '';
+      let dialogSelector = $('.modal-update-data');
+      dialogSelector.load(dialogSelector.attr('data-url')+'?song_id='+songId, function(data){
+        let updateSongModalElem = document.querySelector('#updateSongDialog');
+        updateSongModal = new bootstrap.Modal(updateSongModalElem, {
+          keyboard: false
+        });
+        updateSongModal.show();
+      })
+    });
+
+    $(document).on('click', '.save-edit-song', function(){
+      let dataSet = $(this).closest('form').serializeArray();
+      $.ajax({
+        type:'POST',
+        url:'lib.ajax/song-update.php',
+        data:dataSet, 
+        dataType:'html',
+        success: function(data)
+        {
+          updateSongModal.hide();
+          let formData = getFormData(dataSet);
+          let dataId = formData.song_id;
+          let name = formData.name;
+          let active = $('[name="active"]')[0].checked;
+          $('[data-id="'+dataId+'"] .text-data.text-data-name').text(name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(active?'Yes':'No');
+        }
+      })
+    });
+  });
+  
+  
+  
+</script>
 <?php
 }
 }
