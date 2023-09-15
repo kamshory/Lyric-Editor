@@ -8,19 +8,23 @@ $album = new Album(array('album_id'=>trim(@$_GET['album_id'])), $database);
 $album->select();
 ?>
 <form action="">
-    <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="editAlbumDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editAlbumDialogLabel" aria-hidden="true">
+    <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="updateAlbumDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateAlbumDialogLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editAlbumDialogLabel">Edit Album</h5>
+                    <h5 class="modal-title" id="updateAlbumDialogLabel">Edit Album</h5>
                     <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <table class="dialog-table">
                         <tbody>
-                            <tr>
+                        <tr>
                                 <td>Album Name</td>
                                 <td><input type="text" class="form-control" name="name" value="<?php echo $album->getName();?>"></td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td><textarea class="form-control" name="description" id="description" rows="3"><?php echo $album->getDescription();?></textarea></td>
                             </tr>
                             <tr>
                                 <td>Release Date</td>

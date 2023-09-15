@@ -124,6 +124,17 @@ class PicoDatabasePersistent // NOSONAR
     }
     
     /**
+     * Check if string is null or empty
+     *
+     * @param string $string
+     * @return string
+     */
+    private function nulOrEmpty($string)
+    {
+        return $string == null || empty($string);
+    }
+    
+    /**
      * Check if string is not null and not empty
      *
      * @param string $string
@@ -591,6 +602,23 @@ class PicoDatabasePersistent // NOSONAR
         }
         return $aiKeys;
     }
+    
+    private function addGeneratedValue($info)
+    {
+        $keys = $this->getPrimaryKeyAutoIncrement($info);
+        if(isset($keys) && is_array($keys))
+        {
+            $props = array_keys($keys);
+            foreach($props as $prop)
+            {
+                $pkVal = $this->object->get($prop);
+                if($this->nulOrEmpty($pkVal))
+                {
+                    //TODO: check if generator is internal database or external
+                }
+            }
+        }
+    }
 
     /**
      * Insert data
@@ -625,6 +653,10 @@ class PicoDatabasePersistent // NOSONAR
         }
         $values = $this->getValues($info, $queryBuilder);
         $fixValues = $this->fixInsertableValues($values, $info);
+        
+        //TODO: check value of autoIncrementKeys
+        $this->addGeneratedValue($info);
+        
         $sqlQuery = $queryBuilder
             ->newQuery()
             ->insert()
@@ -637,7 +669,8 @@ class PicoDatabasePersistent // NOSONAR
         {
             $props = array_keys($keys);
             $prop = $props[0];
-            if($this->object->get($prop) == null)
+            $pkVal = $this->object->get($prop);
+            if($this->nulOrEmpty($pkVal))
             {
                 $generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
                 $this->object->set($prop, $generatedValue);

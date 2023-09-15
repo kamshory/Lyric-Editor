@@ -161,7 +161,7 @@ if(!empty($result))
 
 <script>
   let addArtistModal;
-  let editArtistModal;
+  let updateArtistModal;
   $(document).ready(function(e){
 
     $(document).on('click', '.add-data', function(e2){
@@ -169,8 +169,8 @@ if(!empty($result))
       e2.stopPropagation();
       let dialogSelector = $('.modal-add-data');
       dialogSelector.load(dialogSelector.attr('data-url'), function(data){
-        let editArtistModalElem = document.querySelector('#addArtistDialog');
-        addArtistModal = new bootstrap.Modal(editArtistModalElem, {
+        let addArtistModalElem = document.querySelector('#addArtistDialog');
+        addArtistModal = new bootstrap.Modal(addArtistModalElem, {
           keyboard: false
         });
         addArtistModal.show();
@@ -183,11 +183,11 @@ if(!empty($result))
       let artistId = $(this).closest('tr').attr('data-id') || '';
       let dialogSelector = $('.modal-edit-data');
       dialogSelector.load(dialogSelector.attr('data-url')+'?artist_id='+artistId, function(data){
-        let editArtistModalElem = document.querySelector('#updateArtistDialog');
-        editArtistModal = new bootstrap.Modal(editArtistModalElem, {
+        let updateArtistModalElem = document.querySelector('#updateArtistDialog');
+        updateArtistModal = new bootstrap.Modal(updateArtistModalElem, {
           keyboard: false
         });
-        editArtistModal.show();
+        updateArtistModal.show();
       })
     });
 
@@ -217,7 +217,7 @@ if(!empty($result))
         dataType:'html',
         success: function(data)
         {
-          editArtistModal.hide();
+          updateArtistModal.hide();
           let formData = getFormData(dataSet);
           let dataId = formData.artist_id;
           let name = formData.name;

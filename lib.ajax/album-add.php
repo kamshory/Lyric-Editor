@@ -10,25 +10,26 @@ use Pico\Response\PicoResponse;
 require_once dirname(__DIR__)."/inc/auth.php";
 $inputPost = new PicoRequest(INPUT_POST);
 $inputPost->filterName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+$inputPost->filterDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+$inputPost->checkboxActive(false);
 $data = new Album($inputPost, $database);
 try
 {
-    $saved = $data->findByName($name);
-    if($saved && !empty($saved))
+    $saved = $data->findOneByName($inputPost->getName());
+    if($saved && $saved->hasValueAlbumId())
     {
-        $data->setAlbumId($saved[0]->getAlbumId());
+        $data->setAlbumId($saved->getAlbumId());
     }
     else
     {
         $data->save();
     }
-    $restResponse = new PicoResponse();
-    
+    $restResponse = new PicoResponse();   
     $response = AlbumDto::valueOf($data);
-    
     $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);
 }
 catch(Exception $e)
 {
     // do nothing
+    $data->insert();
 }

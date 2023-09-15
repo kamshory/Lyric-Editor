@@ -74,6 +74,7 @@ else
   </div>
   
   <input class="btn btn-success" type="submit" value="Show">
+  <input class="btn btn-primary add-data" type="button" value="Add">
   
   </form>
 </div>
@@ -167,22 +168,54 @@ if(!empty($result))
 </div>
 
 
-<div class="lazy-dom modal-container" data-url="lib.ajax/album-edit-dialog.php"></div>
+<div class="lazy-dom modal-container modal-add-data" data-url="lib.ajax/album-add-dialog.php"></div>
+<div class="lazy-dom modal-container modal-update-data" data-url="lib.ajax/album-update-dialog.php"></div>
 
 <script>
-  let editAlbumModal;
+  let addAlbumModal;
+  let updateAlbumModal;
+  
   $(document).ready(function(e){
+    
+    $(document).on('click', '.add-data', function(e2){
+      e2.preventDefault();
+      e2.stopPropagation();
+      let dialogSelector = $('.modal-add-data');
+      dialogSelector.load(dialogSelector.attr('data-url'), function(data){
+        let addAlbumModalElem = document.querySelector('#addAlbumDialog');
+        addAlbumModal = new bootstrap.Modal(addAlbumModalElem, {
+          keyboard: false
+        });
+        addAlbumModal.show();
+      })
+    });
+    
     $(document).on('click', '.edit-data', function(e2){
       e2.preventDefault();
       e2.stopPropagation();
       let albumId = $(this).closest('tr').attr('data-id') || '';
-      let dialogSelector = $('.modal-container');
+      let dialogSelector = $('.modal-update-data');
       dialogSelector.load(dialogSelector.attr('data-url')+'?album_id='+albumId, function(data){
-        let editAlbumModalElem = document.querySelector('#editAlbumDialog');
-        editAlbumModal = new bootstrap.Modal(editAlbumModalElem, {
+        let updateAlbumModalElem = document.querySelector('#updateAlbumDialog');
+        updateAlbumModal = new bootstrap.Modal(updateAlbumModalElem, {
           keyboard: false
         });
-        editAlbumModal.show();
+        updateAlbumModal.show();
+      })
+    });
+    
+    $(document).on('click', '.save-add-album', function(){
+      let dataSet = $(this).closest('form').serializeArray();
+      $.ajax({
+        type:'POST',
+        url:'lib.ajax/album-add.php',
+        data:dataSet, 
+        dataType:'html',
+        success: function(data)
+        {
+          addAlbumModal.hide();
+          window.location.reload();
+        }
       })
     });
 
@@ -195,7 +228,7 @@ if(!empty($result))
         dataType:'html',
         success: function(data)
         {
-          editAlbumModal.hide();
+          updateAlbumModal.hide();
           let formData = getFormData(dataSet);
           let dataId = formData.album_id;
           let name = formData.name;

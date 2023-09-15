@@ -25,6 +25,12 @@ class Album extends DynamicObject
 	 * @var string
 	 */
 	protected $name;
+	
+	/**
+	 * @Column(name="description", type="longtext", nullable=true)
+	 * @var string
+	 */
+	protected $description;
 
 	/**
 	 * @Column(name="release_date", type="date", nullable=true)

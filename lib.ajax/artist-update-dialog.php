@@ -8,7 +8,7 @@ require_once dirname(__DIR__)."/inc/auth.php";
 $inputGet = new PicoRequest(INPUT_GET);
 $artist = new Artist(null, $database);
 ?>
-<form action="" method="post>
+<form action="">
     <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="updateArtistDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateArtistDialogLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
