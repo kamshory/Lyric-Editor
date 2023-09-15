@@ -1,6 +1,7 @@
 <?php
 namespace Pico\Database;
 
+use DateTime;
 use Exception;
 use PDO;
 use PDOException;
@@ -25,6 +26,8 @@ class PicoDatabasePersistent // NOSONAR
     const ANNOTATION_GENERATED_VALUE = "GeneratedValue";
     const ANNOTATION_NOT_NULL = "NotNull";
     const ANNOTATION_DEFAULT_COLUMN = "DefaultColumn";
+    const ANNOTATION_JSON_FORMAT = "JsonFormat";
+    const SQL_DATE_TIME_FORMAT = "SqlDateTimeFormat";
     
     const KEY_NAME = "name";
     const KEY_NULL = "null";
@@ -46,6 +49,9 @@ class PicoDatabasePersistent // NOSONAR
 
     const MESSAGE_NO_RECORD_FOUND = "No record found";
     const MESSAGE_INVALID_FILTER = "Invalid filter";
+    const SQL_DATETIME_FORMAT = "Y-m-d H:i:s";
+    const DATE_TIME_FORMAT = "datetimeformat";
+    
     const NAMESPACE_SEPARATOR = "\\";
     
     /**
@@ -173,6 +179,14 @@ class PicoDatabasePersistent // NOSONAR
                     $type = explode(' ', trim($val, " \r\n\t "))[0];
                     $columns[$prop->name][self::KEY_PROPERTY_TYPE] = $type;
                 }
+                if(strcasecmp($param, self::SQL_DATE_TIME_FORMAT) == 0)
+                {
+                    $values = $reflexProp->parseKeyValue($val);
+                    if(isset($values['pattern']))
+                    {
+                        $columns[$prop->name][self::DATE_TIME_FORMAT] = $values['pattern'];
+                    }
+                }
             }
             
             // get join column name of each parameters
@@ -187,6 +201,7 @@ class PicoDatabasePersistent // NOSONAR
                     }
                 }
             }
+            
             // set join column type
             foreach($parameters as $param=>$val)
             {
@@ -333,6 +348,7 @@ class PicoDatabasePersistent // NOSONAR
         {
             $columnName = $column[self::KEY_NAME];
             $value = $this->object->get($property);
+            $value = $this->fixInput($value, $column);
             if($this->flagIncludeNull || $value !== null)
             {
                 $value = $queryBuilder->escapeValue($value);
@@ -428,6 +444,7 @@ class PicoDatabasePersistent // NOSONAR
             if(!$this->isPrimaryKeys($columnName, $primaryKeys))
             {
                 $value = $this->object->get($property);
+                $value = $this->fixInput($value, $column);
                 if(($this->flagIncludeNull || $value !== null) 
                     && !in_array($columnName, $nullCols) 
                     && !in_array($columnName, $nonUpdatableCols)
@@ -1551,7 +1568,7 @@ class PicoDatabasePersistent // NOSONAR
      */
     public function fixData($value, $type)
     {
-        $type = strtolower($type);
+        $typeLower = strtolower($type);
         /*
         Map of data type (MySQL)
         "double"=>"double",
@@ -1574,39 +1591,106 @@ class PicoDatabasePersistent // NOSONAR
         "datetime"=>"string",
         "date"=>"string",
         "time"=>"string"
-        */
-        $ret = $value;
-        if($type == 'bool')
+        */     
+        
+        if($type == 'DateTime')
         {
-            $ret = $value == 1 || $value == '1';
+            $v = strlen($value) > 19 ? substr($value, 0, 19) : $value;
+            $ret = DateTime::createFromFormat(self::SQL_DATETIME_FORMAT, $v);
         }
-        else if($type == 'integer')
+        else if($typeLower == 'bool')
         {
-            if($value === null)
-            {
-                $ret = null;
-            }
-            else
-            {
-                $ret = intval($value);
-            }
+            $ret = $this->boolval($value);
         }
-        else if($type == 'double')
+        else if($typeLower == 'integer')
         {
-            if($value === null)
-            {
-                $ret = null;
-            }
-            else
-            {
-                $ret = doubleval($value);
-            }
+            $ret = $this->intval($value);
+        }
+        else if($typeLower == 'double')
+        {
+            $ret = $this->doubleval($value);
         }
         else if($this->isDateTimeNull($value))
         {
             $ret = null;
         }
+        else
+        {
+            $ret = $value;
+        }
         return $ret;
+    }
+    
+    /**
+     * Boolean value
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private function boolval($value)
+    {
+        return $value == 1 || $value == '1';
+    }
+    
+    /**
+     * Integer value
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private function intval($value)
+    {
+        if($value === null)
+        {
+            $ret = null;
+        }
+        else
+        {
+            $ret = intval($value);
+        }
+        return $ret;
+    }
+    
+    /**
+     * Double value
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private function doubleval($value)
+    {
+        if($value === null)
+        {
+            $ret = null;
+        }
+        else
+        {
+            $ret = doubleval($value);
+        }
+        return $ret;
+    }
+
+    /**
+     * Fixing input
+     *
+     * @param mixed $value
+     * @param array $column
+     * @return mixed
+     */
+    private function fixInput($value, $column)
+    {
+        if($value instanceof DateTime)
+        {
+            if(isset($column[self::DATE_TIME_FORMAT]))
+            {
+                return (string) $value->format($column[self::DATE_TIME_FORMAT]);
+            }
+            else
+            {
+                return (string) $value->format(self::SQL_DATETIME_FORMAT);
+            }
+        }
+        return $value;
     }
     
     /**
