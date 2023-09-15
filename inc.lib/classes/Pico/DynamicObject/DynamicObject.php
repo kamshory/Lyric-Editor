@@ -1028,8 +1028,8 @@ class DynamicObject extends stdClass // NOSONAR
      * listAllAsc &raquo; search data from database without filter order by primary keys ascending. Similar to findAllAsc but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
      * listAllDesc &raquo; search data from database without filter order by primary keys descending. Similar to findAllDesc but does not contain a connection to the database so objects cannot be saved directly to the database. This method require database connection.
      * countBy &raquo; count data from database.
-     * deleteBy &raquo; delete data from database without read it first. This method require database connection.
      * existsBy &raquo; check data from database. This method require database connection.
+     * deleteBy &raquo; delete data from database without read it first. This method require database connection.
      * booleanToTextBy &raquo; convert bool value to yes/no or true/false depend on parameters given. Example: $result = booleanToTextByActive("Yes", "No"); If $obj->active is true, $result will be "Yes" otherwise "No". This method not require database connection.
      * booleanToSelectedBy &raquo; Create attribute selected="selected" for form. This method not require database connection.
      * booleanToCheckedBy &raquo; Create attribute checked="checked" for form. This method not require database connection.
@@ -1043,8 +1043,7 @@ class DynamicObject extends stdClass // NOSONAR
         if (strncasecmp($method, "hasValue", 8) === 0) {
             $var = lcfirst(substr($method, 8));
             return isset($this->$var);
-        } 
-        else if (strncasecmp($method, "is", 2) === 0) {
+        } else if (strncasecmp($method, "is", 2) === 0) {
             $var = lcfirst(substr($method, 2));
             return isset($this->$var) ? $this->$var == 1 : false;
         } else if (strncasecmp($method, "get", 3) === 0) {
@@ -1144,7 +1143,10 @@ class DynamicObject extends stdClass // NOSONAR
             $parameters = $this->valuesFromParams($params);
             return $this->countBy($var, $parameters);
         }
-        else if (strncasecmp($method, "deleteBy", 8) === 0) {
+        else if (strncasecmp($method, "existsBy", 8) === 0) {
+            $var = lcfirst(substr($method, 8));
+            return $this->existsBy($var, $params);
+        } else if (strncasecmp($method, "deleteBy", 8) === 0) {
             $var = lcfirst(substr($method, 8));
             return $this->deleteBy($var, $params);
         }
@@ -1159,11 +1161,7 @@ class DynamicObject extends stdClass // NOSONAR
         else if (strncasecmp($method, "booleanToCheckedBy", 18) === 0) {
             $prop = lcfirst(substr($method, 18));
             return $this->booleanToTextBy($prop, array(' cheked="checked"', ''));
-        }
-        else if (strncasecmp($method, "existsBy", 8) === 0) {
-            $var = lcfirst(substr($method, 8));
-            return $this->existsBy($var, $params);
-        }
+        }     
     }
 
     /**
