@@ -2,6 +2,7 @@
 
 namespace Pico\DynamicObject;
 
+use Pico\Secret\PicoSecret;
 use Pico\Util\PicoAnnotationParser;
 use Pico\Util\PicoEnvironmentVariable;
 use ReflectionClass;
@@ -10,8 +11,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class PicoSecretObject extends stdClass //NOSONAR
 {
-    const RANDOM_KEY_1 = "68e656b251e67e8358bef8483ab0d51c";
-    const RANDOM_KEY_2 = "6619f3e7a1a9f0e75838d41ff368f728";
     const KEY_NAME = "name";
     const KEY_VALUE = "value";
     
@@ -147,11 +146,11 @@ class PicoSecretObject extends stdClass //NOSONAR
     {
         if($this->needInputEncryption($var))
         {
-            $value = $this->encryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+            $value = $this->encryptValue($value, PicoSecret::RANDOM_KEY_1.PicoSecret::RANDOM_KEY_2);
         }
         else if($this->needInputDecryption($var))
         {
-            $value = $this->decryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+            $value = $this->decryptValue($value, PicoSecret::RANDOM_KEY_1.PicoSecret::RANDOM_KEY_2);
         }
         $this->$var = $value;
     }
@@ -167,11 +166,11 @@ class PicoSecretObject extends stdClass //NOSONAR
         $value = $this->_getValue($var);
         if($this->needOutputEncryption($var))
         {
-            $value = $this->encryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+            $value = $this->encryptValue($value, PicoSecret::RANDOM_KEY_1.PicoSecret::RANDOM_KEY_2);
         }
         else if($this->needOutputDecryption($var))
         {
-            $value = $this->decryptValue($value, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+            $value = $this->decryptValue($value, PicoSecret::RANDOM_KEY_1.PicoSecret::RANDOM_KEY_2);
         }
         return $value;
     }
@@ -701,7 +700,7 @@ class PicoSecretObject extends stdClass //NOSONAR
             }
             else if(is_string($val))
             {
-                $array[$key] = $this->encryptValue($val, self::RANDOM_KEY_1.self::RANDOM_KEY_2);
+                $array[$key] = $this->encryptValue($val, PicoSecret::RANDOM_KEY_1.PicoSecret::RANDOM_KEY_2);
             }
         }
         return $array;
