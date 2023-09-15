@@ -202,7 +202,7 @@ if(!empty($result))
         dataType:'html',
         success: function(data)
         {
-          editArtistModal.hide();
+          addArtistModal.hide();
           window.location.reload();
         }
       })
