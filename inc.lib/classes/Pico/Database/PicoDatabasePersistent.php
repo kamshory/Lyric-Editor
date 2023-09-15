@@ -621,33 +621,18 @@ class PicoDatabasePersistent // NOSONAR
     {
         if(!$this->generatedValue)
         {
-            error_log("addGeneratedValue not executed");
-            if($fisrtCall)
-            {
-                error_log("THIS IS FIRST CALL");
-            }
             $keys = $info->autoIncrementKeys;
             if(isset($keys) && is_array($keys))
             {
-                error_log("addGeneratedValue is present");
                 foreach($keys as $prop=>$col)
                 {
-                    error_log("$prop");
                     $autoVal = $this->object->get($prop);
-                    error_log("$prop = $autoVal");
                     if($this->nulOrEmpty($autoVal) && isset($col[self::KEY_STRATEGY]))
                     {
-                        //TODO: check if generator is internal database or external
-                        error_log("$prop is empty");
-                        error_log(print_r($col, true));
                         $this->setGeneratedValue($prop, $col[self::KEY_STRATEGY], $fisrtCall);
                     }
                 }
             }
-        }
-        else
-        {
-            error_log("addGeneratedValue has been executed");
         }
     }
     
@@ -660,13 +645,9 @@ class PicoDatabasePersistent // NOSONAR
      */
     private function setGeneratedValue($prop, $strategy, $fisrtCall)
     {
-        error_log("CALL setGeneratedValue for $prop");
-        error_log("PROP = $prop, STRATEGY = $strategy");
         if(strcasecmp($strategy, "GenerationType.UUID") == 0)
         {
-            //$generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
             $generatedValue = $this->database->generateNewId();
-            error_log("SET $prop = ");
             $this->object->set($prop, $generatedValue);
             if($fisrtCall)
             {
@@ -676,7 +657,6 @@ class PicoDatabasePersistent // NOSONAR
         if(strcasecmp($strategy, "GenerationType.IDENTITY") == 0)
         {
             $generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
-            error_log("SET $prop = ");
             $this->object->set($prop, $generatedValue);
         }
     }
