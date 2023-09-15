@@ -1,8 +1,5 @@
 <?php
-use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
-use \PDO as PDO;
-use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Genre;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
@@ -26,14 +23,15 @@ $inputGet = new PicoRequest(INPUT_GET);
   </div>
   
   <input class="btn btn-success" type="submit" value="Show">
-  
+  <input class="btn btn-primary add-data" type="button" value="Add">
+`  
   </form>
 </div>
 <?php
 $orderMap = array(
   'name'=>'name', 
-  'albumId'=>'albumId', 
-  'album'=>'albumId'
+  'genreId'=>'genreId', 
+  'genre'=>'genreId'
 );
 $orderDefault = 'name';
 $pagination = new PicoPagination($cfg->getResultPerPage());
@@ -105,22 +103,52 @@ if(!empty($result))
 </table>
 
 
-<div class="lazy-dom modal-container" data-url="lib.ajax/genre-edit-dialog.php"></div>
+<div class="lazy-dom modal-container modal-add-data" data-url="lib.ajax/genre-add-dialog.php"></div>
+<div class="lazy-dom modal-container modal-update-data" data-url="lib.ajax/genre-update-dialog.php"></div>
 
 <script>
-  let editGenreModal;
+  let addGenreModal;
+  let updateGenreModal;
   $(document).ready(function(e){
+    $(document).on('click', '.add-data', function(e2){
+      e2.preventDefault();
+      e2.stopPropagation();
+      let dialogSelector = $('.modal-add-data');
+      dialogSelector.load(dialogSelector.attr('data-url'), function(data){
+        let addGenreModalElem = document.querySelector('#addGenreDialog');
+        addGenreModal = new bootstrap.Modal(addGenreModalElem, {
+          keyboard: false
+        });
+        addGenreModal.show();
+      })
+    });
+
     $(document).on('click', '.edit-data', function(e2){
       e2.preventDefault();
       e2.stopPropagation();
       let genreId = $(this).closest('tr').attr('data-id') || '';
-      let dialogSelector = $('.modal-container');
+      let dialogSelector = $('.modal-update-data');
       dialogSelector.load(dialogSelector.attr('data-url')+'?genre_id='+genreId, function(data){
-        let editGenreModalElem = document.querySelector('#editGenreDialog');
-        editGenreModal = new bootstrap.Modal(editGenreModalElem, {
+        let updateGenreModalElem = document.querySelector('#updateGenreDialog');
+        updateGenreModal = new bootstrap.Modal(updateGenreModalElem, {
           keyboard: false
         });
-        editGenreModal.show();
+        updateGenreModal.show();
+      })
+    });
+
+    $(document).on('click', '.save-add-genre', function(){
+      let dataSet = $(this).closest('form').serializeArray();
+      $.ajax({
+        type:'POST',
+        url:'lib.ajax/genre-add.php',
+        data:dataSet, 
+        dataType:'html',
+        success: function(data)
+        {
+          addGenreModal.hide();
+          window.location.reload();
+        }
       })
     });
 
@@ -133,8 +161,7 @@ if(!empty($result))
         dataType:'html',
         success: function(data)
         {
-          console.log(data)
-          editGenreModal.hide();
+          updateGenreModal.hide();
         }
       })
     });

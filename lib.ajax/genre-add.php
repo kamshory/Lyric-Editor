@@ -14,13 +14,13 @@ $inputPost->checkboxActive(false);
 // filter name
 $inputPost->filterName(FILTER_SANITIZE_SPECIAL_CHARS);
 // filter stage name
-$inputPost->filterStageName(FILTER_SANITIZE_SPECIAL_CHARS);
+$inputPost->setActive(true);
 $genre = new Genre($inputPost, $database);
 
 try
 {
     $savedData = new Genre(null, $database);
-    $saved = $savedData->findOneByName($name);
+    $saved = $savedData->findOneByName($inputPost->getName());
     if($saved->getGenreId() != "")
     {
         $genre->setGenreId($saved->getGenreId());
@@ -32,9 +32,8 @@ try
 }
 catch(Exception $e)
 {
-    $genre->update();
+    $genre->insert();
 }
-
 $restResponse = new PicoResponse();
 $response = GenreDto::valueOf($genre);
 $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);

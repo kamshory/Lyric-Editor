@@ -12,11 +12,11 @@ try
 $genre->findOneByGenreId($inputGet->getGenreId());
 ?>
 <form action="">
-    <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="editGenreDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editGenreDialogLabel" aria-hidden="true">
+    <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="updateGenreDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateGenreDialogLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editGenreDialogLabel">Edit Genre</h5>
+                    <h5 class="modal-title" id="updateGenreDialogLabel">Update Genre</h5>
                     <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
