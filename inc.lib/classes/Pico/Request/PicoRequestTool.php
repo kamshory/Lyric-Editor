@@ -6,7 +6,7 @@ use Pico\Util\PicoAnnotationParser;
 use ReflectionClass;
 use stdClass;
 
-class PicoRequestTool
+class PicoRequestTool extends stdClass
 {
     /**
      * Class parameter
@@ -324,20 +324,6 @@ class PicoRequestTool
     {
         return addslashes($inp);
     }
-    public function my_stripslashes($inp){
-        $inp = str_replace(array("\\'"), array("'"), $inp);
-        $inp = str_replace(array("\\\""), array("\""), $inp);
-        $inp = str_replace(array("\\\\","\\0", "\\n", "\\r", "\\Z"), array("\\","\0", "\n", "\r", "\x1a"), $inp);
-        return $inp;
-    }
-    public function array_addslashes(&$item, $key) // NOSONAR
-    {
-        $item = $this->addslashes($item);
-    }
-    public function array_stripslashes(&$item, $key) // NOSONAR
-    {
-        $item = $this->my_stripslashes($item);
-    }
 
     public function _get_value($cfg, $input)
     {
@@ -375,7 +361,7 @@ class PicoRequestTool
      * Magic method called when user call any undefined method
      *
      * @param string $method
-     * @param string $params
+     * @param array $params
      * @return mixed|null
      */
     public function __call($method, $params)
@@ -411,15 +397,18 @@ class PicoRequestTool
             $this->$var = $this->applyFilter($this->$var, $params[0]);
             return $this;
         }
-    }
-    
+    }  
     private function applyFilter($value, $filterType)
     {
         if(isset($value))
         {
-            if($filterType == FILTER_SANITIZE_SPECIAL_CHARS)
+            if($filterType == PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS)
             {
                 return htmlspecialchars($value);
+            }
+            else if($filterType == PicoFilterConstant::FILTER_SANITIZE_BOOL)
+            {
+                return $value === true || $value == 1 || $value == "1";
             }
             else
             {

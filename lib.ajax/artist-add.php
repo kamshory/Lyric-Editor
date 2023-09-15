@@ -3,6 +3,7 @@
 use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Dto\ArtistDto;
 use Pico\Data\Entity\Artist;
+use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
 
@@ -13,9 +14,9 @@ $inputPost = new PicoRequest(INPUT_POST);
 // if active is null, then set to false
 $inputPost->checkboxActive(false);
 // filter name
-$inputPost->filterName(FILTER_SANITIZE_SPECIAL_CHARS);
+$inputPost->filterName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 // filter stage name
-$inputPost->filterStageName(FILTER_SANITIZE_SPECIAL_CHARS);
+$inputPost->filterStageName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $artist = new Artist($inputPost, $database);
 
 try

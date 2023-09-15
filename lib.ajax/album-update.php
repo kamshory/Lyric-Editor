@@ -4,13 +4,14 @@ use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Dto\AlbumDto;
 use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Song;
+use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 
 $inputPost = new PicoRequest(INPUT_POST);
-$inputPost->filterName(FILTER_SANITIZE_SPECIAL_CHARS);
+$inputPost->filterName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $inputPost->checkboxActive(false);
 $album = new Album($inputPost, $database);
 

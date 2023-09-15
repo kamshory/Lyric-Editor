@@ -15,7 +15,7 @@ class PicoRequest extends PicoRequestTool
         {
             $this->loadData($_GET);
         }
-        else if($inputType == INPUT_POST && isset($_GET))
+        else if($inputType == INPUT_POST && isset($_POST))
         {
             $this->loadData($_POST);
         }

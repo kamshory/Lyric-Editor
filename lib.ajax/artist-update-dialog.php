@@ -8,12 +8,12 @@ require_once dirname(__DIR__)."/inc/auth.php";
 $inputGet = new PicoRequest(INPUT_GET);
 $artist = new Artist(null, $database);
 ?>
-<form action="">
-    <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="editArtistDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editArtistDialogLabel" aria-hidden="true">
+<form action="" method="post>
+    <div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="updateArtistDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateArtistDialogLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editArtistDialogLabel">Edit Artist</h5>
+                    <h5 class="modal-title" id="updateArtistDialogLabel">Update Artist</h5>
                     <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -61,7 +61,9 @@ $artist = new Artist(null, $database);
                         }
                         catch(Exception $e)
                         {
-                            
+                            ?>
+                            <div class="alert alert-warning">Unexpected error occured</div>
+                            <?php
                         }
                         ?>
                 </div>

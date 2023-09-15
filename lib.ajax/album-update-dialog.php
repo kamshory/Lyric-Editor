@@ -51,7 +51,9 @@ $album = new Album(null, $database);
                     }
                     catch(Exception $e)
                     {
-                        
+                        ?>
+                        <div class="alert alert-warning">Unexpected error occured</div>
+                        <?php
                     }
                     ?>
                 </div>

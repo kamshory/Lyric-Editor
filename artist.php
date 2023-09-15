@@ -61,6 +61,7 @@ else
   </div>
   
   <input class="btn btn-success" type="submit" value="Show">
+  <input class="btn btn-primary add-data" type="button" value="Add">
   
   </form>
 </div>
@@ -155,22 +156,55 @@ if(!empty($result))
   </div>
 </div>
 
-<div class="lazy-dom modal-container" data-url="lib.ajax/artist-edit-dialog.php"></div>
+<div class="lazy-dom modal-container modal-add-data" data-url="lib.ajax/artist-add-dialog.php"></div>
+<div class="lazy-dom modal-container modal-edit-data" data-url="lib.ajax/artist-update-dialog.php"></div>
 
 <script>
+  let addArtistModal;
   let editArtistModal;
   $(document).ready(function(e){
+
+    $(document).on('click', '.add-data', function(e2){
+      e2.preventDefault();
+      e2.stopPropagation();
+      let dialogSelector = $('.modal-add-data');
+      dialogSelector.load(dialogSelector.attr('data-url'), function(data){
+        let editArtistModalElem = document.querySelector('#addArtistDialog');
+        addArtistModal = new bootstrap.Modal(editArtistModalElem, {
+          keyboard: false
+        });
+        addArtistModal.show();
+      })
+    });
+
     $(document).on('click', '.edit-data', function(e2){
       e2.preventDefault();
       e2.stopPropagation();
       let artistId = $(this).closest('tr').attr('data-id') || '';
-      let dialogSelector = $('.modal-container');
+      let dialogSelector = $('.modal-edit-data');
       dialogSelector.load(dialogSelector.attr('data-url')+'?artist_id='+artistId, function(data){
-        let editArtistModalElem = document.querySelector('#editArtistDialog');
+        let editArtistModalElem = document.querySelector('#updateArtistDialog');
         editArtistModal = new bootstrap.Modal(editArtistModalElem, {
           keyboard: false
         });
         editArtistModal.show();
+      })
+    });
+
+    
+
+    $(document).on('click', '.save-add-artist', function(){
+      let dataSet = $(this).closest('form').serializeArray();
+      $.ajax({
+        type:'POST',
+        url:'lib.ajax/artist-add.php',
+        data:dataSet, 
+        dataType:'html',
+        success: function(data)
+        {
+          editArtistModal.hide();
+          window.location.reload();
+        }
       })
     });
 
