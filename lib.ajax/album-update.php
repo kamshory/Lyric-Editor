@@ -39,6 +39,11 @@ try
         $album->setDuration(0);
         $album->setNumberOfSong(0);        
     }
+    
+    $now = date('Y-m-d H:i:s');
+    $album->setTimeEdit($now);
+    $album->setIpEdit($_SERVER['REMOTE_ADDR']);
+    $album->setAdminEdit(1);
 
     $album->update();
     $restResponse = new PicoResponse();

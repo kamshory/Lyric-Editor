@@ -24,6 +24,14 @@ PicoHttpCache::cacheLifetime(3600*12);
                             <td>Description</td>
                             <td><textarea class="form-control" name="description" id="description" rows="3"></textarea></td>
                         </tr>
+                        <tr>
+                            <td>Release Date</td>
+                                <td><input type="date" class="form-control" name="release_date"></td>
+                            </tr>
+                        <tr>
+                            <td>Active</td>
+                            <td><label></label><input type="checkbox" name="active" value="1"> Active</label></td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>

@@ -98,6 +98,13 @@ class PicoDatabasePersistent // NOSONAR
      * @var string
      */
     private $namespaceName = "";
+    
+    /**
+     * Flag that generated value has been added
+     *
+     * @var boolean
+     */
+    private $generatedValue = false;
 
     /**
      * Database connection
@@ -603,20 +610,74 @@ class PicoDatabasePersistent // NOSONAR
         return $aiKeys;
     }
     
-    private function addGeneratedValue($info)
+    /**
+     * Add generated value
+     *
+     * @param stdClass $info
+     * @param bool $fisrtCall
+     * @return void
+     */
+    private function addGeneratedValue($info, $fisrtCall)
     {
-        $keys = $this->getPrimaryKeyAutoIncrement($info);
-        if(isset($keys) && is_array($keys))
+        if(!$this->generatedValue)
         {
-            $props = array_keys($keys);
-            foreach($props as $prop)
+            error_log("addGeneratedValue not executed");
+            if($fisrtCall)
             {
-                $pkVal = $this->object->get($prop);
-                if($this->nulOrEmpty($pkVal))
+                error_log("THIS IS FIRST CALL");
+            }
+            $keys = $info->autoIncrementKeys;
+            if(isset($keys) && is_array($keys))
+            {
+                error_log("addGeneratedValue is present");
+                foreach($keys as $prop=>$col)
                 {
-                    //TODO: check if generator is internal database or external
+                    error_log("$prop");
+                    $autoVal = $this->object->get($prop);
+                    error_log("$prop = $autoVal");
+                    if($this->nulOrEmpty($autoVal) && isset($col[self::KEY_STRATEGY]))
+                    {
+                        //TODO: check if generator is internal database or external
+                        error_log("$prop is empty");
+                        error_log(print_r($col, true));
+                        $this->setGeneratedValue($prop, $col[self::KEY_STRATEGY], $fisrtCall);
+                    }
                 }
             }
+        }
+        else
+        {
+            error_log("addGeneratedValue has been executed");
+        }
+    }
+    
+    /**
+     * Set generated value
+     *
+     * @param string $prop
+     * @param string $strategy
+     * @return void
+     */
+    private function setGeneratedValue($prop, $strategy, $fisrtCall)
+    {
+        error_log("CALL setGeneratedValue for $prop");
+        error_log("PROP = $prop, STRATEGY = $strategy");
+        if(strcasecmp($strategy, "GenerationType.UUID") == 0)
+        {
+            //$generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
+            $generatedValue = $this->database->generateNewId();
+            error_log("SET $prop = ");
+            $this->object->set($prop, $generatedValue);
+            if($fisrtCall)
+            {
+                $this->generatedValue = true;
+            }
+        }
+        if(strcasecmp($strategy, "GenerationType.IDENTITY") == 0)
+        {
+            $generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
+            error_log("SET $prop = ");
+            $this->object->set($prop, $generatedValue);
         }
     }
 
@@ -643,6 +704,7 @@ class PicoDatabasePersistent // NOSONAR
      */
     private function _insert($info = null, $queryBuilder = null)
     {
+        $this->generatedValue = false;
         if($queryBuilder == null)
         {
             $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
@@ -651,11 +713,10 @@ class PicoDatabasePersistent // NOSONAR
         {
             $info = $this->getTableInfo();
         }
+        $this->addGeneratedValue($info, true);
         $values = $this->getValues($info, $queryBuilder);
         $fixValues = $this->fixInsertableValues($values, $info);
         
-        //TODO: check value of autoIncrementKeys
-        $this->addGeneratedValue($info);
         
         $sqlQuery = $queryBuilder
             ->newQuery()
@@ -664,17 +725,10 @@ class PicoDatabasePersistent // NOSONAR
             ->fields($this->createStatementFields($fixValues))
             ->values($this->createStatementValues($fixValues));
         $stmt = $this->database->executeQuery($sqlQuery);
-        $keys = $this->getPrimaryKeyAutoIncrement($info);
-        if(!empty($keys))
+        if(!$this->generatedValue)
         {
-            $props = array_keys($keys);
-            $prop = $props[0];
-            $pkVal = $this->object->get($prop);
-            if($this->nulOrEmpty($pkVal))
-            {
-                $generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
-                $this->object->set($prop, $generatedValue);
-            }
+            $this->addGeneratedValue($info, false);
+            $this->object->update();
         }
         return $stmt;
     }

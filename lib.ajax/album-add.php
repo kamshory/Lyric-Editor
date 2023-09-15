@@ -12,24 +12,37 @@ $inputPost = new PicoRequest(INPUT_POST);
 $inputPost->filterName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $inputPost->filterDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $inputPost->checkboxActive(false);
-$data = new Album($inputPost, $database);
+$album = new Album($inputPost, $database);
 try
 {
-    $saved = $data->findOneByName($inputPost->getName());
+    $saved = $album->findOneByName($inputPost->getName());
     if($saved && $saved->hasValueAlbumId())
     {
-        $data->setAlbumId($saved->getAlbumId());
+        $album->setAlbumId($saved->getAlbumId());
     }
     else
     {
-        $data->save();
+        $album->save();
     }
     $restResponse = new PicoResponse();   
-    $response = AlbumDto::valueOf($data);
+    $response = AlbumDto::valueOf($album);
     $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);
 }
 catch(Exception $e)
 {
-    // do nothing
-    $data->insert();
+    // prevent data corrupt
+    $album = new Album($inputPost, $database);
+    
+    $album->setNumberOfSong(0);
+    $album->setDuration(0);
+    
+    $now = date('Y-m-d H:i:s');
+    $album->setTimeCreate($now);
+    $album->setTimeEdit($now);
+    $album->setIpCreate($_SERVER['REMOTE_ADDR']);
+    $album->setIpEdit($_SERVER['REMOTE_ADDR']);
+    $album->setAdminCreate(1);
+    $album->setAdminEdit(1);
+    
+    $album->insert();
 }
