@@ -1129,14 +1129,18 @@ class DynamicObject extends stdClass // NOSONAR
             return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistent::ORDER_DESC, true);
         }
         else if ($method == "listAllAsc") {
+            // get spefification
+            $specification = $this->specificationFromParams($params);
             // get pagable
             $pagable = $this->pagableFromParams($params);
-            return $this->findAll($pagable, PicoDatabasePersistent::ORDER_ASC, true);
+            return $this->findAll($specification, $pagable, PicoDatabasePersistent::ORDER_ASC, true);
         }
         else if ($method == "listAllDesc") {
+            // get spefification
+            $specification = $this->specificationFromParams($params);
             // get pagable
             $pagable = $this->pagableFromParams($params);
-            return $this->findAll($pagable, PicoDatabasePersistent::ORDER_DESC, true);
+            return $this->findAll($specification, $pagable, PicoDatabasePersistent::ORDER_DESC, true);
         }
         else if (strncasecmp($method, "countBy", 6) === 0) {
             $var = lcfirst(substr($method, 6));
@@ -1162,6 +1166,26 @@ class DynamicObject extends stdClass // NOSONAR
             $prop = lcfirst(substr($method, 18));
             return $this->booleanToTextBy($prop, array(' cheked="checked"', ''));
         }     
+    }
+    
+    /**
+     * Get specification from parameters
+     * @param array $params
+     * @return PicoSpecification|null
+     */
+    private function specificationFromParams($params)
+    {
+        if(isset($params) && is_array($params))
+        {
+            foreach($params as $param)
+            {
+                if($param instanceof PicoSpecification)
+                {
+                    return $param;
+                }
+            }
+        }
+        return null;
     }
 
     /**

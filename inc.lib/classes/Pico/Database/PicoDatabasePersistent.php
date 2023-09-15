@@ -156,7 +156,7 @@ class PicoDatabasePersistent // NOSONAR
         // iterate each properties of the class
         foreach($props as $prop)
         {
-            $reflexProp = new PicoAnnotationParser($this->className, $prop->name, 'property');
+            $reflexProp = new PicoAnnotationParser($this->className, $prop->name, PicoAnnotationParser::PROPERTY);
             $parameters = $reflexProp->getParameters();
 
             // get column name of each parameters
