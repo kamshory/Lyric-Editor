@@ -23,7 +23,8 @@ if(!empty($randomSongId))
     {
         $savedData->findOneByRandomSongId($randomSongId);
         $songId = $savedData->getSongId();
-        $song->copyValueFrom($savedData);
+        $song = new Song($inputPost, $database); 
+        $song->setSongId($songId);
     }
     catch(NoRecordFoundException $e)
     {
@@ -42,23 +43,12 @@ else
 
 try
 {
-    $postData = $song->removePropertyExcept($inputPost, 
-        array(
-            'title',
-            'artist_vocal',
-            'artist_composer',
-            'artist_arranger',
-            'album_id',
-            'genre_id'
-        )
-    );
+    $now = date('Y-m-d H:i:s');
+    $song->setTimeCreate($now);
+    $song->setIpCreate($_SERVER['REMOTE_ADDR']);
+    $song->setAdminCreate('1');
 
-    foreach($postData as $key=>$val)
-    {
-        $song->set($key, $val);
-    }  
-    
-    $song->setTimeEdit(date('Y-m-d H:i:s'));
+    $song->setTimeEdit($now);
     $song->setIpEdit($_SERVER['REMOTE_ADDR']);
     $song->setAdminEdit('1');
 

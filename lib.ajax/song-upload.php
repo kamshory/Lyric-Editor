@@ -18,29 +18,29 @@ if(empty($id))
 }
 $randomSongId = $inputPost->getRandomSongId();
 
-error_log("RANDOM ID = ".$randomSongId);
-
 try
 {
     $song = new Song(null, $database);
+    $song->setActive(true);
     $song->setSongId($id);
+
+    $now = date('Y-m-d H:i:s');
 
 
     $song->setRandomSongId($randomSongId);
-    $song->setTimeCreate(date('Y-m-d H:i:s'));
-    $song->setTimeEdit(date('Y-m-d H:i:s'));
+    $song->setTimeCreate($now);
+    $song->setTimeEdit($now);
     $song->setIpCreate($_SERVER['REMOTE_ADDR']);
     $song->setIpEdit($_SERVER['REMOTE_ADDR']);
     $song->setAdminCreate('1');
     $song->setAdminEdit('1');
 
     // get uploaded file properties
-    $uploadTime = date('Y-m-d H:i:s');
     $fileUpload = new FileUpload();
     $targetDir = dirname(__DIR__)."/files";
     $fileUpload->upload($_FILES, 'file', $targetDir, $id);
     $path = $fileUpload->getFilePath();
-    $song->setFileUploadTime($uploadTime);
+    $song->setFileUploadTime($now);
     $song->setFilePath($path);
     $song->setFileName(basename($path));
     $song->setFileSize($fileUpload->getFileSize());
