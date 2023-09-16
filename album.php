@@ -78,13 +78,15 @@ else
 $orderMap = array(
   'name'=>'name', 
   'albumId'=>'albumId', 
-  'album'=>'albumId'
+  'album'=>'albumId',
+  'sortOrder'=>'sortOrder'
 );
-$orderDefault = 'name';
+$defaultOrderBy = 'sortOrder';
+$defaultOrderType = 'asc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createAlbumSpecification($inputGet);
-$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $orderDefault), $pagination->getOrderType());
+$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
 $albumEntity = new Album(null, $database);

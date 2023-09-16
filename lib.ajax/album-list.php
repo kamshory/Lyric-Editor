@@ -13,7 +13,8 @@ $queryBuilder
     ->newQuery()
     ->select("album.album_id as id, album.name as value")
     ->from("album")
-    ->where("album.active = ? ", true);
+    ->where("album.active = ? ", true)
+    ->orderBy("sort_order asc");
 $response = new PicoSelectOption($database, $queryBuilder, $defautValue);
 $restResponse = new PicoResponse();
 $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);

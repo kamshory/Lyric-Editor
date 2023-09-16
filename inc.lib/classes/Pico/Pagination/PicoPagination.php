@@ -109,12 +109,12 @@ class PicoPagination
      *
      * @param array $map
      * @param array $filter
-     * @param string $default
+     * @param string $defaultOrderBy
      * @return string
      */
-    public function createOrder($map = null, $filter = null, $default = null)
+    public function createOrder($map = null, $filter = null, $defaultOrderBy = null)
     {
-        $orderBy = $this->getOrderBy($filter, $default);
+        $orderBy = $this->getOrderBy($filter, $defaultOrderBy);
         $orderByFixed = $orderBy;
         // mapping if any
         if($map != null && is_array($map) && isset($map[$orderBy]))
@@ -132,19 +132,19 @@ class PicoPagination
      * Get order by
      *
      * @var array $filter
-     * @var string $default
+     * @var string $defaultOrderBy
      * @return string
      */ 
-    public function getOrderBy($filter = null, $default = null)
+    public function getOrderBy($filter = null, $defaultOrderBy = null)
     {
         $orderBy = $this->camelize($this->orderBy);
         if($filter != null && is_array($filter) && !isset($filter[$orderBy]))
         {
             $orderBy = null;
         }
-        if($orderBy == null && !empty($this->orderBy) && $default != null)
+        if(($orderBy == null || empty($this->orderBy)) && $defaultOrderBy != null)
         {
-            $orderBy = $this->camelize($default);
+            $orderBy = $this->camelize($defaultOrderBy);
         }
         if(empty($orderBy))
         {
@@ -156,9 +156,10 @@ class PicoPagination
     /**
      * Get order type
      *
+     * @var string $defaultOrderType
      * @return  string
      */ 
-    public function getOrderType()
+    public function getOrderType($defaultOrderType = null)
     {
         $orderType = $this->orderType;
         if(strcasecmp($orderType, 'desc') == 0)
@@ -172,6 +173,10 @@ class PicoPagination
         else
         {
             $orderType = null;
+        }
+        if($orderType == null && $defaultOrderType != null)
+        {
+            $orderType = $defaultOrderType;
         }
         return $orderType;
     }   

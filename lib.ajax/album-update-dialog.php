@@ -39,6 +39,10 @@ $album = new Album(null, $database);
                                 <td><input type="date" class="form-control" name="release_date" value="<?php echo $album->getReleaseDate();?>"></td>
                             </tr>
                             <tr>
+                                <td>Sort Order</td>
+                                <td><input type="number" class="form-control" name="sort_order" value="<?php echo $album->getSortOrder();?>"></td>
+                            </tr>
+                            <tr>
                                 <td>Active</td>
                                 <td><label></label><input type="checkbox" name="active" value="1" <?php echo $album->getActive() == 1 ?' checked':'';?>> Active</label></td>
                             </tr>

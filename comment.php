@@ -294,11 +294,11 @@ $orderMap = array(
     'artistComposerId'=>'artistComposerId',
     'artistComposer'=>'artistComposerId'
 );
-$orderDefault = 'title';
+$defaultOrderBy = 'title';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createMidiSpecification($inputGet);
-$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $orderDefault), $pagination->getOrderType());
+$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType());
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
 $songEntity = new EntitySong(null, $database);

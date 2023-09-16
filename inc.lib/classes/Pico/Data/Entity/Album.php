@@ -51,6 +51,12 @@ class Album extends DynamicObject
 	protected $duration;
 
 	/**
+	 * @Column(name="sort_order", type="int", nullable=true)
+	 * @var integer
+	 */
+	protected $sortOrder;
+
+	/**
 	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @var string
 	 */

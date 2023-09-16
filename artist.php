@@ -71,11 +71,11 @@ $orderMap = array(
   'artistId'=>'artistId', 
   'artist'=>'artistId'
 );
-$orderDefault = 'name';
+$defaultOrderBy = 'name';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createArtistsSpecification($inputGet);
-$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $orderDefault), $pagination->getOrderType());
+$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType());
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
 $artistEntity = new Artist(null, $database);

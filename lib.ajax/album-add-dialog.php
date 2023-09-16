@@ -29,6 +29,10 @@ PicoHttpCache::cacheLifetime(3600*12);
                                 <td><input type="date" class="form-control" name="release_date"></td>
                             </tr>
                         <tr>
+                            <td>Sort Order</td>
+                            <td><input type="number" class="form-control" name="sort_order"></td>
+                        </tr>
+                        <tr>
                             <td>Active</td>
                             <td><label></label><input type="checkbox" name="active" value="1"> Active</label></td>
                         </tr>
