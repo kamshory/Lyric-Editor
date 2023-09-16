@@ -10,7 +10,7 @@
     }
 
 
-    .upload-drop-zone {
+    .upload-drop-zone-add {
     color: #0f3c4b;
     background-color: var(--colorPrimaryPale, #c8dadf);
     outline: 2px dashed var(--colorPrimaryHalf, #c1ddef);
@@ -20,7 +20,7 @@
         outline-color 0.3s ease-in-out,
         background-color 0.2s ease-out;
     }
-    .upload-drop-zone.highlight {
+    .upload-drop-zone-add.highlight {
     outline-offset: -4px;
     outline-color: var(--colorPrimaryNormal, #0576bd);
     background-color: var(--colorPrimaryEighth, #c8dadf);

@@ -1,10 +1,6 @@
 <?php
-use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
-use \PDO as PDO;
-use Pico\Data\Dto\AlbumDto;
 use Pico\Data\Entity\Album;
-use Pico\Data\Entity\EntitySong;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
 use Pico\Database\PicoSortable;

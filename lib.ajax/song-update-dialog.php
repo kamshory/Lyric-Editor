@@ -1,10 +1,19 @@
 <?php
 
-use Pico\Util\PicoHttpCache;
+use Pico\Data\Entity\Song;
+use Pico\Request\PicoRequest;
 
 require_once dirname(__DIR__) . "/inc/auth.php";
-PicoHttpCache::cacheLifetime(3600 * 12);
+
+$inputGet = new PicoRequest(INPUT_GET);
+if($inputGet->getSongId() != null)
+{
+$song = new Song(null, $database);
+try
+{
+$song->findOneBySongId($inputGet->getSongId());
 ?>
+<form action="">
 <div class="modal fade" id="updateSongDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateSongDialogLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -15,7 +24,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
             <div class="modal-body">
 
                 <div class="file-uploader">
-                    <fieldset class="file-upload-zone upload-drop-zone text-center mb-3 p-4">
+                    <fieldset class="file-upload-zone upload-drop-zone-update text-center mb-3 p-4">
                         <legend class="visually-hidden">Song Pploader</legend>
                         <svg class="upload_svg" width="60" height="60" aria-hidden="true">
                             <use href="#icon-imageUpload"></use>
@@ -35,13 +44,13 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                     <tr>
                                         <td>Title</td>
                                         <td>
-                                            <input type="text" class="form-control" name="title">
+                                            <input type="text" class="form-control" name="title" value="<?php echo $song->getTitle();?>">
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Album</td>
                                         <td>
-                                            <select class="form-control" name="album_id" data-ajax="true" data-source="lib.ajax/album-list.php">
+                                            <select class="form-control" name="album_id" data-value="<?php echo $song->getAlbumId();?>" data-ajax="true" data-source="lib.ajax/album-list.php">
                                                 <option value="">- select -</option>
                                             </select>
                                             <button class="button-add-list button-add-general-album">+</button>
@@ -50,7 +59,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                     <tr>
                                         <td>Genre</td>
                                         <td>
-                                            <select class="form-control" name="genre_id" data-ajax="true" data-source="lib.ajax/genre-list.php">
+                                            <select class="form-control" name="genre_id" data-value="<?php echo $song->getGenreId();?>" data-ajax="true" data-source="lib.ajax/genre-list.php">
                                                 <option value="">- select -</option>
                                             </select>
                                             <button class="button-add-list button-add-general-genre">+</button>
@@ -59,7 +68,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                     <tr>
                                         <td>Vocal</td>
                                         <td>
-                                            <select class="form-control" name="artist_vocal" data-ajax="true" data-source="lib.ajax/artist-list.php">
+                                            <select class="form-control" name="artist_vocal" data-value="<?php echo $song->getArtistVocal();?>" data-ajax="true" data-source="lib.ajax/artist-list.php">
                                                 <option value="">- select -</option>
                                             </select>
                                             <button class="button-add-list button-add-general-artist">+</button>
@@ -68,7 +77,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                     <tr>
                                         <td>Composer</td>
                                         <td>
-                                            <select class="form-control" name="artist_composer" data-ajax="true" data-source="lib.ajax/artist-list.php">
+                                            <select class="form-control" name="artist_composer" data-value="<?php echo $song->getArtistComposer();?>" data-ajax="true" data-source="lib.ajax/artist-list.php">
                                                 <option value="">- select -</option>
                                             </select>
                                             <button class="button-add-list button-add-general-artist">+</button>
@@ -77,13 +86,13 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                     <tr>
                                         <td>Arranger</td>
                                         <td>
-                                            <select class="form-control" name="artist_arranger" data-ajax="true" data-source="lib.ajax/artist-list.php">
+                                            <select class="form-control" name="artist_arranger" data-value="<?php echo $song->getArtistComposer();?>" data-ajax="true" data-source="lib.ajax/artist-list.php">
                                                 <option value="">- select -</option>
                                             </select>
                                             <button class="button-add-list button-add-general-artist">+</button>
                                         </td>
                                     </tr>
-                                    <input type="hidden" name="random_song_id" value="">
+                                    <input type="hidden" name="song_id" value="<?php echo $song->getSongId();?>">
                                 </tbody>
                             </table>
                             <div class="progress-upload">
@@ -97,9 +106,18 @@ PicoHttpCache::cacheLifetime(3600 * 12);
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success save-song">OK</button>
+                <button type="button" class="btn btn-success save-update-song">OK</button>
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
 </div>
+</form>
+<?php
+}
+catch(Exception $e)
+{
+
+}
+}
+?>

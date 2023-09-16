@@ -189,6 +189,7 @@ if(!empty($result))
         <th scope="col">Vocalist</th>
         <th scope="col">Composer</th>
         <th scope="col">Duration</th>
+        <th scope="col">Active</th>
         </tr>
     </thead>
     <tbody>
@@ -201,15 +202,16 @@ if(!empty($result))
         $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&song_id=".$songId;
         $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&song_id=".$songId;
         ?>
-        <tr>
+        <tr data-id="<?php echo $songId;?>">
         <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
         <th class="text-right" scope="row"><?php echo $no;?></th>
-        <td><a href="<?php echo $linkDetail;?>"><?php echo $song->getTitle();?></a></td>
-        <td><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>
-        <td><?php echo $song->hasValueGenre() ? $song->getGenre()->getName() : "";?></td>
-        <td><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
-        <td><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
-        <td><?php echo $song->getDuration();?></td>
+        <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-title"><?php echo $song->getTitle();?></a></td>
+        <td class="text-data text-data-album-name"><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>
+        <td class="text-data text-data-genre-name"><?php echo $song->hasValueGenre() ? $song->getGenre()->getName() : "";?></td>
+        <td class="text-data text-data-artist-vocal-name"><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
+        <td class="text-data text-data-artist-composer-name"><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
+        <td class="text-data text-data-duration"><?php echo $song->getDuration();?></td>
+        <td class="text-data text-data-active"><?php echo $song->getActive() ? 'Yes' : 'No';?></td>
         </tr>
         <?php
         }
@@ -242,10 +244,6 @@ if(!empty($result))
       e2.preventDefault();
       e2.stopPropagation();
       
-      //loadForm();  
-
-      
-
       let songId = $(this).closest('tr').attr('data-id') || '';
       let dialogSelector = $('.modal-update-data');
       dialogSelector.load(dialogSelector.attr('data-url')+'?song_id='+songId, function(data){
@@ -267,29 +265,33 @@ if(!empty($result))
       })
     });
 
-    $(document).on('click', '.save-edit-song', function(){
+    $(document).on('click', '.save-update-song', function(){
       let dataSet = $(this).closest('form').serializeArray();
       $.ajax({
         type:'POST',
         url:'lib.ajax/song-update.php',
         data:dataSet, 
-        dataType:'html',
+        dataType:'json',
         success: function(data)
         {
           updateSongModal.hide();
           let formData = getFormData(dataSet);
-          let dataId = formData.song_id;
-          let name = formData.name;
-          let active = $('[name="active"]')[0].checked;
-          $('[data-id="'+dataId+'"] .text-data.text-data-name').text(name);
-          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(active?'Yes':'No');
+          let dataId = data.song_id;
+          let title = data.title;
+          let active = data.active;
+          $('[data-id="'+dataId+'"] .text-data.text-data-title').text(data.title);
+          $('[data-id="'+dataId+'"] .text-data.text-data-artist-vocal-name').text(data.artist_vocal_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-artist-composer-name').text(data.artist_composer_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-artist-arranger-name').text(data.artist_arranger_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-album-name').text(data.album_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-genre-name').text(data.genre_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(data.active?'Yes':'No');
+          $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(data.duration);
+
         }
       })
     });
   });
-  
-  
-  
 </script>
 <?php
 }

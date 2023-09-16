@@ -4,21 +4,35 @@ use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Entity\Song;
 use Pico\File\FileMp3;
 use Pico\File\FileUpload;
+use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
-$id = $database->generateNewId();
 
-$randomSongId = trim(@$_POST['random_song_id']);
+$inputPost = new PicoRequest(INPUT_POST);
+
+$id = $inputPost->getSongId();
+if(empty($id))
+{
+    $id = $database->generateNewId();
+}
+$randomSongId = $inputPost->getRandomSongId();
+
+error_log("RANDOM ID = ".$randomSongId);
 
 try
 {
-    $response = new Song(null, $database);
-    $response->setSongId($id);
-    $response->setRandomSongId($randomSongId);
-    $response->setTimeCreate(date('Y-m-d H:i:s'));
-    $response->setIpCreate($_SERVER['REMOTE_ADDR']);
-    $response->setAdminCreate('1');
+    $song = new Song(null, $database);
+    $song->setSongId($id);
+
+
+    $song->setRandomSongId($randomSongId);
+    $song->setTimeCreate(date('Y-m-d H:i:s'));
+    $song->setTimeEdit(date('Y-m-d H:i:s'));
+    $song->setIpCreate($_SERVER['REMOTE_ADDR']);
+    $song->setIpEdit($_SERVER['REMOTE_ADDR']);
+    $song->setAdminCreate('1');
+    $song->setAdminEdit('1');
 
     // get uploaded file properties
     $uploadTime = date('Y-m-d H:i:s');
@@ -26,22 +40,22 @@ try
     $targetDir = dirname(__DIR__)."/files";
     $fileUpload->upload($_FILES, 'file', $targetDir, $id);
     $path = $fileUpload->getFilePath();
-    $response->setFileUploadTime($uploadTime);
-    $response->setFilePath($path);
-    $response->setFileName(basename($path));
-    $response->setFileSize($fileUpload->getFileSize());
-    $response->setFileType($fileUpload->getFileType());
-    $response->setFileExtension($fileUpload->getFileExtension());
-    $response->setFileMd5(md5_file($path));
+    $song->setFileUploadTime($uploadTime);
+    $song->setFilePath($path);
+    $song->setFileName(basename($path));
+    $song->setFileSize($fileUpload->getFileSize());
+    $song->setFileType($fileUpload->getFileType());
+    $song->setFileExtension($fileUpload->getFileExtension());
+    $song->setFileMd5(md5_file($path));
     
     // get MP3 duration
     $mp3file = new FileMp3($path); 
     $duration = $mp3file->getDuration(); 
-    $response->setDuration($duration);
-    $response->insert();
+    $song->setDuration($duration);
+    $song->save();
 
     $restResponse = new PicoResponse();
-    $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);
+    $restResponse->sendResponse($song, 'json', null, PicoHttpStatus::HTTP_OK);
 
 }
 catch(Exception $e)

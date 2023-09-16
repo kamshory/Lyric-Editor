@@ -1,21 +1,25 @@
 <?php
 
+use Pico\Data\Entity\Song;
+use Pico\Request\PicoRequest;
 use Pico\Util\PicoHttpCache;
 
 require_once dirname(__DIR__) . "/inc/auth.php";
+
 PicoHttpCache::cacheLifetime(3600 * 12);
+
 ?>
 <div class="modal fade" id="uploadFile" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="uploadFileLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadFileLabel">Upload Song</h5>
+                <h5 class="modal-title" id="uploadFileLabel">Add New Song</h5>
                 <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
 
                 <div class="file-uploader">
-                    <fieldset class="file-upload-zone upload-drop-zone text-center mb-3 p-4">
+                    <fieldset class="file-upload-zone upload-drop-zone-add text-center mb-3 p-4">
                         <legend class="visually-hidden">Song Pploader</legend>
                         <svg class="upload_svg" width="60" height="60" aria-hidden="true">
                             <use href="#icon-imageUpload"></use>
@@ -97,7 +101,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success save-song">OK</button>
+                <button type="button" class="btn btn-success save-add-general-song">OK</button>
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>

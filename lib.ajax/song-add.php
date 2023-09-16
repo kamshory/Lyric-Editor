@@ -15,34 +15,34 @@ $inputPost->filterTitle(FILTER_SANITIZE_SPECIAL_CHARS);
 
 $randomSongId = $inputPost->getRandomSongId();
 
-$data = new Song();
+$song = new Song(null, $database);
 if(!empty($randomSongId))
 {
     $savedData = new Song(null, $database);
     try
     {
-        $saved = $savedData->findByRandomSongId($randomSongId);
-        $data = $saved[0];
-        $songId = $data->getSongId();
+        $savedData->findOneByRandomSongId($randomSongId);
+        $songId = $savedData->getSongId();
+        $song->copyValueFrom($savedData);
     }
     catch(NoRecordFoundException $e)
     {
         // do nothing
-        $data = new Song($inputPost, $database); 
-        $data->setSongId($songId);
-        $data->setActive(true);    
+        $song = new Song($inputPost, $database); 
+        $song->setSongId($songId);
+        $song->setActive(true);    
     }
 }
 else
 {
-    $data = new Song($_POST, $database);
-    $data->setSongId($songId);
-    $data->setActive(true);
+    $song = new Song($inputPost, $database);
+    $song->setSongId($songId);
+    $song->setActive(true);
 }
 
 try
 {
-    $postData = $data->removePropertyExcept($inputPost, 
+    $postData = $song->removePropertyExcept($inputPost, 
         array(
             'title',
             'artist_vocal',
@@ -55,27 +55,27 @@ try
 
     foreach($postData as $key=>$val)
     {
-        $data->set($key, $val);
+        $song->set($key, $val);
     }  
     
-    $data->setTimeEdit(date('Y-m-d H:i:s'));
-    $data->setIpEdit($_SERVER['REMOTE_ADDR']);
-    $data->setAdminEdit('1');
+    $song->setTimeEdit(date('Y-m-d H:i:s'));
+    $song->setIpEdit($_SERVER['REMOTE_ADDR']);
+    $song->setAdminEdit('1');
 
-    $data->save();
+    $song->save();
 
     $restResponse = new PicoResponse();    
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
     $sql = $queryBuilder->newQuery()
         ->select("song.*, 
-        (select artist.name from artist where artist.artist_id = song.artist_vocal) as artist_vocal_name,
-        (select artist.name from artist where artist.artist_id = song.artist_composer) as artist_composer_name,
-        (select artist.name from artist where artist.artist_id = song.artist_arranger) as artist_arranger_name,
-        (select genre.name from genre where genre.genre_id = song.genre_id) as genre_name,
-        (select album.name from album where album.album_id = album.album_id) as album_name
+        (select artist.name from artist where artist.artist_id = song.artist_vocal limit 0,1) as artist_vocal_name,
+        (select artist.name from artist where artist.artist_id = song.artist_composer limit 0,1) as artist_composer_name,
+        (select artist.name from artist where artist.artist_id = song.artist_arranger limit 0,1) as artist_arranger_name,
+        (select genre.name from genre where genre.genre_id = song.genre_id limit 0,1) as genre_name,
+        (select album.name from album where album.album_id = album.album_id limit 0,1) as album_name
         ")
         ->from("song")
-        ->where("song.song_id = ? ", $data->getSongId())
+        ->where("song.song_id = ? ", $song->getSongId())
         ;
         try
         {
