@@ -31,13 +31,15 @@ $inputGet = new PicoRequest(INPUT_GET);
 $orderMap = array(
   'name'=>'name', 
   'genreId'=>'genreId', 
-  'genre'=>'genreId'
+  'genre'=>'genreId',
+  'sortOrder'=>'sortOrder'
 );
-$defaultOrderBy = 'name';
+$defaultOrderBy = 'sortOrder';
+$defaultOrderType = 'asc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createGenreSpecification($inputGet);
-$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType());
+$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
 $genreEntity = new Genre(null, $database);

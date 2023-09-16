@@ -27,6 +27,10 @@ $genre->findOneByGenreId($inputGet->getGenreId());
                                 <td><input type="text" class="form-control" name="name" value="<?php echo $genre->getName();?>"></td>
                             </tr>
                             <tr>
+                            <td>Sort Order</td>
+                            <td><input type="number" class="form-control" name="sort_order" value="<?php echo $genre->getSortOrder();?>"></td>
+                        </tr>
+                            <tr>
                                 <td>Active</td>
                                 <td><label></label><input type="checkbox" name="active" value="1" <?php echo $genre->getActive() == 1 ?' checked':'';?>> Active</label></td>
                             </tr>

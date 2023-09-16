@@ -13,7 +13,8 @@ $queryBuilder
     ->newQuery()
     ->select("genre.genre_id as id, genre.name as value")
     ->from("genre")
-    ->where("genre.active = ? ", true);
+    ->where("genre.active = ? ", true)
+    ->orderBy("genre.sort_order asc");
 $response = new PicoSelectOption($database, $queryBuilder, $defautValue);
 $restResponse = new PicoResponse();
 $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);

@@ -14,7 +14,23 @@ PicoHttpCache::cacheLifetime(3600*12);
                     <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" class="form-control" name="name">
+                    <table class="dialog-table">
+                        <tbody>
+                            <tr>
+                                <td>Genre Name</td>
+                                <td><input type="text" class="form-control" name="name"></td>
+                            </tr>
+                            <tr>
+                            <td>Sort Order</td>
+                            <td><input type="number" class="form-control" name="sort_order"></td>
+                        </tr>
+                            <tr>
+                                <td>Active</td>
+                                <td><label></label><input type="checkbox" name="active" value="1"> Active</label></td>
+                            </tr>
+                        </tbody>
+                        <input type="hidden" name="genre_id">
+                    </table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success save-genre">OK</button>
