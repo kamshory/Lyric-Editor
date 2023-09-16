@@ -46,9 +46,9 @@
 
 <div class="lazy-dom-container">
     <div class="lazy-dom song-upload-dialog" data-url="lib.ajax/song-upload-dialog.php"></div>
-    <div class="lazy-dom album-add-dialog" data-url="lib.ajax/album-add-dialog.php"></div>
-    <div class="lazy-dom genre-add-dialog" data-url="lib.ajax/genre-add-dialog.php"></div>
-    <div class="lazy-dom artist-add-dialog" data-url="lib.ajax/artist-add-dialog.php"></div>
+    <div class="lazy-dom album-add-general-dialog" data-url="lib.ajax/album-add-general-dialog.php"></div>
+    <div class="lazy-dom genre-add-general-dialog" data-url="lib.ajax/genre-add-general-dialog.php"></div>
+    <div class="lazy-dom artist-add-general-dialog" data-url="lib.ajax/artist-add-general-dialog.php"></div>
 </div>
 </div>
 </div>

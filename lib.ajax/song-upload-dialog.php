@@ -44,7 +44,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                             <select class="form-control" name="album_id" data-ajax="true" data-source="lib.ajax/album-list.php">
                                                 <option value="">- select -</option>
                                             </select>
-                                            <button class="button-add-list button-add-album">+</button>
+                                            <button class="button-add-list button-add-general-album">+</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -53,7 +53,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                             <select class="form-control" name="genre_id" data-ajax="true" data-source="lib.ajax/genre-list.php">
                                                 <option value="">- select -</option>
                                             </select>
-                                            <button class="button-add-list button-add-genre">+</button>
+                                            <button class="button-add-list button-add-general-genre">+</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -62,7 +62,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                             <select class="form-control" name="artist_vocal" data-ajax="true" data-source="lib.ajax/artist-list.php">
                                                 <option value="">- select -</option>
                                             </select>
-                                            <button class="button-add-list button-add-artist">+</button>
+                                            <button class="button-add-list button-add-general-artist">+</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -71,7 +71,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                             <select class="form-control" name="artist_composer" data-ajax="true" data-source="lib.ajax/artist-list.php">
                                                 <option value="">- select -</option>
                                             </select>
-                                            <button class="button-add-list button-add-artist">+</button>
+                                            <button class="button-add-list button-add-general-artist">+</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -80,7 +80,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                             <select class="form-control" name="artist_arranger" data-ajax="true" data-source="lib.ajax/artist-list.php">
                                                 <option value="">- select -</option>
                                             </select>
-                                            <button class="button-add-list button-add-artist">+</button>
+                                            <button class="button-add-list button-add-general-artist">+</button>
                                         </td>
                                     </tr>
                                     <input type="hidden" name="random_song_id" value="">

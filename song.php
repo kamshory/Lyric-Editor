@@ -158,7 +158,7 @@ $result = $rowData->getResult();
     $(document).ready(function(e){
         let pg = new Pagination('.pagination', '.page-selector', 'data-page-number', 'page');
         pg.init();
-        $(document).on('change', 'select', function(e2){
+        $(document).on('change', '.filter-container form select', function(e2){
             $(this).closest('form').submit();
         });
     });
@@ -241,14 +241,29 @@ if(!empty($result))
     $(document).on('click', '.edit-data', function(e2){
       e2.preventDefault();
       e2.stopPropagation();
+      
+      //loadForm();  
+
+      
+
       let songId = $(this).closest('tr').attr('data-id') || '';
       let dialogSelector = $('.modal-update-data');
       dialogSelector.load(dialogSelector.attr('data-url')+'?song_id='+songId, function(data){
+        
         let updateSongModalElem = document.querySelector('#updateSongDialog');
         updateSongModal = new bootstrap.Modal(updateSongModalElem, {
           keyboard: false
         });
         updateSongModal.show();
+        downloadForm('.lazy-dom-container', function(){
+          if(!allDownloaded)
+          {
+              initModal2();
+              console.log('loaded')
+              allDownloaded = true;
+          }
+          loadForm();
+      });
       })
     });
 

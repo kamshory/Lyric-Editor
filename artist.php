@@ -89,7 +89,7 @@ $result = $rowData->getResult();
   $(document).ready(function(e){
       let pg = new Pagination('.pagination', '.page-selector', 'data-page-number', 'page');
       pg.init();
-      $(document).on('change', 'select', function(e2){
+      $(document).on('change', '.filter-container form select', function(e2){
           $(this).closest('form').submit();
       });
   });
