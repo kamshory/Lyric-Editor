@@ -78,7 +78,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getSongId() !
                     <button class="btn btn-dark button-scroll-master">Scroll</button>
                     <button class="btn btn-dark button-reset-master">Reset</button>
                     <button class="btn btn-dark button-save-master">Save</button>
-                    <button class="btn btn-dark button-complete-master">Complete</button>
+                    <button class="btn btn-dark button-complete-master">OK</button>
                 </div>
             </div>
         </div>
