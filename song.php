@@ -123,7 +123,16 @@ else
         <span>Title</span>
         <input class="form-control" type="text" name="title" id="title" autocomplete="off" value="<?php echo $inputGet->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
     </div>
-    
+
+    <div class="filter-group">
+        <span>Complete</span>
+        <select class="form-control" name="active" id="active">
+            <option value="">- All -</option>
+            <option value="1"<?php echo $inputGet->getLyricComplete() == '1'?' selected':'';?>>Yes</option>
+            <option value="0"<?php echo $inputGet->getLyricComplete() == '0'?' selected':'';?>>No</option>
+        </select>
+    </div>
+
     <input class="btn btn-success" type="submit" value="Show">
     
     </form>
@@ -140,11 +149,12 @@ $orderMap = array(
     'artistComposerId'=>'artistComposerId',
     'artistComposer'=>'artistComposerId'
 );
-$defaultOrderBy = 'title';
+$defaultOrderBy = 'albumId';
+$defaultOrderType = 'asc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
-$spesification = SpecificationUtil::createMidiSpecification($inputGet);
-$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType());
+$spesification = SpecificationUtil::createSongSpecification($inputGet);;
+$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
 $songEntity = new EntitySong(null, $database);

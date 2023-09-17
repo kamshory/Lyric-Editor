@@ -58,10 +58,11 @@ class SpecificationUtil
 
     /**
      * Create Song specification
-     * @param PicoRequest $name
+     * @param PicoRequest $inputGet
+     * @param array $$additional
      * @return PicoSpecification
      */
-    public static function createSongSpecification($inputGet)
+    public static function createSongSpecification($inputGet, $additional = null)
     {
         $spesification = new PicoSpecification();
 
@@ -98,6 +99,30 @@ class SpecificationUtil
             $predicate1 = new PicoPredicate();
             $predicate1->equals('artistVocalId', $inputGet->getArtistVocalId());
             $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getLyricComplete() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->equals('lyricComplete', $inputGet->getLyricComplete());
+            $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getActive() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->equals('active', $inputGet->getActive());
+            $spesification->addAnd($predicate1);
+        }
+
+        if(isset($additional) && is_array($additional))
+        {
+            foreach($additional as $key=>$value)
+            {
+                $predicate2 = new PicoPredicate();          
+                $predicate2->equals($key, $value);
+                $spesification->addAnd($predicate2);
+            }
         }
         
         return $spesification;

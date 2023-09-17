@@ -78,6 +78,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getSongId() !
                     <button class="btn btn-dark button-scroll-master">Scroll</button>
                     <button class="btn btn-dark button-reset-master">Reset</button>
                     <button class="btn btn-dark button-save-master">Save</button>
+                    <button class="btn btn-dark button-complete-master">Complete</button>
                 </div>
             </div>
         </div>
@@ -195,6 +196,11 @@ if($song != null)
             e.stopPropagation();
             saveLyric();
         });
+        document.querySelector('.button-complete-master').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            saveLyric(true);
+        });
         document.querySelector('.button-reset-master').addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -223,7 +229,7 @@ if($song != null)
             }
         });
     }
-    function saveLyric()
+    function saveLyric(complete)
     {
         if(srt.zoomLevelIndex < srt.zoomLevelIndexOriginal)
         {
@@ -235,6 +241,7 @@ if($song != null)
         ajax.post('lib.ajax/lyric-save.php', {
             song_id: song_id,
             lyric: rawData,
+            lyricComplete:complete?1:0,
             duration: duration
         }, function(response, status) {
         });
@@ -280,12 +287,23 @@ else
         <input class="form-control" type="text" name="title" id="title" autocomplete="off" value="<?php echo $inputGet->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
     </div>
     
+    <div class="filter-group">
+        <span>Complete</span>
+        <select class="form-control" name="lyric_complete" id="lyric_complete">
+            <option value="">- All -</option>
+            <option value="1"<?php echo $inputGet->getLyricComplete() == '1'?' selected':'';?>>Yes</option>
+            <option value="0"<?php echo $inputGet->getLyricComplete() == '0'?' selected':'';?>>No</option>
+        </select>
+    </div>
+    
     <input class="btn btn-success" type="submit" value="Show">
     
     </form>
 </div>
 <?php
 $orderMap = array(
+    'songId'=>'songId',
+    'song'=>'songId',
     'title'=>'title', 
     'albumId'=>'albumId', 
     'album'=>'albumId', 
@@ -296,11 +314,12 @@ $orderMap = array(
     'artistComposerId'=>'artistComposerId',
     'artistComposer'=>'artistComposerId'
 );
-$defaultOrderBy = 'title';
+$defaultOrderBy = 'songId';
+$defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
-$spesification = SpecificationUtil::createMidiSpecification($inputGet);
-$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType());
+$spesification = SpecificationUtil::createSongSpecification($inputGet, array('active'=>true));;
+$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
 $songEntity = new EntitySong(null, $database);
@@ -345,6 +364,7 @@ if(!empty($result))
         <th scope="col">Vocalist</th>
         <th scope="col">Composer</th>
         <th scope="col">Duration</th>
+        <th scope="col">Complete</th>
         </tr>
     </thead>
     <tbody>
@@ -366,6 +386,7 @@ if(!empty($result))
         <td><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
         <td><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
         <td><?php echo $song->getDuration();?></td>
+        <td><?php echo $song->isLyricComplete() ? 'Yes':'No';?></td>
         </tr>
         <?php
         }

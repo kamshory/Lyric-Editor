@@ -92,6 +92,10 @@ $song->findOneBySongId($inputGet->getSongId());
                                             <button class="button-add-list button-add-general-artist">+</button>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>Active</td>
+                                        <td><label></label><input type="checkbox" name="active" value="1" <?php echo $song->getActive() == 1 ?' checked':'';?>> Active</label></td>
+                                    </tr>
                                     <input type="hidden" name="song_id" value="<?php echo $song->getSongId();?>">
                                 </tbody>
                             </table>

@@ -297,7 +297,7 @@ $orderMap = array(
 $defaultOrderBy = 'title';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
-$spesification = SpecificationUtil::createMidiSpecification($inputGet);
+$spesification = SpecificationUtil::createSongSpecification($inputGet, array('active'=>true));;
 $sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType());
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 

@@ -64,7 +64,7 @@ class FileMp3
                 return $this->estimateDuration($info['Bitrate'], $offset);
             }
         }
-        return round($duration);
+        return $duration;
     }
 
     private function estimateDuration($bitrate, $offset)
