@@ -1598,7 +1598,15 @@ class PicoDatabasePersistent // NOSONAR
                 }
                 catch(Exception $e)
                 {
-                    // do nothing
+                    // set null
+                    if(is_array($data))
+                    {
+                        $data[$propName] = null;
+                    }
+                    else
+                    {
+                        $data->{$propName} = null;
+                    }
                 }
             }
         }

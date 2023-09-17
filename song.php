@@ -150,7 +150,7 @@ $orderMap = array(
     'artistComposer'=>'artistComposerId'
 );
 $defaultOrderBy = 'albumId';
-$defaultOrderType = 'asc';
+$defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createSongSpecification($inputGet);;
