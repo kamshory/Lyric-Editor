@@ -394,7 +394,10 @@ class PicoRequestTool extends stdClass
         }
         else if (strncasecmp($method, "filter", 6) === 0) {
             $var = lcfirst(substr($method, 6));
-            $this->$var = $this->applyFilter($this->$var, $params[0]);
+            if(isset($this->$var))
+            {
+                $this->$var = $this->applyFilter($this->$var, $params[0]);
+            }
             return $this;
         }
     }  

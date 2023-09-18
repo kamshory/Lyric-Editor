@@ -1,9 +1,6 @@
 <?php
-use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
-use \PDO as PDO;
 use Pico\Data\Entity\Artist;
-use Pico\Data\Entity\Genre;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
 use Pico\Database\PicoSortable;
@@ -12,7 +9,7 @@ use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Utility\SpecificationUtil;
 
-require_once "inc/auth.php";
+require_once "inc/auth-with-login-form.php";
 require_once "inc/header.php";
 
 $inputGet = new PicoRequest(INPUT_GET);

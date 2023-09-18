@@ -6,7 +6,6 @@ require_once __DIR__."/app.php";
 require_once __DIR__."/session.php";
 
 $appUser = new User(null, $database);
-
 if(isset($_SESSION) && isset($_SESSION['suser']) && isset($_SESSION['spass']))
 {
     try
@@ -18,10 +17,13 @@ if(isset($_SESSION) && isset($_SESSION['suser']) && isset($_SESSION['spass']))
     }
     catch(Exception $e)
     {
+        // do nothing
+        require_once dirname(__DIR__)."/login.php";
         exit();
     }
 }
 else
 {
+    require_once dirname(__DIR__)."/login.php";
     exit();
 }

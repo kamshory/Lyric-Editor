@@ -822,23 +822,25 @@ class PicoDatabasePersistent // NOSONAR
      */
     private function getColumnNames($propertyNames, $columns)
     {
-        $result = $propertyNames;
-        $arr = array();
-        if(!empty($columns))
+        $source = str_replace("And", "#And#", $propertyNames."#");
+        $source = str_replace("Or", "#Or#", $source);
+
+        $source = str_replace("#Or#Or", "Or#Or", $source);
+        $source = str_replace("#And#And", "Or#Or", $source);
+
+
+        $sourcex = str_replace("#And#", "@", $source);
+        $sourcex = str_replace("#Or#", "@", $sourcex);
+        $sourcex = trim($sourcex, "#");
+        $arrSource = explode("@", $sourcex);
+        foreach($arrSource as $idx=>$val)
         {
-            $keys = array_keys($columns);           
-            foreach($keys as $key)
-            {
-                $pos = stripos($propertyNames, $key);
-                if($pos !== false)
-                {
-                    $arr[$key] = $pos;
-                }
-            }
-        } 
-        asort($arr, SORT_REGULAR);
-        $keys = array_keys($arr);
-        foreach($keys as $pro)
+            $arrSource[$idx] = lcfirst($val);
+        }
+
+        $result = $propertyNames;
+
+        foreach($arrSource as $pro)
         {
             if (isset($columns[$pro]))
             {
@@ -920,7 +922,6 @@ class PicoDatabasePersistent // NOSONAR
         $columnNames = $this->getColumnNames($propertyName, $info->columns);
         $arr = explode("?", $columnNames);
         $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
-        $info = $this->getTableInfo();       
         $wheres = array();
         for($i = 0; $i < count($arr) - 1 && $i < count($propertyValues); $i++)
         {

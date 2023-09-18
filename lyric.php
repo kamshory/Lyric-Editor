@@ -14,7 +14,7 @@ use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Utility\SpecificationUtil;
 
-require_once "inc/auth.php";
+require_once "inc/auth-with-login-form.php";
 require_once "inc/header.php";
 ?>
 <link rel="stylesheet" href="lib/lyric-editor.css">
@@ -22,7 +22,7 @@ require_once "inc/header.php";
 <script src="lib/ajax.js"></script>
 <link rel="stylesheet" href="lib/icon.css">
 <?php
-require_once "inc/auth.php";
+require_once "inc/auth-with-login-form.php";
 require_once "inc/header.php";
 
 $inputGet = new PicoRequest(INPUT_GET);

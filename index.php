@@ -1,5 +1,5 @@
 <?php
-require_once "inc/auth.php";
+require_once "inc/auth-with-login-form.php";
 require_once "inc/header.php";
 ?>
 <script src="assets/libs/apexcharts/dist/apexcharts.min.js"></script>

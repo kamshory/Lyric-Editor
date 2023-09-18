@@ -3,7 +3,7 @@
 use Pico\Data\Dto\ArtistDto;
 use Pico\Data\Entity\Artist;
 
-require_once "inc/auth.php";
+require_once "inc/auth-with-login-form.php";
 
 $artist = new Artist();
 $artistDto = ArtistDto::valueOf($artist);

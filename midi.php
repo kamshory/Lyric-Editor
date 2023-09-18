@@ -1,7 +1,5 @@
 <?php
-use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Pagination\PicoPagination;
-use \PDO as PDO;
 use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Artist;
 use Pico\Data\Entity\EntityMidi;
@@ -10,15 +8,13 @@ use Pico\Data\Entity\Midi;
 use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
-use Pico\Database\PicoPredicate;
 use Pico\Database\PicoSortable;
-use Pico\Database\PicoSpecification;
 use Pico\Exceptions\NoRecordFoundException;
 use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Utility\SpecificationUtil;
 
-require_once "inc/auth.php";
+require_once "inc/auth-with-login-form.php";
 require_once "inc/header.php";
 
 $inputGet = new PicoRequest(INPUT_GET);

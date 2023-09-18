@@ -1,3 +1,49 @@
+<?php
+
+use Pico\Data\Entity\User;
+use Pico\Request\PicoRequest;
+
+require_once "inc/app.php";
+require_once "inc/session.php";
+
+$inputPost = new PicoRequest(INPUT_POST);
+if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
+{
+  $username = $inputPost->getUsername();
+  $password = $inputPost->getPassword();
+  $username = trim($username);
+  $password = trim($password);
+  $password = hash('sha256', $password);
+  if(!empty($username) && !empty($password))
+  {
+    try
+    {
+      $appUser = new User(null, $database);
+      $appUser->findOneByUsernameAndPasswordAndBlockedAndActive($username, $password, false, true);
+      if($appUser->hasValueUserId())
+      {
+        $_SESSION['suser'] = $username;
+        $_SESSION['spass'] = $password;
+        if($inputPost->getReferer() != null)
+        {
+          $referer = trim($inputPost->getReferer());
+          if(!empty($referer))
+          {
+            header("Location: ".$referer);
+          }
+        }
+      }
+    }
+    catch(Exception $e)
+    {
+      // do nothing
+    }
+  }
+  exit();
+}
+
+
+?>
 <!doctype html>
 <html lang="en">
 
@@ -23,15 +69,15 @@
                 <a href="index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
                   <img src="assets/images/logos/dark-logo.svg" width="180" alt="">
                 </a>
-                <p class="text-center">Your Social Campaigns</p>
-                <form>
+                <p class="text-center">Music Creator</p>
+                <form action="login.php" method="post">
                   <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Username</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <input type="text" class="form-control" id="exampleInputEmail1" name="username" aria-describedby="emailHelp">
                   </div>
                   <div class="mb-4">
                     <label for="exampleInputPassword1" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1">
+                    <input type="password" class="form-control" id="exampleInputPassword1" name="password">
                   </div>
                   <div class="d-flex align-items-center justify-content-between mb-4">
                     <div class="form-check">
@@ -42,10 +88,11 @@
                     </div>
                     <a class="text-primary fw-bold" href="index.html">Forgot Password ?</a>
                   </div>
-                  <a href="index.html" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</a>
+                  <input type="hidden" name="referer" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']);?>">
+                  <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</button>
                   <div class="d-flex align-items-center justify-content-center">
                     <p class="fs-4 mb-0 fw-bold">New to Modernize?</p>
-                    <a class="text-primary fw-bold ms-2" href="authentication-register.html">Create an account</a>
+                    <a class="text-primary fw-bold ms-2" href="authentication-register.php">Create an account</a>
                   </div>
                 </form>
               </div>

@@ -45,4 +45,8 @@ catch(Exception $e)
     $album->setAdminEdit(1);
     
     $album->insert();
+    
+    $restResponse = new PicoResponse();   
+    $response = AlbumDto::valueOf($album);
+    $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);
 }

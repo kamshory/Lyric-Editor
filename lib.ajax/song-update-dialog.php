@@ -18,7 +18,7 @@ $song->findOneBySongId($inputGet->getSongId());
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="updateSongDialogLabel">Upload Song</h5>
+                <h5 class="modal-title" id="updateSongDialogLabel">Update Song</h5>
                 <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">

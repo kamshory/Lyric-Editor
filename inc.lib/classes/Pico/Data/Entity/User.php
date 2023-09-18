@@ -6,7 +6,7 @@ use Pico\DynamicObject\DynamicObject;
 /**
  * User
  * @Entity
- * @Table (name=user)
+ * @Table(name=user)
  */
 class User extends DynamicObject
 {    
@@ -15,7 +15,7 @@ class User extends DynamicObject
      * User ID
      *
      * @var string
-     * @Column (name=user_id)
+     * @Column(name=user_id)
      * @Id
      */
     protected $userId;
@@ -24,15 +24,15 @@ class User extends DynamicObject
      * Username
      *
      * @var string
-     * @Column (name=username)
+     * @Column(name=username)
      */
-    protected $userName;
+    protected $username;
 
     /**
      * Email
      *
      * @var string
-     * @Column (name=email)
+     * @Column(name=email)
      */
     protected $email;
 
@@ -40,7 +40,7 @@ class User extends DynamicObject
      * Password
      *
      * @var string
-     * @Column (name=password)
+     * @Column(name=password)
      */
     protected $password;
 
@@ -48,7 +48,7 @@ class User extends DynamicObject
      * Birth day
      *
      * @var string
-     * @Column (name=birth_day)
+     * @Column(name=birth_day)
      */
     protected $birthDay;
 
@@ -56,7 +56,7 @@ class User extends DynamicObject
      * Gender
      *
      * @var string
-     * @Column (name=gender)
+     * @Column(name=gender)
      */
     protected $gender;
 
@@ -64,15 +64,23 @@ class User extends DynamicObject
      * Name
      *
      * @var string
-     * @Column (name=name)
+     * @Column(name=name)
      */
     protected $name;
+
+    /**
+     * Blocked
+     *
+     * @var bool
+     * @Column(name=blocked)
+     */
+    protected $blocked;
 
     /**
      * Active
      *
      * @var bool
-     * @Column (name=active)
+     * @Column(name=active)
      */
     protected $active;
 
