@@ -69,6 +69,42 @@ class User extends DynamicObject
     protected $name;
 
     /**
+	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $timeCreate;
+
+	/**
+	 * @Column(name="time_edit", type="timestamp", length=19, nullable=true)
+	 * @var string
+	 */
+	protected $timeEdit;
+
+	/**
+	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $ipCreate;
+
+	/**
+	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $ipEdit;
+
+	/**
+	 * @Column(name="admin_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $adminCreate;
+
+	/**
+	 * @Column(name="admin_edit", type="varchar(50)", length=50, nullable=true)
+	 * @var string
+	 */
+	protected $adminEdit;
+
+    /**
      * Blocked
      *
      * @var bool

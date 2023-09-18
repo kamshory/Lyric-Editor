@@ -18,9 +18,9 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
   {
     try
     {
-      $appUser = new User(null, $database);
-      $appUser->findOneByUsernameAndPasswordAndBlockedAndActive($username, $password, false, true);
-      if($appUser->hasValueUserId())
+      $currentLoggedInUser = new User(null, $database);
+      $currentLoggedInUser->findOneByUsernameAndPasswordAndBlockedAndActive($username, $password, false, true);
+      if($currentLoggedInUser->hasValueUserId())
       {
         $_SESSION['suser'] = $username;
         $_SESSION['spass'] = $password;

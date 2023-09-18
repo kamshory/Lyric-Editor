@@ -5,7 +5,7 @@ use Pico\Data\Entity\User;
 require_once __DIR__."/app.php";
 require_once __DIR__."/session.php";
 
-$appUser = new User(null, $database);
+$currentLoggedInUser = new User(null, $database);
 
 if(isset($_SESSION) && isset($_SESSION['suser']) && isset($_SESSION['spass']))
 {
@@ -14,7 +14,7 @@ if(isset($_SESSION) && isset($_SESSION['suser']) && isset($_SESSION['spass']))
         $username = $_SESSION['suser'];
         $password = $_SESSION['spass'];
 
-        $appUser->findOneByUsernameAndPasswordAndBlockedAndActive($username, $password, false, true);
+        $currentLoggedInUser->findOneByUsernameAndPasswordAndBlockedAndActive($username, $password, false, true);
     }
     catch(Exception $e)
     {
