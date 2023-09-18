@@ -41,6 +41,10 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputPost->getSave() ==
         $user->setEmail($email);
     }
 
+    $user->setTimeEdit(date('Y-m-d H:i:s'));
+    $user->setAdminEdit($userId);
+    $user->setIpEdit($_SERVER['REMOTE_ADDR']);
+
     $user->update();
     header('Location: '.basename(($_SERVER['PHP_SELF'])));
 }
@@ -64,7 +68,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT))
         <td>Gender</td>
         <td><select class="form-control" name="gender" id="gender">
         <option value="M"<?php echo $user->getGender() == 'M' ? ' selected':'';?>>Man</option>
-        <option value="F"<?php echo $user->getGender() == 'W' ? ' selected':'';?>>Woman</option>
+        <option value="W"<?php echo $user->getGender() == 'W' ? ' selected':'';?>>Woman</option>
         </select></td>
       </tr>
       <tr>

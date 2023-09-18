@@ -87,6 +87,14 @@
             <span class="hide-menu">AUTH</span>
         </li>
         <li class="sidebar-item">
+            <a class="sidebar-link" href="user.php" aria-expanded="false">
+                <span>
+                    <i class="ti ti-user"></i>
+                </span>
+                <span class="hide-menu">User</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
             <a class="sidebar-link" href="login.php" aria-expanded="false">
                 <span>
                     <i class="ti ti-login"></i>

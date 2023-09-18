@@ -185,7 +185,7 @@ class SpecificationUtil
      * @param PicoRequest $name
      * @return PicoSpecification
      */
-    public static function createArtistsSpecification($inputGet)
+    public static function createArtistSpecification($inputGet)
     {
         $spesification = new PicoSpecification();
 
@@ -205,4 +205,46 @@ class SpecificationUtil
         
         return $spesification;
     }
+
+    /**
+     * Create user specification
+     * @param PicoRequest $name
+     * @return PicoSpecification
+     */
+    public static function createUserSpecification($inputGet)
+    {
+        $spesification = new PicoSpecification();
+
+        if($inputGet->getUserId() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->equals('userId', $inputGet->getUserId());
+            $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getName() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->like('name', PicoPredicate::generateCenterLike($inputGet->getName()));
+            $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getUsername() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->like('username', PicoPredicate::generateCenterLike($inputGet->getUsername()));
+            $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getEmail() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->like('email', PicoPredicate::generateCenterLike($inputGet->getEmail()));
+            $spesification->addAnd($predicate1);
+        }
+        
+        return $spesification;
+    }
+
+    
 }

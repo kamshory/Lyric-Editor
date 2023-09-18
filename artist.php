@@ -71,7 +71,7 @@ $orderMap = array(
 $defaultOrderBy = 'name';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
-$spesification = SpecificationUtil::createArtistsSpecification($inputGet);
+$spesification = SpecificationUtil::createArtistSpecification($inputGet);
 $sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType());
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
