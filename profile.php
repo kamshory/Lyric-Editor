@@ -1,6 +1,8 @@
 <?php
 use Pico\Data\Entity\User;
+use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
+use Pico\Utility\UserUtil;
 
 require_once "inc/auth-with-login-form.php";
 
@@ -8,16 +10,36 @@ $inputGet = new PicoRequest(INPUT_GET);
 $inputPost = new PicoRequest(INPUT_POST);
 if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputPost->getSave() == 'save')
 {
+    $inputPost->filterName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+    $inputPost->filterUsername(PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERICPUNC);
+    $inputPost->filterEmail(PicoFilterConstant::FILTER_SANITIZE_EMAIL);
+
+    $userId = $currentLoggedInUser->getUserId();
     $user = new User(null, $database);
-    $user->setUserId($currentLoggedInUser->getUserId());
+    $user->setUserId($userId);
     $password = $inputPost->getPassword();
     if(!empty($password))
     {
-        $user->setPassword(hash('sha256', $inputPost->getPassword()));
+        $hashPassword = hash('sha256', $inputPost->getPassword());
+        $user->setPassword($hashPassword);
+        $_SESSION['spass'] = $hashPassword;
     }
     $user->setName($inputPost->getName());
     $user->setBirthDay($inputPost->getBirthDay());
     $user->setGender($inputPost->getGender());
+
+    $username = $inputPost->getUsername();
+    if(!empty($username) && !UserUtil::isDuplicatedUsername($database, $userId, $username))
+    {
+        $user->setUsername($username);
+        $_SESSION['suser'] = $username;
+    }
+
+    $email = $inputPost->getEmail();
+    if(!empty($email) && !UserUtil::isDuplicatedEmail($database, $userId, $email))
+    {
+        $user->setEmail($email);
+    }
 
     $user->update();
     header('Location: '.basename(($_SERVER['PHP_SELF'])));
