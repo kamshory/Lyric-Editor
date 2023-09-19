@@ -20,7 +20,7 @@
         <li class="sidebar-item">
             <a class="sidebar-link" href="midi.php" aria-expanded="false">
                 <span>
-                    <i class="ti ti-article"></i>
+                    <i class="ti ti-music"></i>
                 </span>
                 <span class="hide-menu">Midi</span>
             </a>
@@ -28,7 +28,7 @@
         <li class="sidebar-item">
             <a class="sidebar-link" href="song.php" aria-expanded="false">
                 <span>
-                    <i class="ti ti-article"></i>
+                    <i class="ti ti-music"></i>
                 </span>
                 <span class="hide-menu">Song</span>
             </a>
@@ -52,7 +52,7 @@
         <li class="sidebar-item">
             <a class="sidebar-link" href="dubbing.php" aria-expanded="false">
                 <span>
-                    <i class="ti ti-file-description"></i>
+                    <i class="ti ti-device-speaker"></i>
                 </span>
                 <span class="hide-menu">Dubbing</span>
             </a>
@@ -60,7 +60,7 @@
         <li class="sidebar-item">
             <a class="sidebar-link" href="album.php" aria-expanded="false">
                 <span>
-                    <i class="ti ti-article"></i>
+                    <i class="ti ti-folder"></i>
                 </span>
                 <span class="hide-menu">Album</span>
             </a>
@@ -76,7 +76,7 @@
         <li class="sidebar-item">
             <a class="sidebar-link" href="artist.php" aria-expanded="false">
                 <span>
-                    <i class="ti ti-article"></i>
+                    <i class="ti ti-users"></i>
                 </span>
                 <span class="hide-menu">Artist</span>
             </a>
@@ -94,42 +94,7 @@
                 <span class="hide-menu">User</span>
             </a>
         </li>
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="login.php" aria-expanded="false">
-                <span>
-                    <i class="ti ti-login"></i>
-                </span>
-                <span class="hide-menu">Login</span>
-            </a>
-        </li>
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="register.php" aria-expanded="false">
-                <span>
-                    <i class="ti ti-user-plus"></i>
-                </span>
-                <span class="hide-menu">Register</span>
-            </a>
-        </li>
-        <li class="nav-small-cap">
-            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-            <span class="hide-menu">EXTRA</span>
-        </li>
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="icon-tabler.php" aria-expanded="false">
-                <span>
-                    <i class="ti ti-mood-happy"></i>
-                </span>
-                <span class="hide-menu">Icons</span>
-            </a>
-        </li>
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="sample-page.php" aria-expanded="false">
-                <span>
-                    <i class="ti ti-aperture"></i>
-                </span>
-                <span class="hide-menu">Sample Page</span>
-            </a>
-        </li>
+        
     </ul>
 </nav>
 <!-- End Sidebar navigation -->
