@@ -25,7 +25,7 @@ try
         $songs = $song->findByAlbumId($album->getAlbumId());
         $duration = 0;
         $number_of_song = 0;
-        foreach($songs as $val)
+        foreach($songs->getResult() as $val)
         {
             $duration += $val->getDuration();
             $number_of_song ++;
@@ -47,8 +47,7 @@ try
 
     $album->update();
     $restResponse = new PicoResponse();
-    $response = AlbumDto::valueOf($album);
-    $restResponse->sendResponse($response, 'json', null, PicoHttpStatus::HTTP_OK);
+    $restResponse->sendResponse($album, 'json', null, PicoHttpStatus::HTTP_OK);
 }
 catch(Exception $e)
 {

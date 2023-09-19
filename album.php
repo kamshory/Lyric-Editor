@@ -144,8 +144,8 @@ if(!empty($result))
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $album->getName();?></a></td>
-      <td><?php echo $album->getDuration();?></td>
-      <td><?php echo $album->getNumberOfSong();?></td>
+      <td class="text-data text-data-duration"><?php echo $album->getDuration();?></td>
+      <td class="text-data text-data-number-of-song"><?php echo $album->getNumberOfSong();?></td>
       <td class="text-data text-data-active"><?php echo $album->getActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
@@ -228,10 +228,14 @@ if(!empty($result))
         {
           updateAlbumModal.hide();
           let formData = getFormData(dataSet);
-          let dataId = formData.album_id;
-          let name = formData.name;
-          let active = $('[name="active"]')[0].checked;
+          let dataId = data.album_id;
+          let name = data.name;
+          let duration = data.duration;
+          let numberOfSong = data.number_of_song;
+          let active = data.active == 1 || data.active == '1';
           $('[data-id="'+dataId+'"] .text-data.text-data-name').text(name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(duration);
+          $('[data-id="'+dataId+'"] .text-data.text-data-number-of-song').text(numberOfSong);
           $('[data-id="'+dataId+'"] .text-data.text-data-active').text(active?'Yes':'No');
         }
       })
