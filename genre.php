@@ -95,7 +95,7 @@ if(!empty($result))
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkDetail;?>"><?php echo $genre->getName();?></a></td>
-      <td><?php echo $genre->getActive() ? 'Yes' : 'No';?></td>
+      <td><?php echo $genre->isActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
     }

@@ -221,7 +221,7 @@ if(!empty($result))
         <td class="text-data text-data-artist-vocal-name"><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
         <td class="text-data text-data-artist-composer-name"><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
         <td class="text-data text-data-duration"><?php echo $song->getDuration();?></td>
-        <td class="text-data text-data-active"><?php echo $song->getActive() ? 'Yes' : 'No';?></td>
+        <td class="text-data text-data-active"><?php echo $song->isActive() ? 'Yes' : 'No';?></td>
         </tr>
         <?php
         }

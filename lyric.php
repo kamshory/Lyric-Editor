@@ -28,7 +28,15 @@ require_once "inc/header.php";
 $inputGet = new PicoRequest(INPUT_GET);
 if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getSongId() != null)
 {
+$songId = $inputGet->getSongId();
+try
+{
+$song = new Song(null, $database);
+$song->findOneBySongId($songId);
 ?>
+<div class="song-tite" style="">
+    <h3 style="font-size: 18px; padding-bottom:2px;"><?php echo $song->getTitle();?></h3>
+</div>
 <div class="srt-editor editor1">
     <div class="row">
         <div class="col col-7">
@@ -131,10 +139,6 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getSongId() !
 
 <?php
 
-try
-{
-$song = new Song(array('song_id'=>@$_GET['song_id']), $database);
-$song->select();
 if($song != null)
 {
     $lyric = $song->getLyric();

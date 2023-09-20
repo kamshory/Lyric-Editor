@@ -12,12 +12,10 @@ if(isset($_SESSION) && isset($_SESSION['suser']) && isset($_SESSION['spass']))
     {
         $username = $_SESSION['suser'];
         $password = $_SESSION['spass'];
-
         $currentLoggedInUser->findOneByUsernameAndPasswordAndBlockedAndActive($username, $password, false, true);
     }
     catch(Exception $e)
     {
-        // do nothing
         require_once dirname(__DIR__)."/login.php";
         exit();
     }

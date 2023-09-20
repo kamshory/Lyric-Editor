@@ -146,7 +146,7 @@ if(!empty($result))
       <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $album->getName();?></a></td>
       <td class="text-data text-data-duration"><?php echo $album->getDuration();?></td>
       <td class="text-data text-data-number-of-song"><?php echo $album->getNumberOfSong();?></td>
-      <td class="text-data text-data-active"><?php echo $album->getActive() ? 'Yes' : 'No';?></td>
+      <td class="text-data text-data-active"><?php echo $album->isActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
     }

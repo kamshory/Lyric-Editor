@@ -133,7 +133,7 @@ if(!empty($result))
       <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $artist->getName();?></a></td>
       <td class="text-data text-data-stage_name"><?php echo $artist->getStageName();?></td>
       <td class="text-data text-data-gender"><?php echo $artist->getGender() == 'M' ? 'Man' : 'Woman';?></td>
-      <td class="text-data text-data-active"><?php echo $artist->getActive() ? 'Yes' : 'No';?></td>
+      <td class="text-data text-data-active"><?php echo $artist->isActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
     }

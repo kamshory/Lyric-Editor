@@ -18,7 +18,7 @@ require_once "inc/auth-with-login-form.php";
 require_once "inc/header.php";
 
 $inputGet = new PicoRequest(INPUT_GET);
-if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getMidiId() != null)
+if($inputGet->equalsAction('compose') && $inputGet->getMidiId() != null)
 {
   $midi = new Midi(null, $database);
   try
@@ -346,7 +346,8 @@ if(!empty($result))
 <table class="table">
   <thead>
     <tr>
-      <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+    <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+    <th scope="col" width="20"><i class="ti ti-music"></i></th>
       <th scope="col" width="20">#</th>
       <th scope="col">Title</th>
       <th scope="col">Genre</th>
@@ -362,10 +363,12 @@ if(!empty($result))
     {
       $no++;
       $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&midi_id=".$midi->getMidiId();
+      $linkMusic = basename($_SERVER['PHP_SELF'])."?action=compose&midi_id=".$midi->getMidiId();
       $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&midi_id=".$midi->getMidiId();
     ?>
     <tr data-id="<?php echo $midi->getMidiId();?>">
-      <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
+    <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
+    <th scope="row"><a href="<?php echo $linkMusic;?>" class="edit-data"><i class="ti ti-music"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkDetail;?>"><?php echo $midi->getTitle();?></a></td>
       <td><?php echo $midi->hasValueGenre() ? $midi->getGenre()->getName() : "";?></td>
