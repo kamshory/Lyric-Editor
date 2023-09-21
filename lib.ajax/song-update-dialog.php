@@ -21,7 +21,7 @@ $song->findOneBySongId($inputGet->getSongId());
                 <h5 class="modal-title" id="updateSongDialogLabel">Update Song</h5>
                 <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body song-dialog">
 
                 <div class="file-uploader">
                     <fieldset class="file-upload-zone upload-drop-zone-update text-center mb-3 p-4">
@@ -38,7 +38,6 @@ $song->findOneBySongId($inputGet->getSongId());
                     <fieldset class="song-info">
                         <legend class="visually-hidden">Song Information</legend>
                         <form>
-
                             <table class="table table-borderless">
                                 <tbody>
                                     <tr>
@@ -105,7 +104,6 @@ $song->findOneBySongId($inputGet->getSongId());
                             <div class="loader-icon">&nbsp;</div>
                         </form>
                     </fieldset>
-
                 </div>
 
             </div>

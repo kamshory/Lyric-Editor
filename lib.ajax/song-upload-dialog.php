@@ -16,7 +16,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                 <h5 class="modal-title" id="uploadFileLabel">Add New Song</h5>
                 <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body song-dialog">
 
                 <div class="file-uploader">
                     <fieldset class="file-upload-zone upload-drop-zone-add text-center mb-3 p-4">
