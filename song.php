@@ -192,6 +192,7 @@ if(!empty($result))
     <thead>
         <tr>
         <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+        <th scope="col" width="20"><i class="ti ti-trash"></i></th>
         <th scope="col" width="20">#</th>
         <th scope="col">Title</th>
         <th scope="col">Album</th>
@@ -211,9 +212,11 @@ if(!empty($result))
         $songId = $song->getSongId();
         $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&song_id=".$songId;
         $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&song_id=".$songId;
+        $linkDelete = basename($_SERVER['PHP_SELF'])."?action=delete&song_id=".$songId;
         ?>
         <tr data-id="<?php echo $songId;?>">
         <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
+        <th scope="row"><a href="<?php echo $linkDelete;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
         <th class="text-right" scope="row"><?php echo $no;?></th>
         <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-title"><?php echo $song->getTitle();?></a></td>
         <td class="text-data text-data-album-name"><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>

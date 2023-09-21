@@ -124,10 +124,12 @@ if(!empty($result))
   <thead>
     <tr>
       <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+      <th scope="col" width="20"><i class="ti ti-trash"></i></th>
       <th scope="col" width="20">#</th>
       <th scope="col">Name</th>
       <th scope="col">Duration</th>
       <th scope="col">Song</th>
+      <th scope="col">Order</th>
       <th scope="col">Active</th>
     </tr>
   </thead>
@@ -137,15 +139,19 @@ if(!empty($result))
     foreach($result as $album)
     {
       $no++;
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&album_id=".$album->getAlbumId();
-      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&album_id=".$album->getAlbumId();
+      $albumId = $album->getAlbumId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&album_id=".$albumId;
+      $linkdDelete = basename($_SERVER['PHP_SELF'])."?action=delete&album_id=".$albumId;
+      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&album_id=".$albumId;
     ?>
-    <tr data-id="<?php echo $album->getAlbumId();?>">
+      <tr data-id="<?php echo $albumId;?>">
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
+      <th scope="row"><a href="<?php echo $linkdDelete;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $album->getName();?></a></td>
       <td class="text-data text-data-duration"><?php echo $album->getDuration();?></td>
       <td class="text-data text-data-number-of-song"><?php echo $album->getNumberOfSong();?></td>
+      <td class="text-data text-data-sort-order"><?php echo $album->getSortOrder();?></td>
       <td class="text-data text-data-active"><?php echo $album->isActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
@@ -234,6 +240,7 @@ if(!empty($result))
           let numberOfSong = data.number_of_song;
           let active = data.active == 1 || data.active == '1';
           $('[data-id="'+dataId+'"] .text-data.text-data-name').text(name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-sort-order').text(data.sort_order);
           $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(duration);
           $('[data-id="'+dataId+'"] .text-data.text-data-number-of-song').text(numberOfSong);
           $('[data-id="'+dataId+'"] .text-data.text-data-active').text(active?'Yes':'No');

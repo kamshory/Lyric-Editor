@@ -111,6 +111,7 @@ if(!empty($result))
   <thead>
     <tr>
       <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+      <th scope="col" width="20"><i class="ti ti-trash"></i></th>
       <th scope="col" width="20">#</th>
       <th scope="col">Real Name</th>
       <th scope="col">Stage Name</th>
@@ -124,11 +125,14 @@ if(!empty($result))
     foreach($result as $artist)
     {
       $no++;
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&artist_id=".$artist->getArtistId();
-      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&artist_id=".$artist->getArtistId();
+      $artistId = $artist->getArtistId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&artist_id=".$artistId;
+      $linkdDelete = basename($_SERVER['PHP_SELF'])."?action=delete&artist_id=".$artistId;
+      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&artist_id=".$artistId;
     ?>
-    <tr data-id="<?php echo $artist->getArtistId();?>">
+    <tr data-id="<?php echo $artistId;?>">
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
+      <th scope="row"><a href="<?php echo $linkdDelete;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $artist->getName();?></a></td>
       <td class="text-data text-data-stage_name"><?php echo $artist->getStageName();?></td>

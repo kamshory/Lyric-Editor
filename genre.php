@@ -77,6 +77,7 @@ if(!empty($result))
   <thead>
     <tr>
       <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+      <th scope="col" width="20"><i class="ti ti-trash"></i></th>
       <th scope="col" width="20">#</th>
       <th scope="col">Name</th>
       <th scope="col">Active</th>
@@ -88,11 +89,14 @@ if(!empty($result))
     foreach($result as $genre)
     {
       $no++;
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&genre_id=".$genre->getGenreId();
-      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&genre_id=".$genre->getGenreId();
+      $genreId = $genre->getGenreId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&genre_id=".$genreId;
+      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&genre_id=".$genreId;
+      $linkDelete = basename($_SERVER['PHP_SELF'])."?action=delete&genre_id=".$genreId;
     ?>
-    <tr data-id="<?php echo $genre->getGenreId();?>">
+    <tr data-id="<?php echo $genreId;?>">
       <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
+      <th scope="row"><a href="<?php echo $linkDelete;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkDetail;?>"><?php echo $genre->getName();?></a></td>
       <td><?php echo $genre->isActive() ? 'Yes' : 'No';?></td>

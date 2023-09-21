@@ -347,6 +347,7 @@ if(!empty($result))
   <thead>
     <tr>
     <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+    <th scope="col" width="20"><i class="ti ti-trash"></i></th>
     <th scope="col" width="20"><i class="ti ti-music"></i></th>
       <th scope="col" width="20">#</th>
       <th scope="col">Title</th>
@@ -362,19 +363,21 @@ if(!empty($result))
     foreach($result as $midi)
     {
       $no++;
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&midi_id=".$midi->getMidiId();
-      $linkMusic = basename($_SERVER['PHP_SELF'])."?action=compose&midi_id=".$midi->getMidiId();
-      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&midi_id=".$midi->getMidiId();
+      $midiId = $midi->getMidiId();
+      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&midi_id=".$midiId;
+      $linkMusic = basename($_SERVER['PHP_SELF'])."?action=compose&midi_id=".$midiId;
+      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&midi_id=".$midiId;
     ?>
-    <tr data-id="<?php echo $midi->getMidiId();?>">
-    <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
-    <th scope="row"><a href="<?php echo $linkMusic;?>" class="edit-data"><i class="ti ti-music"></i></a></th>
-      <th scope="row"><?php echo $no;?></th>
-      <td><a href="<?php echo $linkDetail;?>"><?php echo $midi->getTitle();?></a></td>
-      <td><?php echo $midi->hasValueGenre() ? $midi->getGenre()->getName() : "";?></td>
-      <td><?php echo $midi->hasValueArtistVocal() ? $midi->getArtistVocal()->getName() : "";?></td>
-      <td><?php echo $midi->hasValueAlbum() ? $midi->getAlbum()->getName() : "";?></td>
-      <td><?php echo $midi->getDuration();?></td>
+    <tr data-id="<?php echo $midiId;?>">
+        <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
+        <th scope="row"><a href="<?php echo $linkEdit;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
+        <th scope="row"><a href="<?php echo $linkMusic;?>" class="edit-data"><i class="ti ti-music"></i></a></th>
+        <th scope="row"><?php echo $no;?></th>
+        <td><a href="<?php echo $linkDetail;?>"><?php echo $midi->getTitle();?></a></td>
+        <td><?php echo $midi->hasValueGenre() ? $midi->getGenre()->getName() : "";?></td>
+        <td><?php echo $midi->hasValueArtistVocal() ? $midi->getArtistVocal()->getName() : "";?></td>
+        <td><?php echo $midi->hasValueAlbum() ? $midi->getAlbum()->getName() : "";?></td>
+        <td><?php echo $midi->getDuration();?></td>
     </tr>
     <?php
     }
