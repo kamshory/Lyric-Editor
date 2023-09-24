@@ -158,7 +158,7 @@ if(!empty($result))
 </div>
 
 <div class="lazy-dom modal-container modal-add-data" data-url="lib.ajax/artist-add-dialog.php"></div>
-<div class="lazy-dom modal-container modal-edit-data" data-url="lib.ajax/artist-update-dialog.php"></div>
+<div class="lazy-dom modal-container modal-update-data" data-url="lib.ajax/artist-update-dialog.php"></div>
 
 <script>
   let addArtistModal;
@@ -182,7 +182,7 @@ if(!empty($result))
       e2.preventDefault();
       e2.stopPropagation();
       let artistId = $(this).closest('tr').attr('data-id') || '';
-      let dialogSelector = $('.modal-edit-data');
+      let dialogSelector = $('.modal-update-data');
       dialogSelector.load(dialogSelector.attr('data-url')+'?artist_id='+artistId, function(data){
         let updateArtistModalElem = document.querySelector('#updateArtistDialog');
         updateArtistModal = new bootstrap.Modal(updateArtistModalElem, {

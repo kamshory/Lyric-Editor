@@ -129,6 +129,71 @@ class SpecificationUtil
     }
 
     /**
+     * Create Song specification
+     * @param PicoRequest $inputGet
+     * @param array $$additional
+     * @return PicoSpecification
+     */
+    public static function createReferenceSpecification($inputGet, $additional = null)
+    {
+        $spesification = new PicoSpecification();
+
+        if($inputGet->getReferenceId() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->equals('referenceId', $inputGet->getReferenceId());
+            $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getGenreId() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->equals('genreId', $inputGet->getGenreId());
+            $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getAlbum() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->equals('album', $inputGet->getAlbum());
+            $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getTitle() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->like('title', PicoPredicate::generateCenterLike($inputGet->getTitle()));
+            $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getArtistId() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->equals('artistId', $inputGet->getArtistId());
+            $spesification->addAnd($predicate1);
+        }
+
+        if($inputGet->getActive() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->equals('active', $inputGet->getActive());
+            $spesification->addAnd($predicate1);
+        }
+
+        if(isset($additional) && is_array($additional))
+        {
+            foreach($additional as $key=>$value)
+            {
+                $predicate2 = new PicoPredicate();          
+                $predicate2->equals($key, $value);
+                $spesification->addAnd($predicate2);
+            }
+        }
+        
+        return $spesification;
+    }
+
+    /**
      * Create album specification
      * @param PicoRequest $name
      * @return PicoSpecification
