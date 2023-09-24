@@ -49,6 +49,7 @@
                 <span class="hide-menu">Comment</span>
             </a>
         </li>
+        <!--
         <li class="sidebar-item">
             <a class="sidebar-link" href="dubbing.php" aria-expanded="false">
                 <span>
@@ -57,6 +58,7 @@
                 <span class="hide-menu">Dubbing</span>
             </a>
         </li>
+        -->
         <li class="sidebar-item">
             <a class="sidebar-link" href="album.php" aria-expanded="false">
                 <span>

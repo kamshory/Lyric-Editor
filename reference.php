@@ -1,13 +1,9 @@
 <?php
-use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Database\PicoSortable;
 use Pico\Pagination\PicoPagination;
-use \PDO as PDO;
-use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Artist;
 use Pico\Data\Entity\EntityReference;
 use Pico\Data\Entity\Genre;
-use Pico\Data\Entity\Reference;
 use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
@@ -21,76 +17,55 @@ require_once "inc/header.php";
 $inputGet = new PicoRequest(INPUT_GET);
 if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getReferenceId() != null)
 {
-  $queryBuilder = new PicoDatabaseQueryBuilder($database);
-  $sql = $queryBuilder->newQuery()
-  ->select("reference.*, 
-    (select artist.name from artist where artist.artist_id = reference.artist_composer) as artist_composer_name,
-    (select artist.name from artist where artist.artist_id = reference.artist_arranger) as artist_arranger_name,
-    artist.name as artist_vocal_name,
-    genre.name as genre_name,
-    album.name as album_name
-    ")
-  ->from("reference")
-  ->leftJoin("artist")->on("artist.artist_id = reference.artist_vocal")
-  ->leftJoin("genre")->on("genre.genre_id = reference.genre_id")
-  ->leftJoin("album")->on("album.album_id = reference.album_id")
-  ->where("reference.reference_id = ? ", $inputGet->getReferenceId());
+  $reference = new EntityReference(null, $database);
   try
   {
-    $row = $database->fetch($sql, PDO::FETCH_OBJ);
-    if(!empty($row))
-    {
-      $reference = new Reference($row);
-      ?>
-      <table class="table table-responsive">
-        <tbody>
-          <tr>
-            <td>Reference ID</td>
-            <td><?php echo $reference->getReferenceId();?></td>
-          </tr>
-          <tr>
-            <td>Title</td>
-            <td><?php echo $reference->getTitle();?></td>
-          </tr>
-          <tr>
-            <td>Duration</td>
-            <td><?php echo $reference->getDuration();?></td>
-          </tr>
-          <tr>
-            <td>Genre</td>
-            <td><?php echo $reference->getGenreName();?></td>
-          </tr>
-          <tr>
-            <td>Album</td>
-            <td><?php echo $reference->getAlbumName();?></td>
-          </tr>
-          <tr>
-            <td>Vocal</td>
-            <td><?php echo $reference->getArtistVocalName();?></td>
-          </tr>
-          <tr>
-            <td>Composer</td>
-            <td><?php echo $reference->getArtistComposerName();?></td>
-          </tr>
-          <tr>
-            <td>Arranger</td>
-            <td><?php echo $reference->getArtistArrangerName();?></td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <?php
-    }
-    else
-    {
-      ?>
-      <div class="alert alert-warning"><?php echo $e->getMessage();?></div>
-      <?php
-    }
+    $reference->findOneByReferenceId($inputGet->getReferenceId());
+    ?>
+    <table class="table table-responsive">
+      <tbody>
+        <tr>
+          <td>Reference ID</td>
+          <td><?php echo $reference->getReferenceId();?></td>
+        </tr>
+        <tr>
+          <td>Title</td>
+          <td><?php echo $reference->getTitle();?></td>
+        </tr>
+        <tr>
+          <td>Genre</td>
+          <td><?php echo $reference->hasValueGenre() ? $reference->getGenre()->getName() : '';?></td>
+        </tr>
+        <tr>
+          <td>Artist</td>
+          <td><?php echo $reference->hasValueArtist() ? $reference->getArtist()->getName() : '';?></td>
+        </tr>
+        <tr>
+          <td>Album</td>
+          <td><?php echo $reference->getAlbum();?></td>
+        </tr>
+        <tr>
+          <td>Year</td>
+          <td><?php echo $reference->getYear();?></td>
+        </tr>
+        <tr>
+          <td>URL</td>
+          <td><?php echo $reference->getUrl();?></td>
+        </tr>
+        <tr>
+          <td>Description</td>
+          <td><?php echo $reference->getDescription();?></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <?php
   }
   catch(Exception $e)
   {
-
+    ?>
+    <div class="alert alert-warning"><?php echo $e->getMessage();?></div>
+    <?php
   }
 }
 else
@@ -323,7 +298,7 @@ if(!empty($result))
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-name').text(data.artist_vocal_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-album').text(data.album);
           $('[data-id="'+dataId+'"] .text-data.text-data-genre-name').text(data.genre_name);
-          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(data.active?'Yes':'No');
+          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(data.active === true || data.active == 1 || data.active == "1" ?'Yes':'No');
           $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(data.duration);
 
         }

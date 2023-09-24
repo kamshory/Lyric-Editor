@@ -125,11 +125,11 @@ else
     </div>
 
     <div class="filter-group">
-        <span>Complete</span>
+        <span>Active</span>
         <select class="form-control" name="active" id="active">
             <option value="">- All -</option>
-            <option value="1"<?php echo $inputGet->getLyricComplete() == '1'?' selected':'';?>>Yes</option>
-            <option value="0"<?php echo $inputGet->getLyricComplete() == '0'?' selected':'';?>>No</option>
+            <option value="1"<?php echo $inputGet->getActive() == '1'?' selected':'';?>>Yes</option>
+            <option value="0"<?php echo $inputGet->getActive() == '0'?' selected':'';?>>No</option>
         </select>
     </div>
 
@@ -296,14 +296,15 @@ if(!empty($result))
           let dataId = data.song_id;
           let title = data.title;
           let active = data.active;
+          console.log(data);
           $('[data-id="'+dataId+'"] .text-data.text-data-title').text(data.title);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-vocal-name').text(data.artist_vocal_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-composer-name').text(data.artist_composer_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-arranger-name').text(data.artist_arranger_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-album-name').text(data.album_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-genre-name').text(data.genre_name);
-          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(data.active?'Yes':'No');
           $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(data.duration);
+          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(data.active === true || data.active == 1 || data.active == "1" ?'Yes':'No');
 
         }
       })
