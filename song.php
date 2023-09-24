@@ -249,7 +249,6 @@ if(!empty($result))
 }
 ?>
 
-
 <div class="lazy-dom modal-container modal-update-data" data-url="lib.ajax/song-update-dialog.php"></div>
 
 <script>
@@ -305,7 +304,6 @@ if(!empty($result))
           $('[data-id="'+dataId+'"] .text-data.text-data-genre-name').text(data.genre_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(data.duration);
           $('[data-id="'+dataId+'"] .text-data.text-data-active').text(data.active === true || data.active == 1 || data.active == "1" ?'Yes':'No');
-
         }
       })
     });
