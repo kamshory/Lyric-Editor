@@ -196,7 +196,7 @@ if(!empty($result))
         <th scope="col">Album</th>
         <th scope="col">Genre</th>
         <th scope="col">Artist</th>
-        <th scope="col">Duration</th>
+        <th scope="col">Year</th>
         <th scope="col">Active</th>
         </tr>
     </thead>
@@ -216,10 +216,10 @@ if(!empty($result))
         <th scope="row"><a href="<?php echo $linkDelete;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
         <th class="text-right" scope="row"><?php echo $no;?></th>
         <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-title"><?php echo $reference->getTitle();?></a></td>
-        <td class="text-data text-data-album-name"><?php echo $reference->hasValueAlbum() ? $reference->getAlbum()->getName() : "";?></td>
+        <td class="text-data text-data-album"><?php echo $reference->getAlbum();?></td>
         <td class="text-data text-data-genre-name"><?php echo $reference->hasValueGenre() ? $reference->getGenre()->getName() : "";?></td>
-        <td class="text-data text-data-artist-name"><?php echo $reference->hasValueArtistVocal() ? $reference->getArtistVocal()->getName() : "";?></td>
-        <td class="text-data text-data-duration"><?php echo $reference->getDuration();?></td>
+        <td class="text-data text-data-artist-name"><?php echo $reference->hasValueArtist() ? $reference->getArtist()->getName() : "";?></td>
+        <td class="text-data text-data-duration"><?php echo $reference->getYear();?></td>
         <td class="text-data text-data-active"><?php echo $reference->isActive() ? 'Yes' : 'No';?></td>
         </tr>
         <?php
@@ -252,8 +252,6 @@ if(!empty($result))
   let updateReferenceModal;
 
   $(document).ready(function(e){
-    console.log('aaa')
-
     $(document).on('click', '.add-data', function(e2){
       e2.preventDefault();
       e2.stopPropagation();
@@ -280,8 +278,7 @@ if(!empty($result))
           window.location.reload();
         }
       })
-    });   
-  
+    });  
     
     $(document).on('click', '.edit-data', function(e2){
       e2.preventDefault();
@@ -324,7 +321,7 @@ if(!empty($result))
           let active = data.active;
           $('[data-id="'+dataId+'"] .text-data.text-data-title').text(data.title);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-name').text(data.artist_vocal_name);
-          $('[data-id="'+dataId+'"] .text-data.text-data-album-name').text(data.album_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-album').text(data.album);
           $('[data-id="'+dataId+'"] .text-data.text-data-genre-name').text(data.genre_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-active').text(data.active?'Yes':'No');
           $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(data.duration);
