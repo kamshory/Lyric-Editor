@@ -43,6 +43,10 @@ if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getAlbumId(
         <td>Duration</td>
         <td><?php echo $album->getDuration();?></td>
       </tr>
+      <tr>
+          <td>Active</td>
+          <td><?php echo $album->booleanToTextByActive('Yes', 'No');?></td>
+        </tr>
     </tbody>
   </table>
   

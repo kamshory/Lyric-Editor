@@ -57,6 +57,22 @@ if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getSongId()
           <td>Arranger</td>
           <td><?php echo $song->hasValueArtistArranger() ? $song->getArtistArranger()->getName() : '';?></td>
         </tr>
+        <tr>
+          <td>File Size</td>
+          <td><?php echo $song->getFileSize();?></td>
+        </tr>
+        <tr>
+          <td>Created</td>
+          <td><?php echo $song->getTimeCreate();?></td>
+        </tr>
+        <tr>
+          <td>Last Update</td>
+          <td><?php echo $song->getTimeEdit();?></td>
+        </tr>
+        <tr>
+          <td>Active</td>
+          <td><?php echo $song->booleanToTextByActive('Yes', 'No');?></td>
+        </tr>
       </tbody>
     </table>
     

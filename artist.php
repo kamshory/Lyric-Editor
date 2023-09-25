@@ -30,6 +30,14 @@ if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getArtistId
         <td>Name</td>
         <td><?php echo $artist->getName();?></td>
       </tr>
+      <tr>
+        <td>Stage Name</td>
+        <td><?php echo $artist->getStageName();?></td>
+      </tr>
+      <tr>
+          <td>Active</td>
+          <td><?php echo $artist->booleanToTextByActive('Yes', 'No');?></td>
+        </tr>
     </tbody>
   </table>
   
