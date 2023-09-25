@@ -423,12 +423,12 @@ class PicoDatabasePersistent // NOSONAR
         $nonInsertableCols = array();
         foreach($info->columns as $params)
         {
-            if(isset($params[self::ANNOTATION_COLUMN]) 
-                && isset($params[self::ANNOTATION_COLUMN][self::KEY_INSERTABLE])
-                && strcasecmp($params[self::ANNOTATION_COLUMN][self::KEY_INSERTABLE], self::VALUE_FALSE) == 0                
+            if(isset($params) 
+                && isset($params[self::KEY_INSERTABLE])
+                && strcasecmp($params[self::KEY_INSERTABLE], self::VALUE_FALSE) == 0              
                 )
             {
-                $columnName = $params[self::ANNOTATION_COLUMN][self::KEY_NAME];
+                $columnName = $params[self::KEY_NAME];
                 $nonInsertableCols[] = $columnName;
             }
         }
@@ -445,12 +445,12 @@ class PicoDatabasePersistent // NOSONAR
         $nonUpdatableCols = array();
         foreach($info->columns as $params)
         {
-            if(isset($params[self::ANNOTATION_COLUMN]) 
-                && isset($params[self::ANNOTATION_COLUMN][self::KEY_INSERTABLE])
-                && strcasecmp($params[self::ANNOTATION_COLUMN][self::KEY_INSERTABLE], self::VALUE_FALSE) == 0              
+            if(isset($params) 
+                && isset($params[self::KEY_UPDATABLE])
+                && strcasecmp($params[self::KEY_UPDATABLE], self::VALUE_FALSE) == 0              
                 )
             {
-                $columnName = $params[self::ANNOTATION_COLUMN][self::KEY_NAME];
+                $columnName = $params[self::KEY_NAME];
                 $nonUpdatableCols[] = $columnName;
             }
         }
