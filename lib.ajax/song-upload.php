@@ -90,12 +90,12 @@ try
         $midiPath = SongFileUtil::saveMidiFile($id, $targetDir, file_get_contents($path));
         $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, $targetDir, $xmlMusic);
         $song->setFilePathMidi($midiPath);
-        $song->setFilePathXml($midiPath);
+        $song->setFilePathXml($xmlMusicPath);
     }
     else if(SongFileUtil::isXmlMusicFile($path))
     {
         $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, $targetDir, file_get_contents($path));
-        $song->setFilePathXml($midiPath);
+        $song->setFilePathXml($xmlMusicPath);
     }  
     
     $song->save();
