@@ -54,8 +54,7 @@ try
         mkdir($tempDir, 0755, true);
     }
     
-    $fileUpload->uploadTemporaryFile($_FILES, 'file', $tempDir, $id, mt_rand(100000, 999999));
-    
+    $fileUpload->uploadTemporaryFile($_FILES, 'file', $tempDir, $id, mt_rand(100000, 999999));    
     
     $path = $fileUpload->getFilePath();
     
@@ -82,15 +81,8 @@ try
     }
     else if(SongFileUtil::isMidiFile($path))
     {
-        $midi = new Midi();
-        $midi->importMid($path);
-        // convert midi to xml
-        $xmlMusic = $midi->getXml();
-        
         $midiPath = SongFileUtil::saveMidiFile($id, $targetDir, file_get_contents($path));
-        $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, $targetDir, $xmlMusic);
         $song->setFilePathMidi($midiPath);
-        $song->setFilePathXml($xmlMusicPath);
     }
     else if(SongFileUtil::isXmlMusicFile($path))
     {
