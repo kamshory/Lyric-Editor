@@ -110,7 +110,6 @@ class Song extends DynamicObject
 	 */
 	protected $filePathXml;
 
-
 	/**
 	 * @Column(name="duration", type="float", nullable=true)
 	 * @var double
