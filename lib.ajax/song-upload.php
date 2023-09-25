@@ -1,11 +1,13 @@
 <?php
 
+use Midi\Midi;
 use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Entity\Song;
 use Pico\File\FileMp3;
 use Pico\File\FileUpload;
 use Pico\Request\PicoRequest;
 use Pico\Response\PicoResponse;
+use Pico\Utility\SongFileUtil;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 
@@ -34,25 +36,65 @@ try
     $song->setIpEdit($_SERVER['REMOTE_ADDR']);
     $song->setAdminCreate('1');
     $song->setAdminEdit('1');
+    
+    
 
     // get uploaded file properties
     $fileUpload = new FileUpload();
     $targetDir = dirname(__DIR__)."/files";
-    $fileUpload->upload($_FILES, 'file', $targetDir, $id);
-    $path = $fileUpload->getFilePath();
-    $song->setFileUploadTime($now);
-    $song->setFilePath($path);
-    $song->setFileName(basename($path));
-    $song->setFileSize($fileUpload->getFileSize());
-    $song->setFileType($fileUpload->getFileType());
-    $song->setFileExtension($fileUpload->getFileExtension());
-    $song->setFileMd5(md5_file($path));
     
-    // get MP3 duration
-    $mp3file = new FileMp3($path); 
-    $duration = $mp3file->getDuration(); 
-    $song->setDuration($duration);
+    $tempDir = dirname(__DIR__)."/temp";
+    $fileUpload->uploadTemporaryFile($_FILES, 'file', $tempDir, $id, mt_rand(100000, 999999));
+    
+    
+    $path = $fileUpload->getFilePath();
+    
+    $header = SongFileUtil::getContent($path, 96);
+    
+    if(SongFileUtil::isMp3File($data))
+    {    
+        $song->setFileUploadTime($now);
+        
+        // copy path to mp3Path
+        $mp3Path = $targetDir . "/" . $id . ".mp3";
+        $song->setFilePath($mp3Path);
+        
+        $song->setFileName(basename($path));
+        $song->setFileSize($fileUpload->getFileSize());
+        $song->setFileType($fileUpload->getFileType());
+        $song->setFileExtension($fileUpload->getFileExtension());
+        $song->setFileMd5(md5_file($path));
+        
+        // get MP3 duration
+        $mp3file = new FileMp3($path); 
+        $duration = $mp3file->getDuration(); 
+        $song->setDuration($duration);
+    }
+    else if(SongFileUtil::isMidiFile($data))
+    {
+        // convert to midi
+        $midi = new Midi();
+        $midi->importMid($path);
+        $xmlMusic = $midi->getXml();
+        
+        $midiPath = SongFileUtil::saveMidiFile($id, file_get_contents($path));
+        $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, $xmlMusic);
+        $song->setMidiFilePath($midiPath);
+        $song->setXmlMusicFilePath($midiPath);
+    }
+    else if(SongFileUtil::isXmlMusicFile($data))
+    {
+        $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, file_get_contents($path));
+        $song->setXmlMusicFilePath($midiPath);
+    }
+    
+    
     $song->save();
+    
+    if(file_exists($path))
+    {
+        unlink($path);
+    }
 
     $restResponse = new PicoResponse();
     $restResponse->sendResponse($song, 'json', null, PicoHttpStatus::HTTP_OK);

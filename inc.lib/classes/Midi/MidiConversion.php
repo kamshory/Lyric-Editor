@@ -7,7 +7,8 @@ class MidiConversion extends Midi{
 	//---------------------------------------------------------------
 	// converts midi file of type 1 (multiple tracks) to type 0 (single track)
 	//---------------------------------------------------------------
-	public function convertToType0(){
+	public function convertToType0()
+	{
 		$this->type = 0;
 		if (count($this->tracks)<2) return;
 		$singleTrack = array();
@@ -22,10 +23,3 @@ class MidiConversion extends Midi{
 	}
 	
 }
-
-// TEST:
-// $midi = new MidiConversion();
-// $midi->importMid($file);
-// $midi->convertToType0();
-// $midi->downloadMidFile('converted.mid');
-// exit();

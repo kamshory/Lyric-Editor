@@ -53,6 +53,29 @@ class FileUpload
     {
         // just constructor
     }
+    
+    public function uploadTemporaryFile($files, $name, $targetDir, $targetName, $random)
+    {
+        $errors = array();
+        $file_name = $files[$name]['name'];
+        $file_size = $files[$name]['size'];
+        $file_tmp = $files[$name]['tmp_name'];
+        $file_type = $files[$name]['type'];
+
+        $arr = explode('.', $files[$name]['name']);
+        $file_ext = strtolower(end($arr));
+        $path = rtrim($targetDir, "/") . "/" . $targetName."_".$random. ".".$file_ext;
+
+        if (empty($errors)) {
+            move_uploaded_file($file_tmp, $path);
+        }
+
+        $this->fileName = $file_name;
+        $this->filePath = $path;
+        $this->fileSize = $file_size;
+        $this->fileType = $file_type;
+        $this->fileExtension = $file_ext;
+    }
 
     public function upload($files, $name, $targetDir, $targetName)
     {

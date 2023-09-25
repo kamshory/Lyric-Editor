@@ -1,7 +1,8 @@
 {
     "autoload": {
         "psr-0": {
-            "Pico\\": "classes/"
+            "Pico\\": "classes/",
+            "Midi\\": "classes/"
         }
     },
     "require": {

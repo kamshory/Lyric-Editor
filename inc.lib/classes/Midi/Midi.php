@@ -570,7 +570,6 @@ public function getXml($ttype=0) //NOSONAR
 	$tc = count($tracks);
 	$type = ($tc>1)?1:0;
 	$timebase = $this->timebase;
-	## echo "".$this->timebase." ".__LINE__."\r\n";
 
 	$xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
 <!DOCTYPE MIDIFile PUBLIC
