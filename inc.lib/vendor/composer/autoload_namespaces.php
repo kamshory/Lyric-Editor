@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Pico\\' => array($baseDir . '/classes'),
+    'Midi\\' => array($baseDir . '/classes'),
 );

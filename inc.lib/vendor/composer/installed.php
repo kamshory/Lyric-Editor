@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '75960eaa133a120a231dc5cc2d9b745878f332af',
+        'reference' => '6d2e3b0c7814a6b0bf8416816e530122e99eb59a',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '75960eaa133a120a231dc5cc2d9b745878f332af',
+            'reference' => '6d2e3b0c7814a6b0bf8416816e530122e99eb59a',
             'dev_requirement' => false,
         ),
         'symfony/polyfill-ctype' => array(

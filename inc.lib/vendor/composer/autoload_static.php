@@ -37,6 +37,13 @@ class ComposerStaticInit2219d434bd9928e433eb450fe0d2c608
                 0 => __DIR__ . '/../..' . '/classes',
             ),
         ),
+        'M' => 
+        array (
+            'Midi\\' => 
+            array (
+                0 => __DIR__ . '/../..' . '/classes',
+            ),
+        ),
     );
 
     public static $classMap = array (
