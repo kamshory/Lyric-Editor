@@ -97,6 +97,19 @@ class Song extends DynamicObject
 	 * @var string
 	 */
 	protected $fileUploadTime;
+	
+	/**
+	 * @Column(name="file_path_midi", type="text", nullable=true)
+	 * @var string
+	 */
+	protected $filePathMidi;
+
+	/**
+	 * @Column(name="file_path_xml", type="text", nullable=true)
+	 * @var string
+	 */
+	protected $filePathXml;
+
 
 	/**
 	 * @Column(name="duration", type="float", nullable=true)

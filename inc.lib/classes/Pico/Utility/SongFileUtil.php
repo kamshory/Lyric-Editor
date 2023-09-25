@@ -2,19 +2,25 @@
 
 namespace Pico\Utility;
 
+use Pico\File\FileMp3;
+
 class SongFileUtil
 {
-    public static function isMp3File($data)
+    public static function isMp3File($path)
     {
-        return true;
+        $mp3file = new FileMp3($path); 
+        $duration = $mp3file->getDuration(); 
+        return $duration > 0;
     }
-    public static function isMidiFile($data)
+    public static function isMidiFile($path)
     {
-        return true;
+        $content = self::getContent($path, 100);
+        return stripos($content, 'MThd') === 0;
     }
-    public static function isXmlMusicFile($data)
+    public static function isXmlMusicFile($path)
     {
-        return true;
+        $content = self::getContent($path, 100);
+        return stripos($content, '<'.'?'.'xml') === false;
     }
     
     public static function getContent($path, $max = 0)
@@ -30,13 +36,17 @@ class SongFileUtil
         return $contents;
     }
     
-    public static function saveMidiFile($songId, $content)
+    public static function saveMidiFile($songId, $targetDir, $content)
     {
-        return "";
+        $path = $targetDir . "/" . $songId . ".mid";
+        file_put_contents($path, $content);
+        return $path;
     }
     
-    public static function saveXmlMusicFile($songId, $content)
+    public static function saveXmlMusicFile($songId, $targetDir, $content)
     {
-        return "";
+        $path = $targetDir . "/" . $songId . ".xml";
+        file_put_contents($path, $content);
+        return $path;
     }
 }

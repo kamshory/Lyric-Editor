@@ -44,6 +44,16 @@ try
     $targetDir = dirname(__DIR__)."/files";
     
     $tempDir = dirname(__DIR__)."/temp";
+    
+    if(!file_exists($targetDir))
+    {
+        mkdir($targetDir, 0755, true);
+    }
+    if(!file_exists($tempDir))
+    {
+        mkdir($tempDir, 0755, true);
+    }
+    
     $fileUpload->uploadTemporaryFile($_FILES, 'file', $tempDir, $id, mt_rand(100000, 999999));
     
     
@@ -51,7 +61,7 @@ try
     
     $header = SongFileUtil::getContent($path, 96);
     
-    if(SongFileUtil::isMp3File($data))
+    if(SongFileUtil::isMp3File($path))
     {    
         $song->setFileUploadTime($now);
         
@@ -70,24 +80,23 @@ try
         $duration = $mp3file->getDuration(); 
         $song->setDuration($duration);
     }
-    else if(SongFileUtil::isMidiFile($data))
+    else if(SongFileUtil::isMidiFile($path))
     {
-        // convert to midi
         $midi = new Midi();
         $midi->importMid($path);
+        // convert midi to xml
         $xmlMusic = $midi->getXml();
         
-        $midiPath = SongFileUtil::saveMidiFile($id, file_get_contents($path));
-        $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, $xmlMusic);
-        $song->setMidiFilePath($midiPath);
-        $song->setXmlMusicFilePath($midiPath);
+        $midiPath = SongFileUtil::saveMidiFile($id, $targetDir, file_get_contents($path));
+        $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, $targetDir, $xmlMusic);
+        $song->setFilePathMidi($midiPath);
+        $song->setFilePathXml($midiPath);
     }
-    else if(SongFileUtil::isXmlMusicFile($data))
+    else if(SongFileUtil::isXmlMusicFile($path))
     {
-        $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, file_get_contents($path));
-        $song->setXmlMusicFilePath($midiPath);
-    }
-    
+        $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, $targetDir, file_get_contents($path));
+        $song->setFilePathXml($midiPath);
+    }  
     
     $song->save();
     
