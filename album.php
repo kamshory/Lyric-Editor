@@ -32,6 +32,10 @@ if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getAlbumId(
         <td><?php echo $album->getName();?></td>
       </tr>
       <tr>
+        <td>Description</td>
+        <td><?php echo $album->getDescription();?></td>
+      </tr>
+      <tr>
         <td>Release Date</td>
         <td><?php echo $album->getReleaseDate();?></td>
       </tr>

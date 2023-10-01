@@ -80,6 +80,7 @@ if(!empty($result))
       <th scope="col" width="20"><i class="ti ti-trash"></i></th>
       <th scope="col" width="20">#</th>
       <th scope="col">Name</th>
+      <th scope="col">Order</th>
       <th scope="col">Active</th>
     </tr>
   </thead>
@@ -99,6 +100,7 @@ if(!empty($result))
       <th scope="row"><a href="<?php echo $linkDelete;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkDetail;?>"><?php echo $genre->getName();?></a></td>
+      <td><?php echo $genre->getSortOrder();?></td>
       <td><?php echo $genre->isActive() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
