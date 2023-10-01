@@ -1,6 +1,5 @@
 <?php
 
-use Midi\Midi;
 use Pico\Constants\PicoHttpStatus;
 use Pico\Data\Entity\Song;
 use Pico\File\FileMp3;

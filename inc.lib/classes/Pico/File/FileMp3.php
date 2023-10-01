@@ -2,6 +2,9 @@
 
 namespace Pico\File;
 
+use Exception;
+use Pico\Exceptions\InvalidFileFormatException;
+
 class FileMp3
 {
     protected $filename = "";
@@ -48,28 +51,36 @@ class FileMp3
         $block = fread($fd, 100);
         $offset = $this->skipID3v2Tag($block);
         fseek($fd, $offset, SEEK_SET);
-        while (!feof($fd)) {
-            $block = fread($fd, 10);
-            if (strlen($block) < 10) {
-                break;
-            }
-            //looking for 1111 1111 111 (frame synchronization bits)
-            else if ($block[0] == "\xff" && (ord($block[1]) & 0xe0)) {
-                $info = self::parseFrameHeader(substr($block, 0, 4));
-                if (empty($info['Framesize'])) {
-                    return $duration;
-                } //some corrupt mp3 files
-                fseek($fd, $info['Framesize'] - 10, SEEK_CUR);
-                $duration += ($info['Samples'] / $info['Sampling Rate']);
-            } else if (substr($block, 0, 3) == 'TAG') {
-                fseek($fd, 128 - 10, SEEK_CUR); //skip over id3v1 tag size
-            } else {
-                fseek($fd, -9, SEEK_CUR);
-            }
-            if ($use_cbr_estimate && !empty($info)) {
-                return $this->estimateDuration($info['Bitrate'], $offset);
+        try
+        {
+            while (!feof($fd)) {
+                $block = fread($fd, 10);
+                if (strlen($block) < 10) {
+                    break;
+                }
+                //looking for 1111 1111 111 (frame synchronization bits)
+                else if ($block[0] == "\xff" && (ord($block[1]) & 0xe0)) {
+                    $info = self::parseFrameHeader(substr($block, 0, 4));
+                    if (empty($info['Framesize'])) {
+                        return $duration;
+                    } //some corrupt mp3 files
+                    fseek($fd, $info['Framesize'] - 10, SEEK_CUR);
+                    $duration += ($info['Samples'] / $info['Sampling Rate']);
+                } else if (substr($block, 0, 3) == 'TAG') {
+                    fseek($fd, 128 - 10, SEEK_CUR); //skip over id3v1 tag size
+                } else {
+                    fseek($fd, -9, SEEK_CUR);
+                }
+                if ($use_cbr_estimate && !empty($info)) {
+                    return $this->estimateDuration($info['Bitrate'], $offset);
+                }
             }
         }
+        catch(Exception $e)
+        {
+            $duration = 0;
+        }
+        fclose($fd);
         return $duration;
     }
 
@@ -148,6 +159,10 @@ class FileMp3
 
         $sample_rate_idx = ($b2 & 0x0c) >> 2; //0xc => b1100
         $sample_rate = isset($sample_rates[$version][$sample_rate_idx]) ? $sample_rates[$version][$sample_rate_idx] : 0;
+        if($sample_rate == 0)
+        {
+            throw new InvalidFileFormatException("Invalid MP3 file format");
+        }
         $padding_bit = ($b2 & 0x02) >> 1;
         $private_bit = ($b2 & 0x01);
         $channel_mode_bits = ($b3 & 0xc0) >> 6;
@@ -157,6 +172,12 @@ class FileMp3
         $emphasis = ($b3 & 0x03);
 
         $info = array();
+
+        if(!isset($samples) || !isset($samples[$simple_version]) || !isset($samples[$simple_version][$layer]))
+        {
+            throw new InvalidFileFormatException("Invalid MP3 file format");
+        }
+
         $info['Version'] = $version; //MPEGVersion
         $info['Layer'] = $layer;
         //$info['Protection Bit'] = $protection_bit; //0=> protected by 2 byte CRC, 1=>not protected
