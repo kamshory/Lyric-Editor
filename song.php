@@ -101,7 +101,7 @@ else
         <span>Album</span>
         <select class="form-control" name="album_id" id="album_id">
             <option value="">- All -</option>
-            <?php echo new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId()); ?>
+            <?php echo new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId(), null, new PicoSortable('sortOrder', PicoSortable::ORDER_TYPE_DESC)); ?>
         </select>
     </div>
     <div class="filter-group">
@@ -139,7 +139,9 @@ $orderMap = array(
     'artistVocalId'=>'artistVocalId',
     'artistVocal'=>'artistVocalId',
     'artistComposerId'=>'artistComposerId',
-    'artistComposer'=>'artistComposerId'
+    'artistComposer'=>'artistComposerId',
+    'duration'=>'duration',
+    'active'=>'active'
 );
 $defaultOrderBy = 'albumId';
 $defaultOrderType = 'desc';
@@ -186,13 +188,13 @@ if(!empty($result))
         <th scope="col" width="20"><i class="ti ti-edit"></i></th>
         <th scope="col" width="20"><i class="ti ti-trash"></i></th>
         <th scope="col" width="20">#</th>
-        <th scope="col">Title</th>
-        <th scope="col">Album</th>
-        <th scope="col">Genre</th>
-        <th scope="col">Vocalist</th>
-        <th scope="col">Composer</th>
-        <th scope="col">Duration</th>
-        <th scope="col">Active</th>
+        <th scope="col" class="col-sort" data-name="title">Title</th>
+        <th scope="col" class="col-sort" data-name="album_id">Album</th>
+        <th scope="col" class="col-sort" data-name="genre_id">Genre</th>
+        <th scope="col" class="col-sort" data-name="artist_vocal">Vocalist</th>
+        <th scope="col" class="col-sort" data-name="artist_composer">Composer</th>
+        <th scope="col" class="col-sort" data-name="duration">Duration</th>
+        <th scope="col" class="col-sort" data-name="active">Active</th>
         </tr>
     </thead>
     <tbody>

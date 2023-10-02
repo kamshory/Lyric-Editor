@@ -263,7 +263,7 @@ else
         <span>Album</span>
         <select class="form-control" name="album_id" id="album_id">
             <option value="">- All -</option>
-            <?php echo new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId()); ?>
+            <?php echo new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId(), null, new PicoSortable('sortOrder', PicoSortable::ORDER_TYPE_DESC)); ?>
         </select>
     </div>
     <div class="filter-group">
@@ -284,6 +284,7 @@ else
 </div>
 <?php
 $orderMap = array(
+    'songId'=>'songId',
     'title'=>'title', 
     'albumId'=>'albumId', 
     'album'=>'albumId', 
@@ -292,7 +293,9 @@ $orderMap = array(
     'artistVocalId'=>'artistVocalId',
     'artistVocal'=>'artistVocalId',
     'artistComposerId'=>'artistComposerId',
-    'artistComposer'=>'artistComposerId'
+    'artistComposer'=>'artistComposerId',
+    'duration'=>'duration',
+    'active'=>'active'
 );
 $defaultOrderBy = 'songId';
 $defaultOrderType = 'desc';

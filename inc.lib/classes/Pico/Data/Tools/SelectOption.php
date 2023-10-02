@@ -42,6 +42,13 @@ class SelectOption
      * @var array
      */
     private $rows = array();
+    
+    /**
+     * Sortable
+     *
+     * @var PicoSortable
+     */
+    private $sortable = null;
 
     /**
      * Constructor
@@ -50,17 +57,26 @@ class SelectOption
      * @param array $map
      * @param mixed $value
      * @param array|null $attributes
+     * @param PicoSortable $sortable
      */
-    public function __construct($object, $map, $value, $attributes = null)
+    public function __construct($object, $map, $value, $attributes = null, $sortable = null)
     {
         $this->object = $object;
         $this->map = $map;
         $this->value = $value;
-        $this->findAllActive();
         if(isset($attributes) && is_array($attributes))
         {
             $this->attributes = $attributes;
         }
+        if($sortable != null)
+        {
+            $this->sortable = $sortable;
+        }
+        else
+        {
+            $this->sortable = new PicoSortable('name', PicoSortable::ORDER_TYPE_DESC);
+        }
+        $this->findAllActive();
     }
 
     /**
@@ -101,9 +117,8 @@ class SelectOption
     private function findAllActive()
     {
         try
-        {  
-            $sortable = new PicoSortable(array('name', PicoSortable::ORDER_TYPE_ASC));         
-            $result = $this->object->findByActive(true, $sortable);
+        {         
+            $result = $this->object->findByActive(true, null, $this->sortable);
             foreach($result->getResult() as $row)
             {
                 $value = $row->get($this->map['value']);

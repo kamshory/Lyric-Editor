@@ -15,6 +15,65 @@
   <script src="assets/js/app.min.js"></script>
   <script src="lib/pagination.js"></script>
   
+  <script>
+    $(document).ready(function(e){
+      
+      
+      const url = new URL(document.location.toString());
+      const searchParams = url.searchParams;
+      let params = {};
+      searchParams.forEach((value, key) => {
+        params[key] = value;
+      });
+
+      let orderby = searchParams.get('orderby');
+      let ordertype = searchParams.get('ordertype'); 
+      
+      $('table thead .col-sort').each(function(e1){
+        let th = $(this);
+        let text = th.text().trim();
+        let col = th.attr('data-name');
+        let linkUrl = createSortUrl(url, col, params);
+        let a = $('<a />');
+        a.text(text);
+        a.attr('href', linkUrl);
+        th.empty().append(a);
+      });
+    });
+    
+    function createSortUrl(url, col, params1)
+    {
+      let params = JSON.parse(JSON.stringify(params1));
+      let path = url.pathname; // '/search'
+      
+      
+      if(typeof params['orderby'] != 'undefined' && col == params['orderby'])
+      {
+        params['orderby'] = col;
+        if(params['ordertype'] == 'asc')
+        {
+          params['ordertype'] = 'desc';
+        }
+        else
+        {
+          params['ordertype'] = 'asc';
+        }
+      }
+      else
+      {
+        params['orderby'] = col;
+        params['ordertype'] = 'asc';
+      }
+      let p = [];
+      for (const key in params) {
+        if (params.hasOwnProperty(key)) {   
+          p.push(encodeURIComponent(key)+'='+encodeURIComponent(params[key]));
+        }
+      }
+      return path + '?'+p.join('&');
+    }
+  </script>
+  
 </head>
 
 <body>

@@ -293,7 +293,7 @@ else
         <span>Album</span>
         <select class="form-control" name="album_id" id="album_id">
             <option value="">- All -</option>
-            <?php echo new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId()); ?>
+            <?php echo new SelectOption(new Album(null, $database), array('value'=>'albumId', 'label'=>'name'), $inputGet->getAlbumId(), null, new PicoSortable('sortOrder', PicoSortable::ORDER_TYPE_DESC)); ?>
         </select>
     </div>
     <div class="filter-group">
