@@ -14,6 +14,7 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
   $username = trim($username);
   $password = trim($password);
   $password = hash('sha256', $password);
+  $url = 'index.php';
   if(!empty($username) && !empty($password))
   {
     try
@@ -27,18 +28,25 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
         if($inputPost->getReferer() != null)
         {
           $referer = trim($inputPost->getReferer());
-          if(!empty($referer))
+          if(!empty($referer) && stripos($referer, 'login.php'))
           {
-            header("Location: ".$referer);
+            $url = $referer;        
           }
         }
       }
+      header("Location: ".$url);
+      exit();
     }
     catch(Exception $e)
     {
       // do nothing
     }
   }
+  if(!empty($referer) && stripos($referer, 'login.php'))
+  {
+    $url = $referer;   
+  }
+  header("Location: ".$url);
   exit();
 }
 
