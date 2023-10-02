@@ -32,7 +32,8 @@ $orderMap = array(
   'name'=>'name', 
   'genreId'=>'genreId', 
   'genre'=>'genreId',
-  'sortOrder'=>'sortOrder'
+  'sortOrder'=>'sortOrder',
+  'active'=>'active'
 );
 $defaultOrderBy = 'sortOrder';
 $defaultOrderType = 'asc';
@@ -79,9 +80,9 @@ if(!empty($result))
       <th scope="col" width="20"><i class="ti ti-edit"></i></th>
       <th scope="col" width="20"><i class="ti ti-trash"></i></th>
       <th scope="col" width="20">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Order</th>
-      <th scope="col">Active</th>
+      <th scope="col" class="col-sort" data-name="name">Name</th>
+      <th scope="col" class="col-sort" data-name="sort_order">Order</th>
+      <th scope="col" class="col-sort" data-name="active">Active</th>
     </tr>
   </thead>
   <tbody>

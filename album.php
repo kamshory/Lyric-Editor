@@ -87,7 +87,10 @@ $orderMap = array(
   'name'=>'name', 
   'albumId'=>'albumId', 
   'album'=>'albumId',
-  'sortOrder'=>'sortOrder'
+  'sortOrder'=>'sortOrder',
+  'numberOfSong'=>'numberOfSong',
+  'duration'=>'duration',
+  'active'=>'active'
 );
 $defaultOrderBy = 'sortOrder';
 $defaultOrderType = 'asc';
@@ -134,11 +137,11 @@ if(!empty($result))
       <th scope="col" width="20"><i class="ti ti-edit"></i></th>
       <th scope="col" width="20"><i class="ti ti-trash"></i></th>
       <th scope="col" width="20">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Duration</th>
-      <th scope="col">Song</th>
-      <th scope="col">Order</th>
-      <th scope="col">Active</th>
+      <th scope="col" class="col-sort" data-name="name">Name</th>
+      <th scope="col" class="col-sort" data-name="duration">Duration</th>
+      <th scope="col" class="col-sort" data-name="number_of_song">Song</th>
+      <th scope="col" class="col-sort" data-name="sort_order">Order</th>
+      <th scope="col" class="col-sort" data-name="active">Active</th>
     </tr>
   </thead>
   <tbody>

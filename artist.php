@@ -73,8 +73,11 @@ else
 <?php
 $orderMap = array(
   'name'=>'name', 
+  'stageName'=>'stageName',
   'artistId'=>'artistId', 
-  'artist'=>'artistId'
+  'artist'=>'artistId',
+  'gender'=>'gender',
+  'active'=>'active'
 );
 $defaultOrderBy = 'name';
 $pagination = new PicoPagination($cfg->getResultPerPage());
@@ -121,10 +124,10 @@ if(!empty($result))
       <th scope="col" width="20"><i class="ti ti-edit"></i></th>
       <th scope="col" width="20"><i class="ti ti-trash"></i></th>
       <th scope="col" width="20">#</th>
-      <th scope="col">Real Name</th>
-      <th scope="col">Stage Name</th>
-      <th scope="col">Gender</th>
-      <th scope="col">Active</th>
+      <th scope="col" class="col-sort" data-name="name">Real Name</th>
+      <th scope="col" class="col-sort" data-name="stage_name">Stage Name</th>
+      <th scope="col" class="col-sort" data-name="gender">Gender</th>
+      <th scope="col" class="col-sort" data-name="active">Active</th>
     </tr>
   </thead>
   <tbody>
