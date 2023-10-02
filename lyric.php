@@ -317,13 +317,14 @@ $orderMap = array(
     'artistComposerId'=>'artistComposerId',
     'artistComposer'=>'artistComposerId',
     'duration'=>'duration',
-    'active'=>'active'
+    'active'=>'active',
+    'lyricComplete'=>'lyricComplete'
 );
 $defaultOrderBy = 'songId';
 $defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
-$spesification = SpecificationUtil::createSongSpecification($inputGet, array('active'=>true));;
+$spesification = SpecificationUtil::createSongSpecification($inputGet, array('active'=>true));
 $sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
@@ -363,13 +364,13 @@ if(!empty($result))
         <tr>
         <th scope="col" width="20"><i class="ti ti-edit"></i></th>
         <th scope="col" width="20">#</th>
-        <th scope="col">Title</th>
-        <th scope="col">Album</th>
-        <th scope="col">Genre</th>
-        <th scope="col">Vocalist</th>
-        <th scope="col">Composer</th>
-        <th scope="col">Duration</th>
-        <th scope="col">Complete</th>
+        <th scope="col" class="col-sort" data-name="title">Title</th>
+        <th scope="col" class="col-sort" data-name="album_id">Album</th>
+        <th scope="col" class="col-sort" data-name="genre_id">Genre</th>
+        <th scope="col" class="col-sort" data-name="artist_vocal">Vocalist</th>
+        <th scope="col" class="col-sort" data-name="artist_composer">Composer</th>
+        <th scope="col" class="col-sort" data-name="duration">Duration</th>
+        <th scope="col" class="col-sort" data-name="lyric_complete">Complete</th>
         </tr>
     </thead>
     <tbody>
