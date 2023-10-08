@@ -93,7 +93,7 @@ $orderMap = array(
   'active'=>'active'
 );
 $defaultOrderBy = 'sortOrder';
-$defaultOrderType = 'asc';
+$defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createAlbumSpecification($inputGet);
@@ -160,7 +160,7 @@ if(!empty($result))
       <th scope="row"><a href="<?php echo $linkdDelete;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
       <th scope="row"><?php echo $no;?></th>
       <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-name"><?php echo $album->getName();?></a></td>
-      <td class="text-data text-data-duration"><?php echo $album->getDuration();?></td>
+      <td class="text-data text-data-duration"><?php echo sprintf("%.3f", $album->getDuration());?></td>
       <td class="text-data text-data-number-of-song"><?php echo $album->getNumberOfSong();?></td>
       <td class="text-data text-data-sort-order"><?php echo $album->getSortOrder();?></td>
       <td class="text-data text-data-active"><?php echo $album->isActive() ? 'Yes' : 'No';?></td>
@@ -240,14 +240,14 @@ if(!empty($result))
         type:'POST',
         url:'lib.ajax/album-update.php',
         data:dataSet, 
-        dataType:'html',
+        dataType:'json',
         success: function(data)
         {
           updateAlbumModal.hide();
           let formData = getFormData(dataSet);
           let dataId = data.album_id;
           let name = data.name;
-          let duration = data.duration;
+          let duration = data.duration.toFixed(3);
           let numberOfSong = data.number_of_song;
           let active = data.active == 1 || data.active == '1';
           $('[data-id="'+dataId+'"] .text-data.text-data-name').text(name);

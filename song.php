@@ -187,6 +187,7 @@ if(!empty($result))
         <tr>
         <th scope="col" width="20"><i class="ti ti-edit"></i></th>
         <th scope="col" width="20"><i class="ti ti-trash"></i></th>
+        <th scope="col" width="20"><i class="ti ti-player-play"></i></th>
         <th scope="col" width="20">#</th>
         <th scope="col" class="col-sort" data-name="title">Title</th>
         <th scope="col" class="col-sort" data-name="album_id">Album</th>
@@ -211,6 +212,7 @@ if(!empty($result))
         <tr data-id="<?php echo $songId;?>">
         <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
         <th scope="row"><a href="<?php echo $linkDelete;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
+        <th scope="row"><a href="#" class="play-data" data-url="<?php echo  $cfg->getSongBaseUrl()."/".$song->getFileName();?>"><i class="ti ti-player-play"></i></a></th>
         <th class="text-right" scope="row"><?php echo $no;?></th>
         <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-title"><?php echo $song->getTitle();?></a></td>
         <td class="text-data text-data-album-name"><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>
@@ -242,6 +244,47 @@ if(!empty($result))
 <?php
 }
 ?>
+
+<script>
+  let playerModal;
+  
+  
+  $(document).ready(function(e){
+    let playerModalSelector = document.querySelector('#songPlayer');
+    playerModal = new bootstrap.Modal(playerModalSelector, {
+      keyboard: false
+    });
+    
+    $('a.play-data').on('click', function(e2){
+      e2.preventDefault();
+      $('#songPlayer').find('audio').attr('src', $(this).attr('data-url'));
+      playerModal.show();
+    });
+    $('.close-player').on('click', function(e2){
+      e2.preventDefault();
+      $('#songPlayer').find('audio')[0].pause();
+      playerModal.hide();
+    });
+  });
+</script>
+
+<div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="songPlayer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="songPlayerLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addAlbumDialogLabel">Play Song</h5>
+              <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <audio style="width: 100%; height: 40px;" controls></audio>
+          </div>
+          
+          <div class="modal-footer">
+              <button type="button" class="btn btn-success close-player">Close</button>
+          </div>
+      </div>
+  </div>
+</div>
 
 <div class="lazy-dom modal-container modal-update-data" data-url="lib.ajax/song-update-dialog.php"></div>
 

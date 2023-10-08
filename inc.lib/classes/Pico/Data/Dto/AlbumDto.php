@@ -66,7 +66,7 @@ class AlbumDto extends SetterGetter
         $output->setName($input->getName());
         $output->setReleaseDate($input->getReleaseDate());
         $output->setNumberOfSong($input->getNumberOfSong());
-        $output->setDuration($input->getDuration());
+        $output->setDuration(round($input->getDuration(), 3));
         $output->setActive($input->getActive());        
         return $output;
     }
