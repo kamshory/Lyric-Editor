@@ -27,7 +27,7 @@ try
         (select artist.name from artist where artist.artist_id = song.artist_composer limit 0,1) as artist_composer_name,
         (select artist.name from artist where artist.artist_id = song.artist_arranger limit 0,1) as artist_arranger_name,
         (select genre.name from genre where genre.genre_id = song.genre_id limit 0,1) as genre_name,
-        (select album.name from album where album.album_id = album.album_id limit 0,1) as album_name
+        (select album.name from album where album.album_id = song.album_id limit 0,1) as album_name
         ")
         ->from("song")
         ->where("song.song_id = ? ", $song->getSongId())
