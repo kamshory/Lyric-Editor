@@ -30,11 +30,6 @@ try
 
     $song->setRandomSongId($randomSongId);
     $song->setTimeCreate($now);
-    $song->setTimeEdit($now);
-    $song->setIpCreate($_SERVER['REMOTE_ADDR']);
-    $song->setIpEdit($_SERVER['REMOTE_ADDR']);
-    $song->setAdminCreate('1');
-    $song->setAdminEdit('1');
     
     
 
@@ -72,6 +67,8 @@ try
         $song->setFileType($fileUpload->getFileType());
         $song->setFileExtension($fileUpload->getFileExtension());
         $song->setFileMd5(md5_file($mp3Path));
+        $song->setFirstUploadTime($now);
+        $song->setLastUploadTime($now);
         
         // get MP3 duration
         $mp3file = new FileMp3($mp3Path); 

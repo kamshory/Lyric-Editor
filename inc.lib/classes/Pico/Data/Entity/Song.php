@@ -141,6 +141,18 @@ class Song extends DynamicObject
 	protected $comment;
 
 	/**
+	 * @Column(name="first_upload_time", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @var string
+	 */
+	protected $firstUploadTime;
+
+	/**
+	 * @Column(name="last_upload_time", type="timestamp", length=19, nullable=true)
+	 * @var string
+	 */
+	protected $lastUploadTime;
+
+	/**
 	 * @Column(name="time_create", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @var string
 	 */
