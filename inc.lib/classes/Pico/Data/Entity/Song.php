@@ -141,7 +141,7 @@ class Song extends DynamicObject
 	protected $comment;
 
 	/**
-	 * @Column(name="first_upload_time", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="first_upload_time", type="timestamp", length=19, nullable=true)
 	 * @var string
 	 */
 	protected $firstUploadTime;

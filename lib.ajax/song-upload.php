@@ -67,7 +67,6 @@ try
         $song->setFileType($fileUpload->getFileType());
         $song->setFileExtension($fileUpload->getFileExtension());
         $song->setFileMd5(md5_file($mp3Path));
-        $song->setFirstUploadTime($now);
         $song->setLastUploadTime($now);
         
         // get MP3 duration
@@ -89,6 +88,12 @@ try
     }  
     */
     $song->save();
+    $song->select();
+    if($song->getFirstUploadTime() == null && $song->getLastUploadTime() != null)
+    {
+        $song->setFirstUploadTime($song->getLastUploadTime());
+        $song->save();
+    }
     
     if(file_exists($path))
     {

@@ -146,7 +146,7 @@ if($song != null)
 ?>
 <script>
     let song_id = '<?php echo $song->getSongId(); ?>';
-    let path = '<?php echo $cfg->getSongBaseUrl();?>/<?php echo $song->getFileName(); ?>';
+    let path = '<?php echo $cfg->getSongBaseUrl();?>/<?php echo $song->getFileName(); ?>?hash=<?php echo str_replace(array(" ", "-", ":"), "", $song->getLastUploadTime());?>';
     let jsonData = <?php echo json_encode(array('comment'=>$comment)); ?>;
     let rawData = jsonData.comment;
 </script>
