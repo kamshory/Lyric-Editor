@@ -20,7 +20,7 @@ PicoHttpCache::cacheLifetime(3600 * 12);
 
                 <div class="file-uploader">
                     <fieldset class="file-upload-zone upload-drop-zone-add text-center mb-3 p-4">
-                        <legend class="visually-hidden">Song Pploader</legend>
+                        <legend class="visually-hidden">Song Uploader</legend>
                         <svg class="upload_svg" width="60" height="60" aria-hidden="true">
                             <use href="#icon-imageUpload"></use>
                         </svg>

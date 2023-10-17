@@ -21,11 +21,11 @@ $song->findOneBySongId($inputGet->getSongId());
                 <h5 class="modal-title" id="updateSongDialogLabel">Update Song</h5>
                 <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body song-dialog">
+            <div class="modal-body song-dialog" style="position:relative">
 
                 <div class="file-uploader">
                     <fieldset class="file-upload-zone upload-drop-zone-update text-center mb-3 p-4">
-                        <legend class="visually-hidden">Song Pploader</legend>
+                        <legend class="visually-hidden">Song Uploader</legend>
                         <svg class="upload_svg" width="60" height="60" aria-hidden="true">
                             <use href="#icon-imageUpload"></use>
                         </svg>
@@ -92,10 +92,18 @@ $song->findOneBySongId($inputGet->getSongId());
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Active</td>
-                                        <td><label></label><input type="checkbox" name="active" value="1" <?php echo $song->getActive() == 1 ?' checked':'';?>> Active</label></td>
+                                        <td>Score</td>
+                                        <td>
+                                            <input type="number" class="form-control" name="score" min="0" max="10" value="<?php echo $song->hasValueScore() ? $song->getScore() : '';?>">
+                                        </td>
                                     </tr>
-                                    <input type="hidden" name="song_id" value="<?php echo $song->getSongId();?>">
+                                    <tr>
+                                        <td>Active</td>
+                                        <td><label></label><input type="checkbox" name="active" value="1" <?php echo $song->getActive() == 1 ?' checked':'';?>> Active</label>
+                                        <input type="hidden" name="song_id" value="<?php echo $song->getSongId();?>">
+                                        </td>
+                                    </tr>
+                                    
                                 </tbody>
                             </table>
                             <div class="progress-upload">
@@ -104,8 +112,9 @@ $song->findOneBySongId($inputGet->getSongId());
                             <div class="loader-icon">&nbsp;</div>
                         </form>
                     </fieldset>
+                    
                 </div>
-
+                <audio style="width: 100%; height: 40px;" src="<?php echo $cfg->getSongBaseUrl()."/".$song->getFileName();?>?hash=<?php echo str_replace(array(' ', '-', ':'), '', $song->getLastUploadTime());?>" controls></audio>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success save-update-song">OK</button>

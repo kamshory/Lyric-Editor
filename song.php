@@ -1,6 +1,4 @@
 <?php
-use Pico\Database\PicoSortable;
-use Pico\Pagination\PicoPagination;
 use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Artist;
 use Pico\Data\Entity\EntitySong;
@@ -8,6 +6,8 @@ use Pico\Data\Entity\Genre;
 use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
+use Pico\Database\PicoSortable;
+use Pico\Pagination\PicoPagination;
 use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Utility\SpecificationUtil;
@@ -132,6 +132,7 @@ else
 <?php
 $orderMap = array(
     'title'=>'title', 
+    'score'=>'score',
     'albumId'=>'albumId', 
     'album'=>'albumId', 
     'genreId'=>'genreId', 
@@ -190,6 +191,7 @@ if(!empty($result))
         <th scope="col" width="20"><i class="ti ti-player-play"></i></th>
         <th scope="col" width="20">#</th>
         <th scope="col" class="col-sort" data-name="title">Title</th>
+        <th scope="col" class="col-sort" data-name="score">Score</th>
         <th scope="col" class="col-sort" data-name="album_id">Album</th>
         <th scope="col" class="col-sort" data-name="genre_id">Genre</th>
         <th scope="col" class="col-sort" data-name="artist_vocal">Vocalist</th>
@@ -215,6 +217,7 @@ if(!empty($result))
         <th scope="row"><a href="#" class="play-data" data-url="<?php echo $cfg->getSongBaseUrl()."/".$song->getFileName();?>?hash=<?php echo str_replace(array(' ', '-', ':'), '', $song->getLastUploadTime());?>"><i class="ti ti-player-play"></i></a></th>
         <th class="text-right" scope="row"><?php echo $no;?></th>
         <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-title"><?php echo $song->getTitle();?></a></td>
+        <td class="text-data text-data-score"><?php echo $song->hasValueScore() ? $song->getScore() : "";?></td>
         <td class="text-data text-data-album-name"><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>
         <td class="text-data text-data-genre-name"><?php echo $song->hasValueGenre() ? $song->getGenre()->getName() : "";?></td>
         <td class="text-data text-data-artist-vocal-name"><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
@@ -319,6 +322,12 @@ if(!empty($result))
     });
 
     $(document).on('click', '.save-update-song', function(){
+      if($('.song-dialog audio').length > 0)
+      {
+        $('.song-dialog audio').each(function(){
+          $(this)[0].pause();
+        });
+      }
       let dataSet = $(this).closest('form').serializeArray();
       $.ajax({
         type:'POST',
@@ -334,6 +343,7 @@ if(!empty($result))
           let active = data.active;
           console.log(data);
           $('[data-id="'+dataId+'"] .text-data.text-data-title').text(data.title);
+          $('[data-id="'+dataId+'"] .text-data.text-data-score').text(data.score);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-vocal-name').text(data.artist_vocal_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-composer-name').text(data.artist_composer_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-arranger-name').text(data.artist_arranger_name);

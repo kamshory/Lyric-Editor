@@ -133,6 +133,12 @@ class Song extends DynamicObject
 	 * @var bool
 	 */
 	protected $lyricComplete;
+	
+	/**
+	 * @Column(name="score", type="int", length=11, nullable=true)
+	 * @var integer
+	 */
+	protected $score;
 
 	/**
 	 * @Column(name="comment", type="longtext", nullable=true)
