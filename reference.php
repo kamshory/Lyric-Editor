@@ -102,10 +102,10 @@ else
 
     <div class="filter-group">
         <span>Complete</span>
-        <select class="form-control" name="active" id="active">
+        <select class="form-control" name="lyric_complete" id="lyric_complete">
             <option value="">- All -</option>
-            <option value="1"<?php echo $inputGet->getLyricComplete() == '1'?' selected':'';?>>Yes</option>
-            <option value="0"<?php echo $inputGet->getLyricComplete() == '0'?' selected':'';?>>No</option>
+            <option value="1"<?php echo $inputGet->createSelectedLyricComplete(true);?>>Yes</option>
+            <option value="0"<?php echo $inputGet->createSelectedLyricComplete(false);?>>No</option>
         </select>
     </div>
 

@@ -121,8 +121,8 @@ else
         <span>Complete</span>
         <select class="form-control" name="lyric_complete" id="lyric_complete">
             <option value="">- All -</option>
-            <option value="1"<?php echo $inputGet->getLyricComplete() == '1'?' selected':'';?>>Yes</option>
-            <option value="0"<?php echo $inputGet->getLyricComplete() == '0'?' selected':'';?>>No</option>
+            <option value="1"<?php echo $inputGet->createSelectedLyricComplete("1");?>>Yes</option>
+            <option value="0"<?php echo $inputGet->createSelectedLyricComplete("0");?>>No</option>
         </select>
     </div>
 
@@ -130,8 +130,8 @@ else
         <span>Active</span>
         <select class="form-control" name="active" id="active">
             <option value="">- All -</option>
-            <option value="1"<?php echo $inputGet->getActive() == '1'?' selected':'';?>>Yes</option>
-            <option value="0"<?php echo $inputGet->getActive() == '0'?' selected':'';?>>No</option>
+            <option value="1"<?php echo $inputGet->createSelectedActive("1");?>>Yes</option>
+            <option value="0"<?php echo $inputGet->createSelectedActive("0");?>>No</option>
         </select>
     </div>
 

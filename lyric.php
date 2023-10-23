@@ -35,7 +35,7 @@ try
 $song = new Song(null, $database);
 $song->findOneBySongId($songId);
 ?>
-<div class="song-tite" style="">
+<div class="song-tite">
     <h3 style="font-size: 18px; padding-bottom:2px;"><?php echo $song->getTitle();?></h3>
 </div>
 <div class="srt-editor editor1">
@@ -296,8 +296,8 @@ else
         <span>Complete</span>
         <select class="form-control" name="lyric_complete" id="lyric_complete">
             <option value="">- All -</option>
-            <option value="1"<?php echo $inputGet->getLyricComplete() == '1'?' selected':'';?>>Yes</option>
-            <option value="0"<?php echo $inputGet->getLyricComplete() == '0'?' selected':'';?>>No</option>
+            <option value="1"<?php echo $inputGet->createSelectedLyricComplete("1");?>>Yes</option>
+            <option value="0"<?php echo $inputGet->createSelectedLyricComplete("0");?>>No</option>
         </select>
     </div>
     

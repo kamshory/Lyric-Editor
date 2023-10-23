@@ -364,7 +364,7 @@ class PicoRequestTool extends stdClass
      * @param array $params
      * @return mixed|null
      */
-    public function __call($method, $params)
+    public function __call($method, $params) //NOSONAR
     {
         if (strncasecmp($method, "is", 2) === 0) 
         {
@@ -421,16 +421,17 @@ class PicoRequestTool extends stdClass
         {
             if($filterType == PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS)
             {
-                return htmlspecialchars($value);
+                $ret = htmlspecialchars($value);
             }
             else if($filterType == PicoFilterConstant::FILTER_SANITIZE_BOOL)
             {
-                return $value === true || $value == 1 || $value == "1";
+                $ret = $value === true || $value == 1 || $value == "1";
             }
             else
             {
-                return $value;
+                $ret = $value;
             }
+            return $ret;
         }
         return null;
     }
