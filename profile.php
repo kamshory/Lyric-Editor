@@ -97,7 +97,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT))
     }
     catch(Exception $e)
     {
-
+      // do something here
     }
     require_once "inc/footer.php";
 }
@@ -142,7 +142,7 @@ else
     }
     catch(Exception $e)
     {
-        
+      // do something here
     }
     require_once "inc/footer.php";
 }

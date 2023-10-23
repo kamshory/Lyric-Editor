@@ -78,6 +78,7 @@ function createProperty($typeMap, $columnName, $columnType, $columnKey, $columnN
     $docEnd = "\t */";
 
     $docs[] = $docStart;
+    $docs[] = "\t * ".getPropertyName($columnName);
 
     if(!empty($columnKey) && stripos($columnKey, "PRI") === 0)
     {
@@ -92,7 +93,7 @@ function createProperty($typeMap, $columnName, $columnType, $columnKey, $columnN
     {
         $docs[] = "\t * @GeneratedValue(strategy=GenerationType.IDENTITY)";
     }
- 
+    
     if(strcasecmp($columnNull, 'No') == 0)
     {
         $docs[] = "\t * @NotNull";
@@ -101,7 +102,7 @@ function createProperty($typeMap, $columnName, $columnType, $columnKey, $columnN
     $attrs = array();
     $attrs[] = "name=\"$columnName\"";
     $attrs[] = "type=\"$columnType\"";
-    $length = getLength($columnType);
+    $length = getDataLength($columnType);
     if($length > 0)
     {
         $attrs[] = "length=$length";
@@ -133,6 +134,34 @@ function createProperty($typeMap, $columnName, $columnType, $columnKey, $columnN
         $docs[] = "\t * @DefaultColumn(value=\"".$columnDefault."\")";        
     }
 
+    $type = getDataType($typeMap, $columnType);
+
+    $docs[] = "\t * @var $type";
+    $docs[] = $docEnd;
+    $prop = "\tprotected \$$propertyName;";
+    return implode("\r\n", $docs)."\r\n".$prop."\r\n";
+}
+
+function getPropertyName($name)
+{
+    $arr = explode("_", $name);
+    foreach($arr as $k => $v)
+    {
+        $arr[$k] = ucfirst($v);
+        $arr[$k] = str_replace("Id","ID", $arr[$k]);
+    }
+    return implode(" ", $arr);
+}
+
+/**
+ * Get data type
+ *
+ * @param array $typeMap
+ * @param string $columnType
+ * @return string
+ */
+function getDataType($typeMap, $columnType)
+{
     $type = "";
     foreach($typeMap as $key=>$val)
     {
@@ -146,11 +175,7 @@ function createProperty($typeMap, $columnName, $columnType, $columnKey, $columnN
     {
         $type = "string";
     }
-
-    $docs[] = "\t * @var $type";
-    $docs[] = $docEnd;
-    $prop = "\tprotected \$$propertyName;";
-    return implode("\r\n", $docs)."\r\n".$prop."\r\n";
+    return $type;
 }
 
 /**
@@ -159,7 +184,7 @@ function createProperty($typeMap, $columnName, $columnType, $columnKey, $columnN
  * @param string $str
  * @return integer
  */
-function getLength($str)
+function getDataLength($str)
 {
     $str2 = preg_replace('~\D~', '', $str);
     if(empty($str2))
