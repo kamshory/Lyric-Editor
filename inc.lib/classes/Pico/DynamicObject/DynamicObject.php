@@ -7,6 +7,7 @@ use PDOException;
 use PDOStatement;
 use Pico\Database\PicoDatabase;
 use Pico\Database\PicoDatabasePersistent;
+use Pico\Database\PicoDatabaseStructure;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPageData;
 use Pico\Database\PicoSortable;
@@ -361,6 +362,12 @@ class DynamicObject extends stdClass // NOSONAR
         {
             throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
         }
+    }
+    
+    public function showCreateTable($databaseType, $tableName = null)
+    {
+        $structure = new PicoDatabaseStructure($this);
+        return $structure->showCreateTable($databaseType, $tableName);
     }
 
     /**
