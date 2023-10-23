@@ -3,6 +3,7 @@
 namespace Pico\Database;
 
 use Exception;
+use Pico\DynamicObject\DynamicObject;
 use Pico\Util\PicoAnnotationParser;
 use stdClass;
 
@@ -22,6 +23,13 @@ class PicoDatabaseStructure
     const DATABASE_TYPE_MARIADB = "mariadb";
     
     /**
+     * Object
+     *
+     * @var DynamicObject
+     */
+    private $object;
+    
+    /**
      * Class name
      *
      * @var string
@@ -29,7 +37,8 @@ class PicoDatabaseStructure
     private $className = "";
     public function __construct($object)
     {
-        
+        $this->className = get_class($object);
+        $this->object = $object;
     }
     
     
@@ -91,6 +100,12 @@ class PicoDatabaseStructure
         return implode(",\r\n", $createStrArr);
     }
     
+    /**
+     * Create nullable
+     *
+     * @param mixed $nullable
+     * @return string
+     */
     private function nullable($nullable)
     {
         if($nullable === true || strtolower($nullable) == "true")
@@ -132,10 +147,7 @@ class PicoDatabaseStructure
                 if(strcasecmp($param, self::ANNOTATION_COLUMN) == 0)
                 {
                     $values = $reflexProp->parseKeyValue($val);
-                    if(!empty($values))
-                    {
-                        $columns[$prop->name] = $values;
-                    }
+                    $columns[$prop->name] = $values;
                 }
             }
             foreach($parameters as $param=>$val)
