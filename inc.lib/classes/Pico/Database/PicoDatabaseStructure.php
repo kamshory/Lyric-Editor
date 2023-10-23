@@ -2,8 +2,8 @@
 
 namespace Pico\Database;
 
-use Exception;
 use Pico\DynamicObject\DynamicObject;
+use Pico\Exceptions\MandatoryTableNameException;
 use Pico\Util\PicoAnnotationParser;
 use stdClass;
 
@@ -54,7 +54,7 @@ class PicoDatabaseStructure
         $info = $this->getObjectInfo();
         if (!isset($tableName) && !isset($info->tableName)) 
         {
-            throw new Exception("Table name is mandatory");
+            throw new MandatoryTableNameException("Table name is mandatory");
         }
         if (isset($tableName) && !isset($info->tableName)) 
         {
