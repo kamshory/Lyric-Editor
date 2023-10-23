@@ -141,7 +141,7 @@ class Parser
         try {
             $data = $this->doParse($value, $flags);
         } catch (\Exception $e) {
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
 
         if (null !== $mbEncoding) {

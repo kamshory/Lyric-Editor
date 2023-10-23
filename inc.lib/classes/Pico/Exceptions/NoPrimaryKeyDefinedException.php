@@ -1,19 +1,22 @@
 <?php
 namespace Pico\Exceptions;
 
-class NoPrimaryKeyDefinedException extends \Exception
+use Exception;
+use Throwable;
+
+class NoPrimaryKeyDefinedException extends Exception
 {
     /**
      * Previous exception
      *
-     * @var \Throwable
+     * @var Throwable
      */
     private $previous;
 
     /**
      * @param string $message Exception message
      * @param mixed $code Exception code
-     * @param \Throwable $previous Previous exception
+     * @param Throwable $previous Previous exception
      */
     public function __construct($message, $code = 0, $previous = null)
     {
