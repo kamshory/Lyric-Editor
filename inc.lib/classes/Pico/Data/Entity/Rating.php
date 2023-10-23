@@ -14,7 +14,7 @@ class Rating extends DynamicObject
      * Rating ID
      *
      * @var string
-     * @Column (name=rating_id)
+     * @Column(name=rating_id)
      * @Id
      */
     protected $ratingId;
@@ -23,7 +23,7 @@ class Rating extends DynamicObject
      * Song ID
      *
      * @var string
-     * @Column (name=song_id)
+     * @Column(name=song_id)
      */
     protected $songId;
 
@@ -31,14 +31,14 @@ class Rating extends DynamicObject
      * User ID
      *
      * @var string
-     * @Column (name=user_id)
+     * @Column(name=user_id)
      */
     protected $userId;
 
     /**
      * Rate
      * @var float
-     * @Column (name=rate)
+     * @Column(name=rate)
      */
     protected $rate;
 
@@ -46,7 +46,7 @@ class Rating extends DynamicObject
      * Active
      *
      * @var bool
-     * @Column (name=active)
+     * @Column(name=active)
      */
     protected $active;
 }

@@ -304,7 +304,7 @@ $defaultOrderBy = 'songId';
 $defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
-$spesification = SpecificationUtil::createSongSpecification($inputGet, array('active'=>true));;
+$spesification = SpecificationUtil::createSongSpecification($inputGet, array('active'=>true));
 if($pagination->getOrderBy() == '')
 {
     $sortable = new PicoSortable();

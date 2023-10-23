@@ -14,7 +14,7 @@ class EntityMidi extends DynamicObject
      * Midi ID
      *
      * @var string
-     * @Column (name=midi_id)
+     * @Column(name=midi_id)
      * @Id
      * @NotNull
      */
@@ -24,7 +24,7 @@ class EntityMidi extends DynamicObject
      * Random midi ID
      *
      * @var string
-     * @Column (name=random_midi_id)
+     * @Column(name=random_midi_id)
      */
     protected $randomMidiId;
 
@@ -32,7 +32,7 @@ class EntityMidi extends DynamicObject
      * Title
      *
      * @var string
-     * @Column (name=title)
+     * @Column(name=title)
      */
     protected $title;
 
@@ -40,7 +40,7 @@ class EntityMidi extends DynamicObject
      * Album ID
      *
      * @var string
-     * @Column (name=album_id)
+     * @Column(name=album_id)
      */
     protected $albumId;    
     
@@ -57,7 +57,7 @@ class EntityMidi extends DynamicObject
      * Artist Vocal
      *
      * @var string
-     * @Column (name=artist_vocal)
+     * @Column(name=artist_vocal)
      */
     protected $artistVocalId;
     
@@ -74,7 +74,7 @@ class EntityMidi extends DynamicObject
      * Artist Composer
      *
      * @var string
-     * @Column (name=artist_composer)
+     * @Column(name=artist_composer)
      */
     protected $artistComposerId;
     
@@ -90,7 +90,7 @@ class EntityMidi extends DynamicObject
      * Artist Arranger
      *
      * @var string
-     * @Column (name=artist_arranger)
+     * @Column(name=artist_arranger)
      */
     protected $artistArrangerId;
     
@@ -106,7 +106,7 @@ class EntityMidi extends DynamicObject
      * File path
      *
      * @var string
-     * @Column (name=file_path)
+     * @Column(name=file_path)
      */
     protected $filePath;
 
@@ -114,7 +114,7 @@ class EntityMidi extends DynamicObject
      * File base name
      *
      * @var string
-     * @Column (name=file_name)
+     * @Column(name=file_name)
      */
     protected $fileName;
 
@@ -122,7 +122,7 @@ class EntityMidi extends DynamicObject
      * File type
      *
      * @var string
-     * @Column (name=file_type)
+     * @Column(name=file_type)
      */
     protected $fileType;
 
@@ -130,7 +130,7 @@ class EntityMidi extends DynamicObject
      * File extension
      *
      * @var string
-     * @Column (name=file_extension)
+     * @Column(name=file_extension)
      */
     protected $fileExtension;
 
@@ -138,7 +138,7 @@ class EntityMidi extends DynamicObject
      * File size
      *
      * @var integer
-     * @Column (name=file_size)
+     * @Column(name=file_size)
      */
     protected $fileSize;
 
@@ -146,7 +146,7 @@ class EntityMidi extends DynamicObject
      * File MD5
      *
      * @var string
-     * @Column (name=file_md5)
+     * @Column(name=file_md5)
      */
     protected $fileMd5;
 
@@ -154,7 +154,7 @@ class EntityMidi extends DynamicObject
      * File upload time
      *
      * @var string
-     * @Column (name=file_upload_time)
+     * @Column(name=file_upload_time)
      */
     protected $fileUploadTime;
 
@@ -162,7 +162,7 @@ class EntityMidi extends DynamicObject
      * File size
      *
      * @var float
-     * @Column (name=duration)
+     * @Column(name=duration)
      */
     protected $duration;
 
@@ -170,7 +170,7 @@ class EntityMidi extends DynamicObject
      * Genre ID
      *
      * @var string
-     * @Column (name=genre_id)
+     * @Column(name=genre_id)
      */
     protected $genreId;
     
@@ -186,7 +186,7 @@ class EntityMidi extends DynamicObject
      * Lyric
      *
      * @var string
-     * @Column (name=lyric)
+     * @Column(name=lyric)
      */
     protected $lyric;
 
@@ -194,7 +194,7 @@ class EntityMidi extends DynamicObject
      * Comment
      *
      * @var string
-     * @Column (name=comment)
+     * @Column(name=comment)
      */
     protected $comment;
 
@@ -202,7 +202,7 @@ class EntityMidi extends DynamicObject
      * Rate
      *
      * @var float
-     * @Column (name=rate)
+     * @Column(name=rate)
      */
     protected $rate;
 
@@ -210,7 +210,7 @@ class EntityMidi extends DynamicObject
      * Time create
      *
      * @var string
-     * @Column (name=time_create)
+     * @Column(name=time_create)
      */
     protected $timeCreate;
 
@@ -218,7 +218,7 @@ class EntityMidi extends DynamicObject
      * Time edit
      *
      * @var string
-     * @Column (name=time_edit)
+     * @Column(name=time_edit)
      */
     protected $timeEdit;
 
@@ -226,7 +226,7 @@ class EntityMidi extends DynamicObject
      * IP create
      *
      * @var string
-     * @Column (name=ip_create)
+     * @Column(name=ip_create)
      */
     protected $ipCreate;
 
@@ -234,7 +234,7 @@ class EntityMidi extends DynamicObject
      * IP edit
      *
      * @var string
-     * @Column (name=ip_edit)
+     * @Column(name=ip_edit)
      */
     protected $ipEdit;
 
@@ -242,7 +242,7 @@ class EntityMidi extends DynamicObject
      * Admin create
      *
      * @var string
-     * @Column (name=admin_create)
+     * @Column(name=admin_create)
      */
     protected $adminCreateId;
     
@@ -258,7 +258,7 @@ class EntityMidi extends DynamicObject
      * Admin edit
      *
      * @var string
-     * @Column (name=admin_edit)
+     * @Column(name=admin_edit)
      */
     protected $adminEditId;
     
@@ -273,7 +273,7 @@ class EntityMidi extends DynamicObject
     /**
      * Active
      * @var bool
-     * @Column (name=active)
+     * @Column(name=active)
      */
     protected $active;
 }

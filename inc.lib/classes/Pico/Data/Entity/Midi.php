@@ -14,7 +14,7 @@ class Midi extends DynamicObject
      * Midi ID
      *
      * @var string
-     * @Column (name=midi_id)
+     * @Column(name=midi_id)
      * @Id
      * @NotNull
      */
@@ -24,7 +24,7 @@ class Midi extends DynamicObject
      * Random midi ID
      *
      * @var string
-     * @Column (name=random_midi_id)
+     * @Column(name=random_midi_id)
      */
     protected $randomMidiId;
 
@@ -32,7 +32,7 @@ class Midi extends DynamicObject
      * Title
      *
      * @var string
-     * @Column (name=title)
+     * @Column(name=title)
      */
     protected $title;
 
@@ -40,7 +40,7 @@ class Midi extends DynamicObject
      * Album ID
      *
      * @var string
-     * @Column (name=album_id)
+     * @Column(name=album_id)
      */
     protected $albumId;
 
@@ -48,7 +48,7 @@ class Midi extends DynamicObject
      * Artist Vocal
      *
      * @var string
-     * @Column (name=artist_vocal)
+     * @Column(name=artist_vocal)
      */
     protected $artistVocal;
 
@@ -56,7 +56,7 @@ class Midi extends DynamicObject
      * Artist Composer
      *
      * @var string
-     * @Column (name=artist_composer)
+     * @Column(name=artist_composer)
      */
     protected $artistComposer;
 
@@ -64,7 +64,7 @@ class Midi extends DynamicObject
      * Artist Arranger
      *
      * @var string
-     * @Column (name=artist_arranger)
+     * @Column(name=artist_arranger)
      */
     protected $artistArranger;
 
@@ -72,7 +72,7 @@ class Midi extends DynamicObject
      * File path
      *
      * @var string
-     * @Column (name=file_path)
+     * @Column(name=file_path)
      */
     protected $filePath;
 
@@ -80,7 +80,7 @@ class Midi extends DynamicObject
      * File base name
      *
      * @var string
-     * @Column (name=file_name)
+     * @Column(name=file_name)
      */
     protected $fileName;
 
@@ -88,7 +88,7 @@ class Midi extends DynamicObject
      * File type
      *
      * @var string
-     * @Column (name=file_type)
+     * @Column(name=file_type)
      */
     protected $fileType;
 
@@ -96,7 +96,7 @@ class Midi extends DynamicObject
      * File extension
      *
      * @var string
-     * @Column (name=file_extension)
+     * @Column(name=file_extension)
      */
     protected $fileExtension;
 
@@ -104,7 +104,7 @@ class Midi extends DynamicObject
      * File size
      *
      * @var integer
-     * @Column (name=file_size)
+     * @Column(name=file_size)
      */
     protected $fileSize;
 
@@ -112,7 +112,7 @@ class Midi extends DynamicObject
      * File MD5
      *
      * @var string
-     * @Column (name=file_md5)
+     * @Column(name=file_md5)
      */
     protected $fileMd5;
 
@@ -120,7 +120,7 @@ class Midi extends DynamicObject
      * File upload time
      *
      * @var string
-     * @Column (name=file_upload_time)
+     * @Column(name=file_upload_time)
      */
     protected $fileUploadTime;
 
@@ -128,7 +128,7 @@ class Midi extends DynamicObject
      * File size
      *
      * @var float
-     * @Column (name=duration)
+     * @Column(name=duration)
      */
     protected $duration;
 
@@ -136,7 +136,7 @@ class Midi extends DynamicObject
      * Genre ID
      *
      * @var string
-     * @Column (name=genre_id)
+     * @Column(name=genre_id)
      */
     protected $genreId;
 
@@ -144,7 +144,7 @@ class Midi extends DynamicObject
      * Lyric
      *
      * @var string
-     * @Column (name=lyric)
+     * @Column(name=lyric)
      */
     protected $lyric;
 
@@ -152,7 +152,7 @@ class Midi extends DynamicObject
      * Comment
      *
      * @var string
-     * @Column (name=comment)
+     * @Column(name=comment)
      */
     protected $comment;
 
@@ -160,7 +160,7 @@ class Midi extends DynamicObject
      * Rate
      *
      * @var float
-     * @Column (name=rate)
+     * @Column(name=rate)
      */
     protected $rate;
 
@@ -168,7 +168,7 @@ class Midi extends DynamicObject
      * Time create
      *
      * @var string
-     * @Column (name=time_create)
+     * @Column(name=time_create)
      */
     protected $timeCreate;
 
@@ -176,7 +176,7 @@ class Midi extends DynamicObject
      * Time edit
      *
      * @var string
-     * @Column (name=time_edit)
+     * @Column(name=time_edit)
      */
     protected $timeEdit;
 
@@ -184,7 +184,7 @@ class Midi extends DynamicObject
      * IP create
      *
      * @var string
-     * @Column (name=ip_create)
+     * @Column(name=ip_create)
      */
     protected $ipCreate;
 
@@ -192,7 +192,7 @@ class Midi extends DynamicObject
      * IP edit
      *
      * @var string
-     * @Column (name=ip_edit)
+     * @Column(name=ip_edit)
      */
     protected $ipEdit;
 
@@ -200,7 +200,7 @@ class Midi extends DynamicObject
      * Admin create
      *
      * @var string
-     * @Column (name=admin_create)
+     * @Column(name=admin_create)
      */
     protected $adminCreate;
 
@@ -208,14 +208,14 @@ class Midi extends DynamicObject
      * Admin edit
      *
      * @var string
-     * @Column (name=admin_edit)
+     * @Column(name=admin_edit)
      */
     protected $adminEdit;
   
     /**
      * Active
      * @var bool
-     * @Column (name=active)
+     * @Column(name=active)
      */
     protected $active;
 }

@@ -1,12 +1,12 @@
 <?php
-use Pico\Database\PicoSortable;
-use Pico\Pagination\PicoPagination;
 use Pico\Data\Entity\Artist;
 use Pico\Data\Entity\EntityReference;
 use Pico\Data\Entity\Genre;
 use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
+use Pico\Database\PicoSortable;
+use Pico\Pagination\PicoPagination;
 use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Utility\SpecificationUtil;
@@ -126,7 +126,7 @@ $defaultOrderBy = 'albumId';
 $defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
-$spesification = SpecificationUtil::createReferenceSpecification($inputGet);;
+$spesification = SpecificationUtil::createReferenceSpecification($inputGet);
 $sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 

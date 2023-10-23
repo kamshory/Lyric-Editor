@@ -48,7 +48,7 @@ class EntitySong extends DynamicObject
      * Track number
      *
      * @var integer
-     * @Column (name=track_number)
+     * @Column(name=track_number, type="int", length=11, nullable=true)
      */
     protected $trackNumber;
 

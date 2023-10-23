@@ -116,6 +116,15 @@ else
         <span>Title</span>
         <input class="form-control" type="text" name="title" id="title" autocomplete="off" value="<?php echo $inputGet->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
     </div>
+    
+    <div class="filter-group">
+        <span>Complete</span>
+        <select class="form-control" name="lyric_complete" id="lyric_complete">
+            <option value="">- All -</option>
+            <option value="1"<?php echo $inputGet->getLyricComplete() == '1'?' selected':'';?>>Yes</option>
+            <option value="0"<?php echo $inputGet->getLyricComplete() == '0'?' selected':'';?>>No</option>
+        </select>
+    </div>
 
     <div class="filter-group">
         <span>Active</span>
@@ -144,13 +153,14 @@ $orderMap = array(
     'artistComposerId'=>'artistComposerId',
     'artistComposer'=>'artistComposerId',
     'duration'=>'duration',
+    'lyricComplete'=>'lyricComplete',
     'active'=>'active'
 );
 $defaultOrderBy = 'albumId';
 $defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
-$spesification = SpecificationUtil::createSongSpecification($inputGet);;
+$spesification = SpecificationUtil::createSongSpecification($inputGet);
 
 if($pagination->getOrderBy() == '')
 {
@@ -213,6 +223,7 @@ if(!empty($result))
         <th scope="col" class="col-sort" data-name="artist_vocal">Vocalist</th>
         <th scope="col" class="col-sort" data-name="artist_composer">Composer</th>
         <th scope="col" class="col-sort" data-name="duration">Duration</th>
+        <th scope="col" class="col-sort" data-name="lyric_complete">Lyric</th>
         <th scope="col" class="col-sort" data-name="active">Active</th>
         </tr>
     </thead>
@@ -240,6 +251,7 @@ if(!empty($result))
         <td class="text-data text-data-artist-vocal-name"><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
         <td class="text-data text-data-artist-composer-name"><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
         <td class="text-data text-data-duration"><?php echo $song->getDuration();?></td>
+        <td class="text-data text-data-lyric-complete"><?php echo $song->isLyricComplete() ? 'Yes' : 'No';?></td>
         <td class="text-data text-data-active"><?php echo $song->isActive() ? 'Yes' : 'No';?></td>
         </tr>
         <?php

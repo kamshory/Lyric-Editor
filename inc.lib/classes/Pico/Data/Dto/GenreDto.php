@@ -29,7 +29,7 @@ class GenreDto extends SetterGetter
      * Sort order
      *
      * @var integer
-     * @Column (name=sort_order)
+     * @Column(name=sort_order)
      */
     protected $sortOrder;
 
@@ -37,7 +37,7 @@ class GenreDto extends SetterGetter
      * Default data
      *
      * @var bool
-     * @Column (name=default_data)
+     * @Column(name=default_data)
      */
     protected $defaultData;
 
