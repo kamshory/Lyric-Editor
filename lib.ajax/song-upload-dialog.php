@@ -1,7 +1,5 @@
 <?php
 
-use Pico\Data\Entity\Song;
-use Pico\Request\PicoRequest;
 use Pico\Util\PicoHttpCache;
 
 require_once dirname(__DIR__) . "/inc/auth.php";
@@ -49,6 +47,12 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                                 <option value="">- select -</option>
                                             </select>
                                             <button class="button-add-list button-add-general-album">+</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Track Number</td>
+                                        <td>
+                                            <input type="number" class="form-control" name="track_number">
                                         </td>
                                     </tr>
                                     <tr>

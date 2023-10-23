@@ -6,6 +6,7 @@ use Pico\Data\Entity\Genre;
 use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
+use Pico\Database\PicoSort;
 use Pico\Database\PicoSortable;
 use Pico\Pagination\PicoPagination;
 use Pico\Request\PicoFilterConstant;
@@ -135,6 +136,7 @@ $orderMap = array(
     'score'=>'score',
     'albumId'=>'albumId', 
     'album'=>'albumId', 
+    'trackNumber'=>'trackNumber',
     'genreId'=>'genreId', 
     'genre'=>'genreId',
     'artistVocalId'=>'artistVocalId',
@@ -149,7 +151,20 @@ $defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createSongSpecification($inputGet);;
-$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
+
+if($pagination->getOrderBy() == '')
+{
+  $sortable = new PicoSortable();
+  $sort1 = new PicoSort('albumId', PicoSortable::ORDER_TYPE_DESC);
+  $sortable->addSortable($sort1);
+  $sort2 = new PicoSort('trackNumber', PicoSortable::ORDER_TYPE_ASC);
+  $sortable->addSortable($sort2);
+}
+else
+{
+  $sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
+}
+
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
 $songEntity = new EntitySong(null, $database);
@@ -193,6 +208,7 @@ if(!empty($result))
         <th scope="col" class="col-sort" data-name="title">Title</th>
         <th scope="col" class="col-sort" data-name="score">Score</th>
         <th scope="col" class="col-sort" data-name="album_id">Album</th>
+        <th scope="col" class="col-sort" data-name="track_number">Track</th>
         <th scope="col" class="col-sort" data-name="genre_id">Genre</th>
         <th scope="col" class="col-sort" data-name="artist_vocal">Vocalist</th>
         <th scope="col" class="col-sort" data-name="artist_composer">Composer</th>
@@ -219,6 +235,7 @@ if(!empty($result))
         <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-title"><?php echo $song->getTitle();?></a></td>
         <td class="text-data text-data-score"><?php echo $song->hasValueScore() ? $song->getScore() : "";?></td>
         <td class="text-data text-data-album-name"><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>
+        <td class="text-data text-data-track-number"><?php echo $song->hasValueTrackNumber() ? $song->getTrackNumber() : "";?></td>
         <td class="text-data text-data-genre-name"><?php echo $song->hasValueGenre() ? $song->getGenre()->getName() : "";?></td>
         <td class="text-data text-data-artist-vocal-name"><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
         <td class="text-data text-data-artist-composer-name"><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
@@ -341,9 +358,9 @@ if(!empty($result))
           let dataId = data.song_id;
           let title = data.title;
           let active = data.active;
-          console.log(data);
           $('[data-id="'+dataId+'"] .text-data.text-data-title').text(data.title);
           $('[data-id="'+dataId+'"] .text-data.text-data-score').text(data.score);
+          $('[data-id="'+dataId+'"] .text-data.text-data-track-number').text(data.track_number);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-vocal-name').text(data.artist_vocal_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-composer-name').text(data.artist_composer_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-artist-arranger-name').text(data.artist_arranger_name);

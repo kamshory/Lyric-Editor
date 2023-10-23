@@ -56,6 +56,12 @@ $song->findOneBySongId($inputGet->getSongId());
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td>Track Number</td>
+                                        <td>
+                                            <input type="number" class="form-control" name="track_number" value="<?php echo $song->getTrackNumber();?>">
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>Genre</td>
                                         <td>
                                             <select class="form-control" name="genre_id" data-value="<?php echo $song->getGenreId();?>" data-ajax="true" data-source="lib.ajax/genre-list.php">

@@ -42,8 +42,7 @@ class EntityMidi extends DynamicObject
      * @var string
      * @Column (name=album_id)
      */
-    protected $albumId;
-    
+    protected $albumId;    
     
     /**
      * Album

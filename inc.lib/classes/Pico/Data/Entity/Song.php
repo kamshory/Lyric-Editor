@@ -37,6 +37,15 @@ class Song extends DynamicObject
 	 * @var string
 	 */
 	protected $albumId;
+	
+	/**
+     * Track number
+     *
+     * @var integer
+     * @Column (name=track_number)
+     */
+    protected $trackNumber;
+
 
 	/**
 	 * @Column(name="artist_vocal", type="varchar(50)", length=50, nullable=true)

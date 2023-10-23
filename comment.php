@@ -8,6 +8,7 @@ use Pico\Data\Entity\Song;
 use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
+use Pico\Database\PicoSort;
 use Pico\Database\PicoSortable;
 use Pico\Pagination\PicoPagination;
 use Pico\Request\PicoFilterConstant;
@@ -288,7 +289,8 @@ $orderMap = array(
     'title'=>'title', 
     'score'=>'score',
     'albumId'=>'albumId', 
-    'album'=>'albumId', 
+    'album'=>'albumId',
+    'trackNumber'=>'trackNumber',
     'genreId'=>'genreId', 
     'genre'=>'genreId',
     'artistVocalId'=>'artistVocalId',
@@ -303,7 +305,18 @@ $defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
 $spesification = SpecificationUtil::createSongSpecification($inputGet, array('active'=>true));;
-$sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
+if($pagination->getOrderBy() == '')
+{
+    $sortable = new PicoSortable();
+    $sort1 = new PicoSort('albumId', PicoSortable::ORDER_TYPE_DESC);
+    $sortable->addSortable($sort1);
+    $sort2 = new PicoSort('trackNumber', PicoSortable::ORDER_TYPE_ASC);
+    $sortable->addSortable($sort2);
+}
+else
+{
+    $sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
+}
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
 
 $songEntity = new EntitySong(null, $database);
@@ -345,6 +358,7 @@ if(!empty($result))
         <th scope="col" class="col-sort" data-name="title">Title</th>
         <th scope="col" class="col-sort" data-name="score">Score</th>
         <th scope="col" class="col-sort" data-name="album_id">Album</th>
+        <th scope="col" class="col-sort" data-name="track_number">Track</th>
         <th scope="col" class="col-sort" data-name="genre_id">Genre</th>
         <th scope="col" class="col-sort" data-name="artist_vocal">Vocalist</th>
         <th scope="col" class="col-sort" data-name="artist_composer">Composer</th>
@@ -367,6 +381,7 @@ if(!empty($result))
         <td><a href="<?php echo $linkDetail;?>"><?php echo $song->getTitle();?></a></td>
         <td><?php echo $song->hasValueScore() ? $song->getScore() : "";?></td>
         <td><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>
+        <td><?php echo $song->hasValueTrackNumber() ? $song->getTrackNumber() : "";?></td>
         <td><?php echo $song->hasValueGenre() ? $song->getGenre()->getName() : "";?></td>
         <td><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
         <td><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
