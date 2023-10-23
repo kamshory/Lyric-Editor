@@ -1,10 +1,10 @@
 <?php
-use Pico\Pagination\PicoPagination;
 use Pico\Data\Entity\Artist;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
 use Pico\Database\PicoSortable;
 use Pico\Exceptions\NoRecordFoundException;
+use Pico\Pagination\PicoPagination;
 use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Utility\SpecificationUtil;
