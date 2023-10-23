@@ -64,7 +64,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getAlbumId(
   }
   catch(Exception $e)
   {
-    
+    // do something here
   }
 }
 else

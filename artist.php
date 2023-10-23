@@ -51,7 +51,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getArtistId
   }
   catch(Exception $e)
   {
-    
+    // do something here
   }
 }
 else
