@@ -91,6 +91,11 @@ PicoHttpCache::cacheLifetime(3600 * 12);
                                             <button class="button-add-list button-add-general-artist">+</button>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>Vocal</td>
+                                        <td><label></label><input type="checkbox" name="vocal" value="1"> Vocal</label>
+                                        </td>
+                                    </tr>
                                     <input type="hidden" name="random_song_id" value="">
                                 </tbody>
                             </table>

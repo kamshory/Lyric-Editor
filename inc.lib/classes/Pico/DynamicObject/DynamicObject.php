@@ -1178,6 +1178,20 @@ class DynamicObject extends stdClass // NOSONAR
         else if (strncasecmp($method, "booleanToCheckedBy", 18) === 0) {
             $prop = lcfirst(substr($method, 18));
             return $this->booleanToTextBy($prop, array(' cheked="checked"', ''));
+        }
+        else if (strncasecmp($method, "createSelected", 14) === 0) {
+            $var = lcfirst(substr($method, 14));
+            if(isset($this->$var))
+            {
+                return $this->$var == $params[0] ? ' selected="selected"' : '';
+            }
+        }
+        else if (strncasecmp($method, "createChecked", 13) === 0) {
+            $var = lcfirst(substr($method, 13));
+            if(isset($this->$var))
+            {
+                return $this->$var == $params[0] ? ' checked="checked"' : '';
+            }
         }     
     }
     

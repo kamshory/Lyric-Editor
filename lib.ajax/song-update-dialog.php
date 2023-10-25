@@ -102,10 +102,16 @@ $song->findOneBySongId($inputGet->getSongId());
                                         <td>
                                             <input type="number" class="form-control" name="score" min="0" max="10" value="<?php echo $song->hasValueScore() ? $song->getScore() : '';?>">
                                         </td>
+                                        </tr>
+                                    <tr>
+                                        <td>Vocal</td>
+                                        <td><label></label><input type="checkbox" name="vocal" value="1" <?php echo $song->createCheckedVocal("1");?>> Vocal</label>
+                                        </td>
+                                    </tr>
                                     </tr>
                                     <tr>
                                         <td>Active</td>
-                                        <td><label></label><input type="checkbox" name="active" value="1" <?php echo $song->getActive() == 1 ?' checked':'';?>> Active</label>
+                                        <td><label></label><input type="checkbox" name="active" value="1" <?php echo $song->createCheckedActive("1");?>> Active</label>
                                         <input type="hidden" name="song_id" value="<?php echo $song->getSongId();?>">
                                         </td>
                                     </tr>
