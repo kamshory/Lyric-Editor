@@ -108,6 +108,13 @@ class SpecificationUtil
             $spesification->addAnd($predicate1);
         }
 
+        if($inputGet->getVocal() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->equals('vocal', $inputGet->getVocal());
+            $spesification->addAnd($predicate1);
+        }
+
         if($inputGet->getActive() != "")
         {
             $predicate1 = new PicoPredicate();

@@ -118,7 +118,16 @@ else
     </div>
     
     <div class="filter-group">
-        <span>Complete</span>
+        <span>Vocal</span>
+        <select class="form-control" name="vocal" id="vocal">
+            <option value="">- All -</option>
+            <option value="1"<?php echo $inputGet->createSelectedVocal("1");?>>Yes</option>
+            <option value="0"<?php echo $inputGet->createSelectedVocal("0");?>>No</option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <span>Lyric</span>
         <select class="form-control" name="lyric_complete" id="lyric_complete">
             <option value="">- All -</option>
             <option value="1"<?php echo $inputGet->createSelectedLyricComplete("1");?>>Yes</option>
@@ -154,6 +163,7 @@ $orderMap = array(
     'artistComposer'=>'artistComposerId',
     'duration'=>'duration',
     'lyricComplete'=>'lyricComplete',
+    'vocal'=>'vocal',
     'active'=>'active'
 );
 $defaultOrderBy = 'albumId';
@@ -223,6 +233,7 @@ if(!empty($result))
         <th scope="col" class="col-sort" data-name="artist_vocal">Vocalist</th>
         <th scope="col" class="col-sort" data-name="artist_composer">Composer</th>
         <th scope="col" class="col-sort" data-name="duration">Duration</th>
+        <th scope="col" class="col-sort" data-name="vocal">Vocal</th>
         <th scope="col" class="col-sort" data-name="lyric_complete">Lyric</th>
         <th scope="col" class="col-sort" data-name="active">Active</th>
         </tr>
@@ -251,6 +262,7 @@ if(!empty($result))
         <td class="text-data text-data-artist-vocal-name"><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
         <td class="text-data text-data-artist-composer-name"><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
         <td class="text-data text-data-duration"><?php echo $song->getDuration();?></td>
+        <td class="text-data text-data-vocal"><?php echo $song->isVocal() ? 'Yes' : 'No';?></td>
         <td class="text-data text-data-lyric-complete"><?php echo $song->isLyricComplete() ? 'Yes' : 'No';?></td>
         <td class="text-data text-data-active"><?php echo $song->isActive() ? 'Yes' : 'No';?></td>
         </tr>
@@ -379,6 +391,7 @@ if(!empty($result))
           $('[data-id="'+dataId+'"] .text-data.text-data-album-name').text(data.album_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-genre-name').text(data.genre_name);
           $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(data.duration);
+          $('[data-id="'+dataId+'"] .text-data.text-data-vocal').text(data.vocal === true || data.vocal == 1 || data.vocal == "1" ?'Yes':'No');
           $('[data-id="'+dataId+'"] .text-data.text-data-active').text(data.active === true || data.active == 1 || data.active == "1" ?'Yes':'No');
         }
       })

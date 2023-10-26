@@ -12,6 +12,7 @@ require_once dirname(__DIR__)."/inc/auth.php";
 $inputPost = new PicoRequest(INPUT_POST);
 $inputPost->filterTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $inputPost->checkboxActive(false);
+$inputPost->checkboxVocal(false);
 
 try
 {

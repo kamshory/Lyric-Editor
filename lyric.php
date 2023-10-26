@@ -291,6 +291,15 @@ else
         <span>Title</span>
         <input class="form-control" type="text" name="title" id="title" autocomplete="off" value="<?php echo $inputGet->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
     </div>
+
+    <div class="filter-group">
+        <span>Vocal</span>
+        <select class="form-control" name="vocal" id="vocal">
+            <option value="">- All -</option>
+            <option value="1"<?php echo $inputGet->createSelectedVocal("1");?>>Yes</option>
+            <option value="0"<?php echo $inputGet->createSelectedVocal("0");?>>No</option>
+        </select>
+    </div>
     
     <div class="filter-group">
         <span>Complete</span>
@@ -320,6 +329,7 @@ $orderMap = array(
     'artistComposerId'=>'artistComposerId',
     'artistComposer'=>'artistComposerId',
     'duration'=>'duration',
+    'vocal'=>'vocal',
     'active'=>'active',
     'lyricComplete'=>'lyricComplete'
 );
@@ -386,6 +396,7 @@ if(!empty($result))
         <th scope="col" class="col-sort" data-name="artist_vocal">Vocalist</th>
         <th scope="col" class="col-sort" data-name="artist_composer">Composer</th>
         <th scope="col" class="col-sort" data-name="duration">Duration</th>
+        <th scope="col" class="col-sort" data-name="vocal">Vocal</th>
         <th scope="col" class="col-sort" data-name="lyric_complete">Complete</th>
         </tr>
     </thead>
@@ -410,6 +421,7 @@ if(!empty($result))
         <td><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
         <td><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
         <td><?php echo $song->getDuration();?></td>
+        <td class="text-data text-data-vocal"><?php echo $song->isVocal() ? 'Yes' : 'No';?></td>
         <td><?php echo $song->isLyricComplete() ? 'Yes':'No';?></td>
         </tr>
         <?php
