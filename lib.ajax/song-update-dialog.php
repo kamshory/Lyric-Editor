@@ -140,7 +140,7 @@ $song->findOneBySongId($inputGet->getSongId());
 }
 catch(Exception $e)
 {
-
+    // do nothing
 }
 }
 ?>
