@@ -94,6 +94,13 @@ class SpecificationUtil
             $spesification->addAnd($predicate1);
         }
 
+        if($inputGet->getLyric() != "")
+        {
+            $predicate1 = new PicoPredicate();
+            $predicate1->like('lyric', PicoPredicate::generateCenterLike($inputGet->getLyric()));
+            $spesification->addAnd($predicate1);
+        }
+
         if($inputGet->getArtistVocalId() != "")
         {
             $predicate1 = new PicoPredicate();

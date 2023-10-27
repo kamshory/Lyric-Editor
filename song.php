@@ -317,7 +317,7 @@ if(!empty($result))
       <div class="modal-content">
           <div class="modal-header">
               <h5 class="modal-title" id="addAlbumDialogLabel">Play Song</h5>
-              <button type="button" class="btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-primary btn-close close-player" aria-label="Close"></button>
           </div>
           <div class="modal-body">
               <audio style="width: 100%; height: 40px;" controls></audio>

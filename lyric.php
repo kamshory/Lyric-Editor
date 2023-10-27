@@ -291,6 +291,10 @@ else
         <span>Title</span>
         <input class="form-control" type="text" name="title" id="title" autocomplete="off" value="<?php echo $inputGet->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
     </div>
+    <div class="filter-group">
+        <span>Lyric</span>
+        <input class="form-control" type="text" name="lyric" id="lyric" autocomplete="off" value="<?php echo $inputGet->getLyric(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
+    </div>
 
     <div class="filter-group">
         <span>Vocal</span>

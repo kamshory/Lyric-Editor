@@ -1,6 +1,7 @@
 <?php
 
 use Pico\Constants\PicoHttpStatus;
+use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Song;
 use Pico\Database\PicoDatabaseQueryBuilder;
 use Pico\Request\PicoFilterConstant;
@@ -9,6 +10,34 @@ use Pico\Response\PicoResponse;
 
 require_once dirname(__DIR__)."/inc/auth.php";
 
+function updateAlbum($database, $albumId)
+{
+    if($albumId != null && !empty($albumId)) {
+        try
+        {
+            $song = new Song(null, $database);
+            $result = $song->findByAlbumId($albumId);
+            $records = $result->getResult();
+            $numberOfSong = 0;
+            $totalDuration = 0;
+            foreach ($records as $record)
+            {
+                $totalDuration += $record->getDuration();
+                $numberOfSong++;
+            }
+            $album = new Album(null, $database);
+            $album->setAlbumId($albumId);
+            $album->setDuration($totalDuration);
+            $album->setNumberOfSong($numberOfSong);
+            $album->update();
+        }
+        catch(Exception $e)
+        {
+            // do nothing
+        }
+    }
+}
+
 $inputPost = new PicoRequest(INPUT_POST);
 $inputPost->filterTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $inputPost->checkboxActive(false);
@@ -16,8 +45,26 @@ $inputPost->checkboxVocal(false);
 
 try
 {
+    // get album ID begin
+    $song1 = new Song(null, $database);
+    $song1->findOneBySongId($inputPost->getSongId());
+    $albumId1 = $song1->getAlbumId();
+    $albumId2 = $inputPost->getAlbumId();
+    // get album ID end
+
     $song = new Song($inputPost, $database);
     $song->update();
+
+
+    // update old album    
+    updateAlbum($database, $albumId1);
+
+    // update new album
+    if($albumId2 != $albumId1)
+    {
+        updateAlbum($database, $albumId2);
+    }
+    
 
     $restResponse = new PicoResponse();    
     $queryBuilder = new PicoDatabaseQueryBuilder($database);
