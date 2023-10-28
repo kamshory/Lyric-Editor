@@ -17,10 +17,9 @@ function updateAlbum($database, $albumId)
         {
             $song = new Song(null, $database);
             $result = $song->findByAlbumId($albumId);
-            $records = $result->getResult();
             $numberOfSong = 0;
             $totalDuration = 0;
-            foreach ($records as $record)
+            foreach ($result->getResult() as $record)
             {
                 $totalDuration += $record->getDuration();
                 $numberOfSong++;

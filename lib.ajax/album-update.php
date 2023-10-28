@@ -22,17 +22,16 @@ try
     
     try
     {   
-        $songs = $song->findByAlbumId($album->getAlbumId());
-        $duration = 0;
-        $number_of_song = 0;
-        foreach($songs->getResult() as $val)
+        $result = $song->findByAlbumId($album->getAlbumId());
+        $numberOfSong = 0;
+        $totalDuration = 0;
+        foreach ($result->getResult() as $record)
         {
-            $duration += $val->getDuration();
-            $number_of_song ++;
+            $totalDuration += $record->getDuration();
+            $numberOfSong++;
         }
-
-        $album->setDuration($duration);
-        $album->setNumberOfSong($number_of_song);
+        $album->setDuration($totalDuration);
+        $album->setNumberOfSong($numberOfSong);
     }
     catch(Exception $e)
     {
