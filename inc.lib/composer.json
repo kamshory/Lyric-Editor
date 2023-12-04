@@ -6,9 +6,9 @@
         }
     },
     "require": {
-        "symfony/yaml": "^3.4",
         "php-ffmpeg/php-ffmpeg": "^0.19.0",
-        "cboden/ratchet": "^0.4.4"
+        "cboden/ratchet": "^0.4.4",
+        "symfony/yaml": "^3.4"
     },
     "config": {
         "platform": {
