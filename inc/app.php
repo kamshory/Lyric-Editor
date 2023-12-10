@@ -11,7 +11,7 @@ $cfg->loadYamlFile(dirname(__DIR__)."/.cfg/app.yml", true, true);
 
 $databaseCredentials = new PicoDatabaseCredentials($cfg->getDatabase());
 $database = new PicoDatabase($databaseCredentials);
-
+print_r($database);
 try
 {
     $database->connect();

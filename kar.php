@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Karaoke</title>
     <script>
-        let url = 'ws://localhost:8888/';
+        let url = 'ws://localhost:8889/';
         if (typeof wsReconnectInterval == "undefined") {
             var wsReconnectInterval = 10000;
         }
@@ -14,6 +14,7 @@
             let ws = new WebSocket(url);
             ws.onopen = function () {
                 // subscribe to some channels
+                console.log('Connected');
             };
 
             ws.onmessage = function (e) {
@@ -58,6 +59,8 @@
     </script>
 </head>
 <body>
-    
+    <?php
+    print_r($_COOKIE);
+    ?>
 </body>
 </html>

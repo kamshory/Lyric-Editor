@@ -47,6 +47,7 @@ class WSDashboardServerAdmin extends WSServer implements WSInterface
 	 */
 	public function onOpen($clientChat)
 	{
+		echo "NEW\r\n";
 		$loggedIn = false;
 
 		$iniWeb = parse_ini_file($this->conf->getIniWebPath());
