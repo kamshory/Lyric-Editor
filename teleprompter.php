@@ -8,21 +8,28 @@ require_once "inc/auth-with-login-form.php";
 $song = new Song(null, $database);
 
 $inputGet = new PicoRequest(INPUT_GET);
-$lyric = array('lyric' => '', 'start'=>0, 'duration'=>0);
+$delayStr = $inputGet->getDelay();
+if($delayStr == null || empty($delayStr))
+{
+    $delay = 0;
+}
+else
+{
+    $delay = intval($delayStr);
+}
+$lyric = array('lyric' => '', 'start'=>0, 'duration'=>0, 'song_id'=>'');
 if($inputGet->getSongId() != null)
 {
     $song->findOneBySongId($inputGet->getSongId());
     $lyric['lyric'] = $song->getLyric();
     $lyric['duration'] = $song->getDuration() * 1000;
-    $lyric['start'] = time() * 1000;
+    $lyric['start'] = (time() * 1000) + $delay;
+    $lyric['song_id'] = $song->getSongId();
 }
 
-?><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karaoke</title>
+
+require_once "inc/header.php";
+?>
     <script>
         let url = 'ws://localhost:8889/';
         if (typeof wsReconnectInterval == "undefined") {
@@ -76,36 +83,27 @@ if($inputGet->getSongId() != null)
 
     </script>
     <script src="kar.js"></script>
-    
-</head>
-<body>
 
-<div class="all">
-    <div id="container"></div>
-</div>
 
-<style>
-    body{
-        margin: 0;
-        padding: 0;
-        position: relative;
-        height: 100vh;
-    }
-    .all
+
+<style> 
+    .teleprompter
     {
         position: relative;
         width: 100%;
-        height: 100%;
+        height: calc(100vh - 160px);
+        background-color: white;
+        overflow: hidden;
     }
-    #container{
+    .teleprompter-container{
         position: relative;
         width: 100%;
     }
-    #container > div{
+    .teleprompter-container > div{
         position: absolute;
         text-align: center;
         width: 100%;
-        border-top: 1px solid #EEEEEE;
+        border-top: 1px solid #fafafa;
         padding-top: 5px;
         box-sizing: border-box;
     }
@@ -114,12 +112,14 @@ if($inputGet->getSongId() != null)
     }
 </style>
 
+<div class="teleprompter">
+    <div class="teleprompter-container"></div>
+</div>
 <script>
     let karaoke = null;
     if(typeof data.lyric != 'undefined' && data.lyric != '')
     {
-        karaoke = new Karaoke(data);
-        
+        karaoke = new Karaoke(data, '.teleprompter-container');      
         animate();
     }
     function animate()
@@ -128,5 +128,7 @@ if($inputGet->getSongId() != null)
         requestAnimationFrame(animate);
     }
     </script>
-</body>
-</html>
+
+<?php
+require_once "inc/footer.php";
+?>

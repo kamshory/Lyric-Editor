@@ -1,5 +1,5 @@
 class Karaoke {
-    constructor(data) {
+    constructor(data, elementSelector) {
         this.scale = 1;
         this.threshold = 30;
         this.last = 0;
@@ -288,9 +288,9 @@ class Karaoke {
             return { data: data, nonempty: nonempty, totalLength: tempData.length };
         };
 
-        this.renderPrompt = function (data, elementSelector) {
+        this.renderPrompt = function (data, selector) {
             this.subtitle = data;
-            let elem = document.querySelector(elementSelector);
+            let elem = document.querySelector(selector);
             this.elem = elem;
             let minDur = this.getMinimumDuration(data);
             let minHeight = 32; // minimum height
@@ -328,7 +328,7 @@ class Karaoke {
             if (now - this.last >= this.threshold) {
                 
                 this.height = this.elem.parentNode.offsetHeight;
-                let ellapsed = now - this.start;
+                let ellapsed = now - this.getStart();
                 let offset = this.height / 2;
                 let top = offset - (ellapsed * this.scale);
 
@@ -339,6 +339,42 @@ class Karaoke {
                 this.last = now;
             }
         };
+
+        this.readStored = false;
+        this.offsetStored = 0;
+
+        this.getStart = function()
+        {
+            if(this.readStored)
+            {
+                return this.offsetStored;
+            }
+            else
+            {
+                let stored = localStorage.getItem('offset_'+this.songId);
+                if(typeof stored == 'undefined' || stored == null)
+                {
+                    return this.start;
+                }
+                else
+                {
+                    stored = stored.replace(/[^0-9.]/g, '');
+                   
+                    if(stored == '')
+                    {
+                        stored = '0';
+                    }
+                    let parsed = parseInt(stored);
+                    if(parsed == 0)
+                    {
+                        return this.start;
+                    }
+                    this.offsetStored = parsed;
+                    this.readStored = true;
+                    return parsed;
+                }
+            }
+        }
 
         this.markSelected = function(selected)
         {
@@ -372,16 +408,18 @@ class Karaoke {
         }
 
         this.lastSelected = -1;
+        this.songId = '';
 
-        this.init = function (data) {
+        this.init = function (data, elementSelector) {
             this.start = data.start;
+            this.songId = data.song_id;
             this.duration = data.duration;
             let parsed = this.parseRawData(data.lyric);
             this.subtitle = parsed;
-            this.renderPrompt(parsed, '#container');
+            this.renderPrompt(parsed, elementSelector);
         };
 
         let _this = this;
-        this.init(data);
+        this.init(data, elementSelector);
     }
 }
