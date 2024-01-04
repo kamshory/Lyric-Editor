@@ -2,6 +2,7 @@
 use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Artist;
 use Pico\Data\Entity\EntitySong;
+use Pico\Data\Entity\EntitySongComment;
 use Pico\Data\Entity\Genre;
 use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoPagable;
@@ -76,6 +77,65 @@ if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getSongId()
         </tr>
       </tbody>
     </table>
+    <style>
+      .comment-wrapper{
+        padding: 10px 0;
+        margin-bottom: 4px;
+        border-bottom: 1px solid #DDDDDD;
+      }
+      .comment-content{
+        padding: 5px 0;
+      }
+      .summernote{
+        width: 100%;
+        height: 120px;
+      }
+      .button-area{
+        padding: 5px 0;
+      }
+    </style>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs5.min.css" integrity="sha512-ngQ4IGzHQ3s/Hh8kMyG4FC74wzitukRMIcTOoKT3EyzFZCILOPF0twiXOQn75eDINUfKBYmzYn2AA8DkAk8veQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs5.min.js" integrity="sha512-6F1RVfnxCprKJmfulcxxym1Dar5FsT/V2jiEUvABiaEiFWoQ8yHvqRM/Slf0qJKiwin6IDQucjXuolCfCKnaJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <form action="">
+      <h4>Comment</h4>
+    <div><textarea name="summernote" class="summernote" rows="4"></textarea></div>
+    <div class="button-area">
+      <input type="submit" class="btn btn-primary" name="save" value="Save">
+      <input type="button" class="btn btn-secondary" name="cancel" value="Cancel">
+    </div>
+    </form>
+    <script>
+      $(document).ready(function() {
+        $('.summernote').summernote({});
+      });
+    </script>
+    
+    <?php
+    
+    $songComment = new EntitySongComment(null, $database);
+    try
+    {
+      $result = $songComment->findDescBySongId($inputGet->getSongId());
+      $comments = $result->getResult();
+      foreach($comments as $comment)
+      {
+        ?>
+        <div class="comment-wrapper">
+        <div class="comment-creator"><?php echo $comment->hasValueCreator() ? $comment->getCreator()->getName() : "";?> <?php echo date("j F Y H:i:s", strtotime($comment->hasValueTimeCreate()));?></div>
+        <div class="comment-content"><?php echo $comment->getComment();?></div>
+        <div class="comment-controller"><a class="comment-edit" href="javascript:">Edit</a> &nbsp; <a class="comment-delete" href="javascript:">Delete</a></div>
+        </div>
+        <?php
+      }
+    }
+    catch(Exception $e)
+    {
+      echo $e->getMessage();
+    }
+    
+    ?>
     
     <?php
   }
