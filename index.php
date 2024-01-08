@@ -1,4 +1,5 @@
 <?php
+use Pico\Database\PicoDatabaseQueryBuilder;
 require_once "inc/auth-with-login-form.php";
 require_once "inc/header.php";
 ?>
@@ -32,12 +33,19 @@ require_once "inc/header.php";
     <div class="row">
       <div class="col-lg-12">
         <!-- Yearly Breakup -->
+        
+        <?php
+        
+        $query = new PicoDatabaseQueryBuilder($database->getDatabaseType());
+        
+        ?>
+        
         <div class="card overflow-hidden">
           <div class="card-body p-4">
             <h5 class="card-title mb-9 fw-semibold">Yearly Breakup</h5>
             <div class="row align-items-center">
               <div class="col-8">
-                <h4 class="fw-semibold mb-3">$36,358</h4>
+                <h4 class="fw-semibold mb-3">36,358</h4>
                 <div class="d-flex align-items-center mb-3">
                   <span class="me-1 rounded-circle bg-light-success round-20 d-flex align-items-center justify-content-center">
                     <i class="ti ti-arrow-up-left text-success"></i>
