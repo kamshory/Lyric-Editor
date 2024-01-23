@@ -6,7 +6,7 @@ use Exception;
 use PDOException;
 use PDOStatement;
 use Pico\Database\PicoDatabase;
-use Pico\Database\PicoDatabasePersistent;
+use Pico\Database\PicoDatabasePersistence;
 use Pico\Database\PicoDatabaseStructure;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPageData;
@@ -271,7 +271,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             return $persist->save($includeNull);
         }
         else
@@ -290,7 +290,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             $data = $persist->select();
             if($data == null)
             {
@@ -316,7 +316,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             return $persist->insert($includeNull);
         }
         else
@@ -336,7 +336,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             return $persist->update($includeNull);
         }
         else
@@ -355,7 +355,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             return $persist->delete();
         }
         else
@@ -518,7 +518,7 @@ class DynamicObject extends stdClass // NOSONAR
      */
     public function defatultValue($snakeCase = false)
     {
-        $persist = new PicoDatabasePersistent($this->database, $this);
+        $persist = new PicoDatabasePersistence($this->database, $this);
         $tableInfo = $persist->getTableInfo();
         $defaultValue = new stdClass;
         if(isset($tableInfo->defaultValue))
@@ -770,7 +770,7 @@ class DynamicObject extends stdClass // NOSONAR
             $pageData = null;
             if($this->database != null && $this->database->isConnected())
             {
-                $persist = new PicoDatabasePersistent($this->database, $this);
+                $persist = new PicoDatabasePersistence($this->database, $this);
                 $result = $persist->findAll($specification, $pagable, $sortable);
                 $match = $persist->countAll($specification);
                 if($this->_notNullAndNotEmpty($result))
@@ -804,7 +804,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             $result = $persist->find($params);
             if($this->_notNullAndNotEmpty($result))
             {
@@ -841,7 +841,7 @@ class DynamicObject extends stdClass // NOSONAR
             $pageData = null;
             if($this->database != null && $this->database->isConnected())
             {
-                $persist = new PicoDatabasePersistent($this->database, $this);
+                $persist = new PicoDatabasePersistence($this->database, $this);
                 $result = $persist->findBy($method, $params, $pagable, $sortable);
                 $match = $persist->countBy($method, $params);
                 if($this->_notNullAndNotEmpty($result))
@@ -876,7 +876,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             return $persist->countBy($method, $params);
         }
         else
@@ -896,7 +896,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             return $persist->deleteBy($method, $params);
         }
         else
@@ -917,7 +917,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             $result = $persist->findOneBy($method, $params, $sortable);
             if($this->_notNullAndNotEmpty($result))
             {
@@ -947,7 +947,7 @@ class DynamicObject extends stdClass // NOSONAR
     {
         if($this->database != null && $this->database->isConnected())
         {
-            $persist = new PicoDatabasePersistent($this->database, $this);
+            $persist = new PicoDatabasePersistence($this->database, $this);
             return $persist->existsBy($method, $params);
         }
         else
@@ -1083,11 +1083,11 @@ class DynamicObject extends stdClass // NOSONAR
         }
         else if (strncasecmp($method, "findFirstBy", 11) === 0) {
             $var = lcfirst(substr($method, 11));
-            return $this->findOneBy($var, $params, PicoDatabasePersistent::ORDER_ASC);
+            return $this->findOneBy($var, $params, PicoDatabasePersistence::ORDER_ASC);
         }
         else if (strncasecmp($method, "findLastBy", 10) === 0) {
             $var = lcfirst(substr($method, 10));
-            return $this->findOneBy($var, $params, PicoDatabasePersistent::ORDER_DESC);
+            return $this->findOneBy($var, $params, PicoDatabasePersistence::ORDER_DESC);
         }
         else if (strncasecmp($method, "findBy", 6) === 0) {
             $var = lcfirst(substr($method, 6));
@@ -1105,7 +1105,7 @@ class DynamicObject extends stdClass // NOSONAR
             $pagable = $this->pagableFromParams($params);
             // filter param
             $parameters = $this->valuesFromParams($params);
-            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistent::ORDER_ASC);
+            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistence::ORDER_ASC);
         }
         else if (strncasecmp($method, "findDescBy", 10) === 0) {
             $var = lcfirst(substr($method, 10));
@@ -1113,7 +1113,7 @@ class DynamicObject extends stdClass // NOSONAR
             $pagable = $this->pagableFromParams($params);
             // filter param
             $parameters = $this->valuesFromParams($params);
-            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistent::ORDER_DESC);
+            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistence::ORDER_DESC);
         }
         else if (strncasecmp($method, "listBy", 6) === 0) {
             $var = lcfirst(substr($method, 6));
@@ -1131,7 +1131,7 @@ class DynamicObject extends stdClass // NOSONAR
             $pagable = $this->pagableFromParams($params);
             // filter param
             $parameters = $this->valuesFromParams($params);
-            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistent::ORDER_ASC, true);
+            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistence::ORDER_ASC, true);
         }
         else if (strncasecmp($method, "listDescBy", 10) === 0) {
             $var = lcfirst(substr($method, 10));
@@ -1139,21 +1139,21 @@ class DynamicObject extends stdClass // NOSONAR
             $pagable = $this->pagableFromParams($params);
             // filter param
             $parameters = $this->valuesFromParams($params);
-            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistent::ORDER_DESC, true);
+            return $this->findBy($var, $parameters, $pagable, PicoDatabasePersistence::ORDER_DESC, true);
         }
         else if ($method == "listAllAsc") {
             // get spefification
             $specification = $this->specificationFromParams($params);
             // get pagable
             $pagable = $this->pagableFromParams($params);
-            return $this->findAll($specification, $pagable, PicoDatabasePersistent::ORDER_ASC, true);
+            return $this->findAll($specification, $pagable, PicoDatabasePersistence::ORDER_ASC, true);
         }
         else if ($method == "listAllDesc") {
             // get spefification
             $specification = $this->specificationFromParams($params);
             // get pagable
             $pagable = $this->pagableFromParams($params);
-            return $this->findAll($specification, $pagable, PicoDatabasePersistent::ORDER_DESC, true);
+            return $this->findAll($specification, $pagable, PicoDatabasePersistence::ORDER_DESC, true);
         }
         else if (strncasecmp($method, "countBy", 6) === 0) {
             $var = lcfirst(substr($method, 6));
