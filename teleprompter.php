@@ -82,7 +82,7 @@ require_once "inc/header.php";
     let data = <?php echo json_encode($lyric);?>;
 
     </script>
-    <script src="kar.js"></script>
+    <script src="karaoke.js"></script>
 
 
 
@@ -90,11 +90,22 @@ require_once "inc/header.php";
     .teleprompter
     {
         position: relative;
-        width: 100%;
+        width: calc(100% + 40px);
         height: calc(100vh - 160px);
         background-color: white;
         overflow: hidden;
+        margin: 0px -20px;
+        white-space: nowrap;
+        text-transform: uppercase;
     }
+    @media screen and (min-width: 1200px) {
+        .main .teleprompter{
+            margin: 0;
+            width: 100%;
+        }
+        
+    }
+    
     .teleprompter-container{
         position: relative;
         width: 100%;
@@ -108,7 +119,8 @@ require_once "inc/header.php";
         box-sizing: border-box;
     }
     .marked{
-        background-color: yellow;
+        background-color: #cdff43c4;
+        color: #222222;
     }
 </style>
 

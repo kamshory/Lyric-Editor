@@ -329,7 +329,7 @@ class Karaoke {
                 
                 this.height = this.elem.parentNode.offsetHeight;
                 let ellapsed = now - this.getStart();
-                let offset = this.height / 2;
+                let offset = this.height / 4;
                 let top = offset - (ellapsed * this.scale);
 
                 let selected = this.getIndex(ellapsed);
@@ -359,7 +359,6 @@ class Karaoke {
                 else
                 {
                     stored = stored.replace(/[^0-9.]/g, '');
-                   
                     if(stored == '')
                     {
                         stored = '0';
