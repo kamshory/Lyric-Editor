@@ -82,7 +82,7 @@ require_once "inc/header.php";
     let data = <?php echo json_encode($lyric);?>;
 
     </script>
-    <script src="karaoke.js"></script>
+    <script src="karaoke-script.js"></script>
 
 
 

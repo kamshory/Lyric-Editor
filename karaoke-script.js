@@ -339,6 +339,19 @@ class Karaoke {
                 this.last = now;
             }
         };
+        
+        this.updatePosition = function(ellapsed)
+        {
+            this.height = this.elem.parentNode.offsetHeight;
+            let offset = this.height / 4;
+            let top = offset - (ellapsed * this.scale);
+
+            let selected = this.getIndex(ellapsed);
+            this.markSelected(selected);
+
+            this.elem.style.top = top + 'px';
+            this.last = now;
+        }
 
         this.readStored = false;
         this.offsetStored = 0;

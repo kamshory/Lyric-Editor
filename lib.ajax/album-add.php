@@ -12,6 +12,7 @@ $inputPost = new PicoRequest(INPUT_POST);
 $inputPost->filterName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $inputPost->filterDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $inputPost->checkboxActive(false);
+$inputPost->checkboxAsDraft(true);
 $album = new Album($inputPost, $database);
 try
 {

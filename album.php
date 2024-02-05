@@ -90,7 +90,8 @@ $orderMap = array(
   'sortOrder'=>'sortOrder',
   'numberOfSong'=>'numberOfSong',
   'duration'=>'duration',
-  'active'=>'active'
+  'active'=>'active',
+  'ad_draft'=>'ad_draft'
 );
 $defaultOrderBy = 'sortOrder';
 $defaultOrderType = 'desc';
@@ -142,6 +143,7 @@ if(!empty($result))
       <th scope="col" class="col-sort" data-name="number_of_song">Song</th>
       <th scope="col" class="col-sort" data-name="sort_order">Order</th>
       <th scope="col" class="col-sort" data-name="active">Active</th>
+      <th scope="col" class="col-sort" data-name="ad_draft">Draft</th>
     </tr>
   </thead>
   <tbody>
@@ -164,6 +166,7 @@ if(!empty($result))
       <td class="text-data text-data-number-of-song"><?php echo $album->getNumberOfSong();?></td>
       <td class="text-data text-data-sort-order"><?php echo $album->getSortOrder();?></td>
       <td class="text-data text-data-active"><?php echo $album->isActive() ? 'Yes' : 'No';?></td>
+      <td class="text-data text-data-ad-draft"><?php echo $album->isAsDraft() ? 'Yes' : 'No';?></td>
     </tr>
     <?php
     }
@@ -250,11 +253,13 @@ if(!empty($result))
           let duration = data.duration.toFixed(3);
           let numberOfSong = data.number_of_song;
           let active = data.active == 1 || data.active == '1';
+          let draft = data.as_draft == 1 || data.as_draft == '1';
           $('[data-id="'+dataId+'"] .text-data.text-data-name').text(name);
           $('[data-id="'+dataId+'"] .text-data.text-data-sort-order').text(data.sort_order);
           $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(duration);
           $('[data-id="'+dataId+'"] .text-data.text-data-number-of-song').text(numberOfSong);
           $('[data-id="'+dataId+'"] .text-data.text-data-active').text(active?'Yes':'No');
+          $('[data-id="'+dataId+'"] .text-data.text-data-as-draft').text(draft?'Yes':'No');
         }
       })
     });

@@ -1,7 +1,6 @@
 <?php
 
 use Pico\Constants\PicoHttpStatus;
-use Pico\Data\Dto\AlbumDto;
 use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Song;
 use Pico\Request\PicoFilterConstant;
@@ -14,6 +13,7 @@ $inputPost = new PicoRequest(INPUT_POST);
 $inputPost->filterName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $inputPost->filterDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $inputPost->checkboxActive(false);
+$inputPost->checkboxAsDraft(false);
 $album = new Album($inputPost, $database);
 
 try

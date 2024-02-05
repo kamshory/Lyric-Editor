@@ -31,6 +31,10 @@ $album->select();
                                 <td><input type="date" class="form-control" name="release_date" value="<?php echo $album->getReleaseDate();?>"></td>
                             </tr>
                             <tr>
+                                <td>Draft</td>
+                                <td><label></label><input type="checkbox" name="as_draft" value="1" <?php echo $album->getAsDraft() == 1 ?' checked':'';?>> Draft</label></td>
+                            </tr>
+                            <tr>
                                 <td>Active</td>
                                 <td><label></label><input type="checkbox" name="active" value="1" <?php echo $album->getActive() == 1 ?' checked':'';?>> Active</label></td>
                             </tr>

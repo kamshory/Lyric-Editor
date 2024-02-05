@@ -42,6 +42,14 @@
             </a>
         </li>
         <li class="sidebar-item">
+            <a class="sidebar-link" href="karaoke.php" aria-expanded="false">
+                <span>
+                    <i class="ti ti-file-description"></i>
+                </span>
+                <span class="hide-menu">Karaoke</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
             <a class="sidebar-link" href="teleprompter.php" aria-expanded="false">
                 <span>
                     <i class="ti ti-music"></i>
