@@ -1,4 +1,4 @@
-result_per_page: 10
+result_per_page: 20
 song_base_url: https://planetbiru.com/studio/production/files
 database:
   time_zone_system: Asia/Jakarta
