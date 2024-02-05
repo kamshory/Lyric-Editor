@@ -350,7 +350,6 @@ class Karaoke {
             this.markSelected(selected);
 
             this.elem.style.top = top + 'px';
-            this.last = now;
         }
 
         this.readStored = false;
