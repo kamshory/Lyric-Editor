@@ -17,11 +17,16 @@ ke pa da &nbsp;";
 ?>
 
 <div class="main-content"> <link rel="stylesheet" type="text/css" href="assets/css/midi-player.css" />
-<script type="text/javascript" src="assets/js/lyric-editor.js"></script>
-<script type="text/javascript" src="assets/midijs/midi.js"></script>
 
 <h3 style="font-size: 18px; padding-bottom:2px;"><?php echo $song->getTitle();?></h3>
 
+<script type="text/javascript">
+	var midi_data = <?php
+	echo json_encode($midi->getMidData(), JSON_PRETTY_PRINT);
+	?>;
+</script>
+<script type="text/javascript" src="assets/js/lyric-editor.js"></script>
+<script type="text/javascript" src="assets/midijs/midi.js"></script>
 
 
 <div class="modal" tabindex="-1" role="dialog" id="generate-dialog">
@@ -69,185 +74,13 @@ ke pa da &nbsp;";
 		</div>
 	  </div>
 	</div>
-	<script type="text/javascript">
-	var midi_data = <?php
-	echo json_encode($midi->getMidData(), JSON_PRETTY_PRINT);
-	?>;
-	var lyric_data = {};
-	</script>
+	
 	<style type="text/css">
 	<?php
 	?>
 	</style>
 	<script type="text/javascript">
-	function generateLyricFromVocal()
-	{
-		var channel = parseInt($('[name="channel"]').val());
-		
-		var note = {};
-		var tone = 0;
-		var rtime = 0;
-		var atime = 0;
-		var symbol = '';
-		var symbol2 = '';
-		$('.lyric-editor tbody').empty();
-		var lastRtime = 0;
-		for(var i in lyric_data.note.tracks)
-		{
-			if(lyric_data.note.tracks[i].length > 0)
-			{
-				if(typeof lyric_data.note.tracks[i][channel] != 'undefined')
-				{
-					if(lyric_data.note.tracks[i][channel].length > 0)
-					{
-						let lastNote = {};
-						let len = lyric_data.note.tracks[i][channel].length;
-						for(var j in lyric_data.note.tracks[i][channel])
-						{
-							note = lyric_data.note.tracks[i][channel][j];
-							
-							rtime = note.rtime;
-							if(rtime > lastRtime)
-							{
-								atime = note.atime;
-								tone = note.note;
-
-								symbol = getNoteFromCode(tone);
-								symbol2 = '"'+symbol.split('"').join('\\"')+' "';
-
-								let x = lastNote[tone] || null;
-
-								if((x == null || note.event == 'On' || x.event == 'Off')) 
-								{
-
-								
-									var ta = '<textarea class="ta-lyric-editor">'+symbol2+'</textarea>';
-									var html = '<tr data-track="'+i+'" data-rtime="'+rtime+'" data-atime="'+atime+'"><td>'+note.event+'</td><td>'+i+'</td><td>'+rtime+'</td><td>'+atime+'</td><td>'+ta+'</td></tr>';
-									$('.lyric-editor tbody').append(html);
-								}
-							
-								lastNote[tone] = note;
-							}
-							lastRtime = rtime;
-						}
-					}
-				}
-			}
-		}
-		renderLyric();
-		playerModal.hide();
-	}
-	$(document).ready(function(e){
-		lyric_data.lyric = getLyric(midi_data);
-		lyric_data.time = getTempoData(midi_data);
-		lyric_data.timebase = midi_data.timebase;
-		lyric_data.note = getNote(midi_data, lyric_data.time, lyric_data.timebase);
-
-		let playerModalSelector = document.querySelector('#generate-dialog');
-			playerModal = new bootstrap.Modal(playerModalSelector, {
-			keyboard: false
-    	});
-
-		$(document).on('click', '#generate', function(e){
-			playerModal.show();
-		});
-
-		$(document).on('click', '#replace-lyric', function(e){
-
-		});
-
-		$(document).on('keyup', 'textarea', function(e){
-			renderLyric();
-		});
-		$(document).on('mouseover', '.lyric-editor tbody tr', function(e2){
-			var tm = $(this).attr('data-rtime');
-			$('.lyric-preview .lyric-item').removeClass('hilight-green');
-			$('.lyric-preview .lyric-item[data-rtime="'+tm+'"]').addClass('hilight-green');
-		});
-		$(document).on('click', '#save', function(e1){
-			lyric_data.lyric.tracks = [];
-			$('.lyric-editor table tbody').find('tr').each(function(e2){
-				var rtime = $(this).attr('data-rtime');
-				var track = $(this).attr('data-track');
-				if($(this).find('textarea').length > 0)
-				{
-					var txt = $(this).find('textarea').val().trim();
-					txt = txt.substring(1, txt.length - 1);
-					txt = txt.split('\\"').join('"');
-					txt = txt.split('\n').join('\r\n');
-					txt = txt.split('\r\r\n').join('\r\n');
-					txt = txt.split('\r').join('\r\n');
-					txt = txt.split('\r\n\n').join('\r\n');					
-					txt = txt.split('"').join('\\"');
-					txt = '"'+txt+'"';
-					if(typeof lyric_data.lyric.tracks[track] == 'undefined')
-					{
-						lyric_data.lyric.tracks[track] = [];
-					}
-					lyric_data.lyric.tracks[track].push(rtime+' Meta Lyric '+txt);
-				}
-			});
-			var url = $('.planet-midi-player').attr('data-midi-url');
-			$.ajax({
-				url:'ajax-save-lyric.php',
-				type:'post',
-				dataType:'html',
-				data:{url:url, lyric:JSON.stringify(lyric_data.lyric)},
-				success:function(data){
-					console.log(data);
-				}
-			});
-		});
-		generateLyric()
-		renderLyric();
-	});	
-	function generateLyric()
-	{
-		var i;
-		var j;
-		var track;
-		var line;
-		var arr;
-		for(i in lyric_data.lyric.tracks)
-		{
-			track = lyric_data.lyric.tracks[i];
-			for(j in track)
-			{
-				line = track[j];
-				arr = line.explode(' ', 4);
-				if(arr[2] == 'Lyric')
-				{
-					var atime = getTime(lyric_data, parseInt(arr[0]));
-					var ta = '<textarea class="ta-lyric-editor">'+arr[3]+'</textarea>';
-					var html = '<tr data-track="'+i+'" data-rtime="'+arr[0]+'" data-atime="'+atime+'"><td>'+i+'</td><td>'+arr[0]+'</td><td>'+atime+'</td><td>'+ta+'</td></tr>';
-					$('.lyric-editor tbody').append(html);
-				}
-			}
-		}
-	}
-	function renderLyric()
-	{
-		var data = [];
-		$('.lyric-editor table tbody').find('tr').each(function(e2){
-			if($(this).find('textarea').length > 0)
-			{
-				var span = $('<span>');
-				span.addClass('lyric-item');
-				span.attr('data-rtime', $(this).attr('data-rtime'));
-				span.attr('data-atime', $(this).attr('data-atime'));
-				var txt = $(this).find('textarea').val().trim();
-				txt = txt.substring(1, txt.length - 1);
-				txt = txt.split('\n').join('\r\n');
-				txt = txt.split('\r\r\n').join('\r\n');
-				txt = txt.split('\r').join('\r\n');
-				txt = txt.split('\r\n\n').join('\r\n');
-				txt = txt.split('\r\n').join('<br />');
-				span.html(txt);
-				data.push(span[0].outerHTML);
-			}
-		})
-		$('.lyric-preview').html(data.join(''));
-	}
+	
 	</script>
 	<style type="text/css">
 	.flex-row {
