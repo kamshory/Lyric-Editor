@@ -35,7 +35,6 @@ require_once "inc/header.php";
 <div class="filter-container">
   <form action="" method="get">
   <div class="filter-group">
-      <span>Song</span>
       <?php
       $inputGet = new PicoRequest(INPUT_GET);
       $sql = "select song.song_id, song.title, song.track_number, album.album_id, album.name as album_name
@@ -74,7 +73,7 @@ require_once "inc/header.php";
                 {
                     $selected = "";
                 }
-                $arr2[] = '<option value="'.$songItem['song_id'].'"'.$selected.'>Track '.sprintf("%02d &mdash; ", $songItem['track_number']).$songItem['title'].'</option>';
+                $arr2[] = '<option value="'.$songItem['song_id'].'"'.$selected.'>'.sprintf("%02d &mdash; ", $songItem['track_number']).$songItem['title'].'</option>';
             }
             $arr2[] = '</optgroup>';
         }
@@ -107,7 +106,8 @@ require_once "inc/header.php";
     {
         position: relative;
         width: calc(100% + 40px);
-        height: calc(100vh - 160px);
+        height: calc(100vh - 270px);
+        min-height: 200px;
         background-color: white;
         overflow: hidden;
         margin: 30px -20px;
@@ -181,13 +181,13 @@ require_once "inc/header.php";
         border-top: 1px solid #DDDDDD;
     }
     .box2::before{
-        left: -20px;
+        left: -19px;
         border-top-right-radius: 10px;
         border-right: 1px solid #DDDDDD;
         
     }
     .box2::after{
-        right: -20px;
+        right: -19px;
         border-top-left-radius: 10px;
         border-left: 1px solid #DDDDDD;
         
@@ -196,6 +196,7 @@ require_once "inc/header.php";
         border-radius: 4px;
         width: 100%;
         box-sizing: border-box;
+        height: 40px;
     }
 </style>
 
