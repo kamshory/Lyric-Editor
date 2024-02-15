@@ -14,16 +14,54 @@ $list = $midi->getInstrument();
 
 $instrumentName = $midi->getInstrumentList();
 ?>
+
+<h3 style="font-size: 18px; padding-bottom:2px;"><?php echo $song->getTitle();?></h3>
+
 <style>
     .selectize-control{
         display: inline-block;
     }
     .selectize-input{
-        width: 100%;
-        min-width: 300px;
+        max-width: calc(100% - 0px);
+        width: 300px;
         box-sizing: border-box;
         vertical-align: middle;
     }
+    .select-wrapper .selectize-input{
+        max-width: calc(100% - 0px);
+        width: 300px;
+        box-sizing: border-box;
+        vertical-align: middle;
+    }
+    .select-wrapper select{
+        max-width: calc(100% - 0px);
+        width: 300px;
+        box-sizing: border-box;
+    }
+    .select-wrapper .selectize-control.form-control{
+        display: inline-block;
+        max-width: calc(100% - 0px);
+        width: 300px;
+    }
+    
+    .midi-channel .selectize-input{
+        max-width: calc(100% - 20px);
+        width: 280px;
+        box-sizing: border-box;
+        vertical-align: middle;
+    }
+    
+    .midi-channel select{
+        max-width: calc(100% - 20px);
+        width: 280px;
+        box-sizing: border-box;
+    }
+    .midi-channel .selectize-control.form-control{
+        display: inline-block;
+        width: 100%;
+        min-width: 300px;
+    }
+    
     .selectize-control.single .selectize-input::after{
         right: 10px !important;
     }
@@ -34,11 +72,7 @@ $instrumentName = $midi->getInstrumentList();
         padding: 2px 0;
     }
     
-    select{
-        max-width: 100%;
-        width: 300px;
-        box-sizing: border-box;
-    }
+    
     
     ul.midi-program{
         padding: 0 0;
@@ -60,6 +94,14 @@ $instrumentName = $midi->getInstrumentList();
         padding: 0;
         margin: 0;
     }
+    .button-area{
+        padding: 5px 0;
+    }
+    .midi-program .form-control{
+        display: inline-block;
+    }
+    
+    
 </style>
 <form action="">
 <ul class="midi-program">
@@ -89,8 +131,8 @@ foreach($list->program->parsed as $trackNumber=>$track)
     if(count($inst) == 1)
     {
     ?>
-    <select class="channel-parent" data-value="<?php echo $parentInst;?>"></select> 
-    <button type="button" class="btn btn-primary apply-to-all">Apply To All</button>
+    <select class="form-control channel-parent" data-value="<?php echo $parentInst;?>"></select> 
+    <button type="button" class="btn btn-primary apply-to-all">&#8595;</button>
     <?php
     }
     ?>
@@ -104,7 +146,7 @@ foreach($list->program->parsed as $trackNumber=>$track)
             <div>
             <div class="channel-label">Channel <?php echo $instrument['channel'] + 1;?></div>
             <div class="select-wrapper">
-            <select class="midi-instrument" data-value="<?php echo $instrument['program'];?>"></select>
+            <select class="form-control midi-instrument" data-value="<?php echo $instrument['program'];?>"></select>
             </div>
             </div>
         </li>
@@ -118,7 +160,9 @@ foreach($list->program->parsed as $trackNumber=>$track)
 
 ?>
 </ul>
+<div class="button-area">
 <input type="button" class="btn btn-success" value="Update Instrument" onclick="getData();">
+</div>
 </form>
 <script>
     let midiProgram = <?php echo json_encode($list->program->parsed);?>; 
