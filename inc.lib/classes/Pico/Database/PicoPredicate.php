@@ -184,7 +184,7 @@ class PicoPredicate
      * Generate LEFT LIKE wildcard
      *
      * @param string $value
-     * @return void
+     * @return string
      */
     public static function generateLeftLike($value)
     {
@@ -195,7 +195,7 @@ class PicoPredicate
      * Generate CENTER LIKE wildcard
      *
      * @param string $value
-     * @return void
+     * @return string
      */
     public static function generateCenterLike($value)
     {
@@ -206,7 +206,7 @@ class PicoPredicate
      * Generate RIGHT LIKE wildcard
      *
      * @param string $value
-     * @return void
+     * @return string
      */
     public static function generateRightLike($value)
     {

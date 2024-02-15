@@ -53,7 +53,7 @@ try
     
     $header = SongFileUtil::getContent($path, 96);
     
-    //if(SongFileUtil::isMp3File($path))
+    if(SongFileUtil::isMp3File($path))
     {    
         $song->setFileUploadTime($now);
         
@@ -75,7 +75,6 @@ try
         $song->setDuration($duration);
         
     }
-    /*
     else if(SongFileUtil::isMidiFile($path))
     {
         $midiPath = SongFileUtil::saveMidiFile($id, $targetDir, file_get_contents($path));
@@ -86,7 +85,7 @@ try
         $xmlMusicPath = SongFileUtil::saveXmlMusicFile($id, $targetDir, file_get_contents($path));
         $song->setFilePathXml($xmlMusicPath);
     }  
-    */
+    
     $song->save();
     $song->select();
     if($song->getFirstUploadTime() == null && $song->getLastUploadTime() != null)
