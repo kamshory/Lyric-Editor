@@ -20,7 +20,20 @@ require_once "inc/auth-with-login-form.php";
 require_once "inc/header.php";
 
 $inputGet = new PicoRequest(INPUT_GET);
-if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getSongId() != null)
+if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getSongId() != null)
+{
+  try
+  {
+    $song = new EntitySong(null, $database);
+    $song->findOneBySongId($inputGet->getSongId());
+    require_once "midi-instrument.php";
+  }
+  catch(Exception $e)
+  {
+    // do nothing
+  }
+}
+else if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getSongId() != null)
 {
   try
   {
