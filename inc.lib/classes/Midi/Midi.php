@@ -67,7 +67,10 @@ public function open($timebase=480){
 //---------------------------------------------------------------
 public function setTempo($tempo){
 	$tempo = round($tempo);
-	if (isset($this->tempoMsgNum)) $this->tracks[0][$this->tempoMsgNum] = "0 Tempo $tempo";
+	if (isset($this->tempoMsgNum)) 
+	{
+		$this->tracks[0][$this->tempoMsgNum] = "0 Tempo $tempo";
+	}
 	else{
 		$tempoTrack = array('0 TimeSig 4/4 24 8',"0 Tempo $tempo",'0 Meta TrkEnd');
 		array_unshift($this->tracks, $tempoTrack);
@@ -106,9 +109,12 @@ public function setTimebase($tb){
 	## echo "".$this->timebase." ".__LINE__."\r\n";
 }
 
-//---------------------------------------------------------------
-// returns timebase
-//---------------------------------------------------------------
+
+/**
+ * Get timebase
+ *
+ * @return integer
+ */
 public function getTimebase(){
 	return $this->timebase;
 	## echo "".$this->timebase." ".__LINE__."\r\n";
@@ -141,12 +147,13 @@ public function getMsgCount($tn){
 public function addMsg($tn, $msgStr, $ttype=0){ //0:absolute, 1:delta
 	$track = $this->tracks[$tn];
 
-	if ($ttype==1){
+	if ($ttype==1)
+	{
 		$last = $this->_getTime($track[count($track)-1]);
 		$msg = explode(' ',$msgStr);
 		$dt = (int) $msg[0];
 		$msg[0] = $last + $dt;
-		$msgStr = implode(' ',$msg);
+		$msgStr = implode(' ', $msg);	
 	}
 
 	$track[] = $msgStr;
@@ -162,7 +169,10 @@ public function insertMsg($tn,$msgStr){
 	$mc = count($track);
 	for ($i=0;$i<$mc;$i++){
 		$t = $this->_getTime($track[$i]);
-		if ($t>=$time) break;
+		if ($t>=$time) 
+		{
+			break;
+		}
 	}
 	array_splice($this->tracks[$tn], $i, 0, $msgStr);
 }
@@ -200,8 +210,14 @@ public function getTrackCount(){
 // deletes all tracks except track $tn (and $track 0 which contains tempo info)
 //---------------------------------------------------------------
 public function soloTrack($tn){
-	if ($tn==0) $this->tracks = array($this->tracks[0]);
-	else $this->tracks = array($this->tracks[0],$this->tracks[$tn]);
+	if ($tn==0) 
+	{
+		$this->tracks = array($this->tracks[0]);
+	}
+	else 
+	{
+		$this->tracks = array($this->tracks[0],$this->tracks[$tn]);
+	}
 }
 
 //---------------------------------------------------------------
@@ -209,7 +225,10 @@ public function soloTrack($tn){
 //---------------------------------------------------------------
 public function transpose($dn){
 	$tc = count($this->tracks);
-	for ($i=0;$i<$tc;$i++) $this->transposeTrack($i,$dn);
+	for ($i=0;$i<$tc;$i++) 
+	{
+		$this->transposeTrack($i, $dn);
+	}
 }
 
 //---------------------------------------------------------------
@@ -328,7 +347,7 @@ public function getScore($ttype=0) //NOSONAR
 	$ks = 0;
 	$ts = 0;
 
-	/*
+	/**
 	 *Currently only support midi file which contain 1 or 2 tracks.
 	 *If there are more than 2 tracks, only the first track will be handled.
 	 *tc
@@ -536,7 +555,10 @@ public function getTxt($ttype=0){ //0:absolute, 1:delta
 	$tc = count($tracks);
 	$type = ($tc>1)?1:0;
 	$str =  "MFile $type $tc $timebase\n";
-	for ($i=0;$i<$tc;$i++) $str .= $this->getTrackTxt($i,$ttype);
+	for ($i=0;$i<$tc;$i++) 
+	{
+		$str .= $this->getTrackTxt($i,$ttype);
+	}
 	return $str;
 }
 
@@ -556,7 +578,14 @@ public function getTrackTxt($tn,$ttype=0){ //0:absolute, 1:delta
 			$str .= implode(' ',$msg)."\n";
 			$last = $t;
 		}
-	}else foreach ($track as $msg) $str .= $msg."\n";
+	}
+	else 
+	{
+		foreach ($track as $msg) 
+		{
+			$str .= $msg."\n";
+		}
+	}
 	$str .= "TrkEnd\n";
 	return $str;
 }
@@ -718,7 +747,10 @@ public function getXml($ttype=0) //NOSONAR
 
 				case 'SysEx':
 					$str = '';
-					for ($k=3;$k<count($msg);$k++) $str .= $msg[$k].' ';
+					for ($k=3;$k<count($msg);$k++) 
+					{
+						$str .= $msg[$k].' ';
+					}
 					$str = trim(strtoupper($str));
 					$xml .= "<SystemExclusive>$str</SystemExclusive>\n";
 					break;
@@ -765,21 +797,28 @@ public function importXml($xmlStr){
 	xml_parser_free($this->xml_parser);
 }
 
-
-
-//---------------------------------------------------------------
-// imports Standard MIDI File (typ 0 or 1) (and RMID)
-// (if optional parameter $tn set, only track $tn is imported)
-//---------------------------------------------------------------
-public function importMid($smf_path){
-	$SMF = fopen($smf_path, "rb"); // Standard MIDI File, typ 0 or 1
-	$song = fread($SMF,filesize($smf_path));
-	fclose($SMF);
-	if (strpos($song,'MThd')>0) $song = substr($song,strpos($song,'MThd'));//get rid of RMID header
+/**
+ * Parse song
+ *
+ * @param string $song
+ * @return void
+ */
+public function parseMid($song)
+{
+	if (strpos($song,'MThd')>0) 
+	{
+		$song = substr($song, strpos($song, 'MThd'));//get rid of RMID header
+	}
 	$header = substr($song,0,14);
-	if (substr($header,0,8)!="MThd\0\0\0\6") $this->_err('wrong MIDI-header');
+	if (substr($header,0,8)!="MThd\0\0\0\6") 
+	{
+		$this->_err('wrong MIDI-header');
+	}
 	$type = ord($header[9]);
-	if ($type>1) $this->_err('only SMF Typ 0 and 1 supported');
+	if ($type>1) 
+	{
+		$this->_err('only SMF Typ 0 and 1 supported');
+	}
 	//$trackCnt = ord($header[10])*256 + ord($header[11]); //ignore
 	$timebase = ord($header[12])*256 + ord($header[13]);
 	$this->type = $type;
@@ -792,11 +831,32 @@ public function importMid($smf_path){
 	$tsc = count($trackStrings);
 	if (func_num_args()>1){
 		$tn =  func_get_arg(1);
-		if ($tn>=$tsc) $this->_err('SMF has less tracks than $tn');
+		if ($tn>=$tsc) 
+		{
+			$this->_err('SMF has less tracks than $tn');
+		}
 		$tracks[] = $this->_parseTrack($trackStrings[$tn],$tn);
-	} else
-		for ($i=0;$i<$tsc;$i++)  $tracks[] = $this->_parseTrack($trackStrings[$i],$i);
+	} 
+	else
+	{
+		for ($i=0;$i<$tsc;$i++)  
+		{
+			$tracks[] = $this->_parseTrack($trackStrings[$i],$i);
+		}
+	}
 	$this->tracks = $tracks;
+}
+
+
+//---------------------------------------------------------------
+// imports Standard MIDI File (typ 0 or 1) (and RMID)
+// (if optional parameter $tn set, only track $tn is imported)
+//---------------------------------------------------------------
+public function importMid($smf_path){
+	$SMF = fopen($smf_path, "rb"); // Standard MIDI File, typ 0 or 1
+	$song = fread($SMF,filesize($smf_path));
+	fclose($SMF);
+	$this->parseMid($song);
 }
 
 //---------------------------------------------------------------
@@ -834,7 +894,10 @@ public function getMid(){
 			// repetition, same event, same channel, omit first byte (smaller file size)
 			$str = $this->_getMsgStr($line);
 			$start = ord($str[0]);
-			if ($start>=0x80 && $start<=0xEF && $start==$last) $str = substr($str, 1);
+			if ($start>=0x80 && $start<=0xEF && $start==$last) 
+			{
+				$str = substr($str, 1);
+			}
 			$last = $start;
 
 			$midStr .= $str;
@@ -849,11 +912,17 @@ public function getMid(){
 // saves MIDI song as Standard MIDI File
 //---------------------------------------------------------------
 public function saveMidFile($mid_path, $chmod=false){
-	if (count($this->tracks)<1) $this->_err('MIDI song has no tracks');
+	if (count($this->tracks)<1) 
+	{
+		$this->_err('MIDI song has no tracks');
+	}
 	$SMF = fopen($mid_path, "wb"); // SMF
 	fwrite($SMF,$this->getMid());
 	fclose($SMF);
-	if ($chmod!==false) @chmod($mid_path, $chmod);
+	if ($chmod!==false) 
+	{
+		@chmod($mid_path, $chmod);
+	}
 }
 
 //---------------------------------------------------------------
@@ -868,7 +937,8 @@ public function playMidFile($file, $visible=true, $autostart=true, $loop=true, $
 // starts download of Standard MIDI File, either from memory or from the server's filesystem
 // ATTENTION: order of params swapped, so $file can be omitted to directly start download
 //---------------------------------------------------------------
-public function downloadMidFile($output, $file=false){
+public function downloadMidFile($output, $file=false)
+{
 	ob_start("ob_gzhandler"); // for compressed output...
 	
 	//$mime_type = 'audio/midi';
@@ -885,7 +955,9 @@ public function downloadMidFile($output, $file=false){
 		@fclose($d);
 	}
 	else
-		{echo $this->getMid();}
+	{
+		echo $this->getMid();
+	}
 	exit();
 }
 
@@ -1002,14 +1074,14 @@ public function getNoteList(){
 //---------------------------------------------------------------
 // returns time code of message string
 //---------------------------------------------------------------
-public function _getTime($msgStr){
+protected function _getTime($msgStr){
 	return (int) strtok($msgStr,' ');
 }
 
 //---------------------------------------------------------------
 // returns binary code for message string
 //---------------------------------------------------------------
-public function _getMsgStr($line)//NOSONAR
+protected function _getMsgStr($line)//NOSONAR
 {
 	$msg = explode(' ',$line);
 	switch($msg[1]){
@@ -1021,7 +1093,6 @@ public function _getMsgStr($line)//NOSONAR
 			$p = isset($p) ? $p : 0;
 			
 			return chr(0xC0+$ch-1).chr($p);
-			break;
 		case 'On': // 0x09
 			eval("\$".$msg[2].';'); // chan
 			eval("\$".$msg[3].';'); // note
@@ -1032,7 +1103,6 @@ public function _getMsgStr($line)//NOSONAR
 			$v = isset($v) ? $v : 0;
 			
 			return chr(0x90+$ch-1).chr($n).chr($v);
-			break;
 		case 'Off': // 0x08
 			eval("\$".$msg[2].';'); // chan
 			eval("\$".$msg[3].';'); // note
@@ -1043,7 +1113,6 @@ public function _getMsgStr($line)//NOSONAR
 			$v = isset($v) ? $v : 0;
 			
 			return chr(0x80+$ch-1).chr($n).chr($v);
-			break;
 		case 'PoPr': // 0x0A = PolyPressure
 			eval("\$".$msg[2].';'); // chan
 			eval("\$".$msg[3].';'); // note
@@ -1054,7 +1123,6 @@ public function _getMsgStr($line)//NOSONAR
 			$v = isset($v) ? $v : 0;
 			
 			return chr(0xA0+$ch-1).chr($n).chr($v);
-			break;
 		case 'Par': // 0x0B = ControllerChange
 			eval("\$".$msg[2].';'); // chan
 			eval("\$".$msg[3].';'); // controller
@@ -1065,7 +1133,6 @@ public function _getMsgStr($line)//NOSONAR
 			$v = isset($v) ? $v : 0;
 			
 			return chr(0xB0+$ch-1).chr($c).chr($v);
-			break;
 		case 'ChPr': // 0x0D = ChannelPressure
 			eval("\$".$msg[2].';'); // chan
 			eval("\$".$msg[3].';'); // val
@@ -1074,7 +1141,6 @@ public function _getMsgStr($line)//NOSONAR
 			$v = isset($v) ? $v : 0;
 			
 			return chr(0xD0+$ch-1).chr($v);
-			break;
 		case 'Pb': // 0x0E = PitchBend
 			eval("\$".$msg[2].';'); // chan
 			eval("\$".$msg[3].';'); // val (2 Bytes!)
@@ -1090,13 +1156,14 @@ public function _getMsgStr($line)//NOSONAR
 			$b = isset($b) ? $b : 0;
 			
 			return chr(0xE0+$ch-1).chr($a).chr($b);
-			break;
 		// META EVENTS
 		case 'Seqnr': // 0x00 = sequence_number
 			$num = chr($msg[2]);
-			if ($msg[2]>255) $this->_err("code broken around Seqnr event");
+			if ($msg[2]>255) 
+			{
+				$this->_err("code broken around Seqnr event");
+			}
 			return "\xFF\x00\x02\x00$num";
-			break;
 		case 'Meta':
 			$type = $msg[2];
 			switch ($type){
@@ -1114,27 +1181,21 @@ public function _getMsgStr($line)//NOSONAR
 					$txt = substr($line,$start,$end-$start);
 					$len = $this->_writeVarLen(strlen($txt)); // NEW
 					return "\xFF$byte$len$txt";
-					break;
 				case 'TrkEnd': //0x2F
 					return "\xFF\x2F\x00";
-					break;
 				case '0x20': // 0x20 = ChannelPrefix
 					$v = chr($msg[3]);
 					return "\xFF\x20\x01$v";
-					break;
 				case '0x21': // 0x21 = ChannelPrefixOrPort
 					$v = chr($msg[3]);
 					return "\xFF\x21\x01$v";
-					break;
 				default:
 					$this->_err("unknown meta event: $type");
-					exit();
+					break;
 			}
-			break;
 		case 'Tempo': // 0x51
 			$tempo = $this->_getBytes((int)$msg[2],3);
 			return "\xFF\x51\x03$tempo";
-			break;
 		case 'SMPTE': // 0x54 = SMPTE offset
 			$h = chr($msg[2]);
 			$m = chr($msg[3]);
@@ -1142,7 +1203,6 @@ public function _getMsgStr($line)//NOSONAR
 			$f = chr($msg[5]);
 			$fh = chr($msg[6]);
 			return "\xFF\x54\x05$h$m$s$f$fh";
-			break;
 		case 'TimeSig': // 0x58
 			$zt = explode('/',$msg[2]);
 			$z = chr($zt[0]);
@@ -1150,20 +1210,19 @@ public function _getMsgStr($line)//NOSONAR
 			$mc = chr($msg[3]);
 			$c = chr($msg[4]);
 			return "\xFF\x58\x04$z$t$mc$c";
-			break;
 		case 'KeySig': // 0x59
 			$vz = chr($msg[2]);
 			$g = chr(($msg[3]=='major')?0:1);
 			return "\xFF\x59\x02$vz$g";
-			break;
 		case 'SeqSpec': // 0x7F = Sequencer specific data (Bs: 0 SeqSpec 00 00 41)
 			$cnt = count($msg)-2;
 			$data = '';
 			for ($i=0;$i<$cnt;$i++)
+			{
 				$data.=$this->_hex2bin($msg[$i+2]);
+			}
 			$len = $this->_writeVarLen(strlen($data)); // NEW
 			return "\xFF\x7F$len$data";
-			break;
 		case 'SysEx': // 0xF0 = SysEx
 			$start = strpos($line,'f0');
 			$end = strrpos($line,'f7');
@@ -1171,18 +1230,17 @@ public function _getMsgStr($line)//NOSONAR
 			$data = $this->_hex2bin(str_replace(' ','',$data));
 			$len = chr(strlen($data));
 			return "\xF0$len".$data;
-			break;
 
 		default:
 			@$this->_err('unknown event: '.$msg[1]);
-			exit();
+			break;
 	}
 }
 
 //---------------------------------------------------------------
 // converts binary track string to track (list of msg strings)
 //---------------------------------------------------------------
-public function _parseTrack($binStr, $tn)//NOSONAR
+private function _parseTrack($binStr, $tn)//NOSONAR
 {
 	$trackLen = strlen($binStr);
   $p=4;
@@ -1209,7 +1267,7 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 			  $note = ord($binStr[$p+1]);
 			  $vel = ord($binStr[$p+2]);
 			  $last = 'On';
-			  $track[] = "$time On ch=$chan n=$note v=$vel";
+			  $track[] = "$time On ch=$chan n=$note v=$vel dt=$dt";
 			  $p+=3;
 			  break;
 		  case 0x08: //Off
@@ -1217,7 +1275,7 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 			  $note = ord($binStr[$p+1]);
 			  $vel = ord($binStr[$p+2]);
 			  $last = 'Off';
-			  $track[] = "$time Off ch=$chan n=$note v=$vel";
+			  $track[] = "$time Off ch=$chan n=$note v=$vel dt=$dt";
 			  $p+=3;
 			  break;
 		  case 0x0A: //PoPr = PolyPressure
@@ -1273,7 +1331,10 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 							  $type = $texttypes[$meta-1];
 							  $p +=2;
 							  $len = $this->_readVarLen($binStr, $p);
-							  if (($len+$p) > $trackLen) $this->_err("Meta $type has corrupt variable length field ($len) [track: $tn dt: $dt]");
+							  if (($len+$p) > $trackLen)
+							  {
+								$this->_err("Meta $type has corrupt variable length field ($len) [track: $tn dt: $dt]");
+							  }
 							  $txt = substr($binStr, $p,$len);
 							  $track[] = "$time Meta $type \"$txt\"";
 							  $p+=$len;
@@ -1283,7 +1344,10 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 						  		$p+=3;
 						  	}else{
 									$chan = ord($binStr[$p+3]);
-									if ($chan<10) $chan = '0'.$chan;//???
+									if ($chan<10) 
+									{
+										$chan = '0'.$chan;//???
+									}
 									$last = 'MetaChannelPrefix';
 							  	$track[] = "$time Meta 0x20 $chan";
 							  	$p+=4;
@@ -1292,9 +1356,14 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 						  case 0x21: // ChannelPrefixOrPort
 						  	if (ord($binStr[$p+2])==0){
 						  		$p+=3;
-						  	}else{
+						  	}
+							else
+							{
 									$chan = ord($binStr[$p+3]);
-									if ($chan<10) $chan = '0'.$chan;//???
+									if ($chan<10) 
+									{
+										$chan = '0'.$chan;//???
+									}
 								  $track[] = "$time Meta 0x21 $chan";
 								  $p+=4;
 								}
@@ -1302,7 +1371,6 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 						  case 0x2F: // Meta TrkEnd
 							  $track[] = "$time Meta TrkEnd";
 							  return $track;//ignore rest
-							  break;
 						  case 0x51: // Tempo
 							  $tempo = ord($binStr[$p+3])*256*256 + ord($binStr[$p+4])*256 + ord($binStr[$p+5]);
 							  $track[] = "$time Tempo $tempo";
@@ -1335,16 +1403,24 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 						  	$len = ord($binStr[$p+2]); # should be: 0x02 => $p+=5
 							  $vz  = $len>0 ? ord($binStr[$p+3]) : 0;
 							  $g   = ($len<=1 || ord($binStr[$p+4])==0) ?'major':'minor'; 
+							
+
 							  $track[] = "$time KeySig $vz $g";
 							  $p+=(3+$len);			   
 							  break;
 						  case 0x7F: // Sequencer specific data (string or hexString???)
 							  $p +=2;
 							  $len = $this->_readVarLen($binStr, $p);
-							  if (($len+$p) > $trackLen) $this->_err("SeqSpec has corrupt variable length field ($len) [track: $tn dt: $dt]");
+							  if (($len+$p) > $trackLen) 
+							  {
+								$this->_err("SeqSpec has corrupt variable length field ($len) [track: $tn dt: $dt]");
+							  }
 							  $p-=3;
 							  $data='';
-							  for ($i=0;$i<$len;$i++) $data.=' '.sprintf("%02x",ord($binStr[$p+3+$i]));
+							  for ($i=0;$i<$len;$i++) 
+							  {
+								$data.=' '.sprintf("%02x",ord($binStr[$p+3+$i]));
+							  }
 							  $track[] = "$time SeqSpec$data";
 							  $p+=$len+3;
 							  break;
@@ -1353,10 +1429,16 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 							  $metacode = sprintf("%02x", ord($binStr[$p+1]) );
 							  $p +=2;
 							  $len = $this->_readVarLen($binStr, $p);
-							  if (($len+$p) > $trackLen) $this->_err("Meta $metacode has corrupt variable length field ($len) [track: $tn dt: $dt]");
+							  if (($len+$p) > $trackLen) 
+							  {
+								$this->_err("Meta $metacode has corrupt variable length field ($len) [track: $tn dt: $dt]");
+							  }
 							  $p -=3;
 							  $data='';
-							  for ($i=0;$i<$len;$i++) $data.=' '.sprintf("%02x",ord($binStr[$p+3+$i]));
+							  for ($i=0;$i<$len;$i++) 
+							  {
+								$data.=' '.sprintf("%02x",ord($binStr[$p+3+$i]));
+							  }
 							  $track[] = "$time Meta 0x$metacode $data";
 							  $p+=$len+3;
 							  break;
@@ -1366,7 +1448,10 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 				  case 0xF0: // SysEx
 					  $p +=1;
 					  $len = $this->_readVarLen($binStr, $p);
-					  if (($len+$p) > $trackLen) $this->_err("SysEx has corrupt variable length field ($len) [track: $tn dt: $dt p: $p]");
+					  if (($len+$p) > $trackLen) 
+					  {
+						$this->_err("SysEx has corrupt variable length field ($len) [track: $tn dt: $dt p: $p]");
+					  }
 					  $str = 'f0';
 					  for ($i=0;$i<$len;$i++) 
 					  {
@@ -1383,7 +1468,7 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 						  case 'Off':
 							  $note = ord(@$binStr[$p]);
 							  $vel = ord(@$binStr[$p+1]);
-							  $track[] = "$time $last ch=$chan n=$note v=$vel";
+							  $track[] = "$time $last ch=$chan n=$note v=$vel dt=$dt";
 							  $p+=2;
 							  break;
 						  case 'PrCh':
@@ -1419,7 +1504,7 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 							  $p+=3;
 							  break;
 						  default:
-// MM: ToDo: Repetition of SysEx and META-events? with <last>?? \n";
+// MM: Repetition of SysEx and META-events? with <last>?? \n";
 							  $this->_err("unknown repetition: $last");
 							  
 					  }  // switch ($last)
@@ -1432,15 +1517,17 @@ public function _parseTrack($binStr, $tn)//NOSONAR
 //---------------------------------------------------------------
 // search track 0 for set tempo msg
 //---------------------------------------------------------------
-public function _findTempo(){
-	echo "_findTempo\r\n";
+private function _findTempo(){
 	$tempo = 0;
 	foreach($this->tracks as $track)
 	{
 		$mc = count($track);
 		for ($i=0;$i<$mc;$i++){
 			$msg = explode(' ',$track[$i]);
-			if ((int) $msg[0]>0) break;
+			if ((int) $msg[0]>0) 
+			{
+				break;
+			}
 			if ($msg[1]=='Tempo'){
 				$tempo = $msg[2];
 				$this->tempoMsgNum = $i;
@@ -1456,11 +1543,15 @@ public function _findTempo(){
 }
 
 
-
-//---------------------------------------------------------------
-// XML PARSING CALLBACKS
-//---------------------------------------------------------------
-public function _startElement($parser, $name, $attrs) //NOSONAR
+/**
+ * XML PARSING CALLBACKS
+ *
+ * @param mixed $parser
+ * @param string $name
+ * @param array $attrs
+ * @return void
+ */
+private function _startElement($parser, $name, $attrs) //NOSONAR
 {
 
 	switch ($name){
@@ -1491,9 +1582,10 @@ public function _startElement($parser, $name, $attrs) //NOSONAR
 	}
 }
 
-public function _endElement($parser, $name)//NOSONAR
+private function _endElement($parser, $name)//NOSONAR
 {
-	switch ($name){
+	switch ($name)
+	{
 		case 'MIDIFILE':
 			break;
 		case 'FORMAT':
@@ -1571,7 +1663,10 @@ public function _endElement($parser, $name)//NOSONAR
 					break;
 
 				case 'MIDICHANNELPREFIX'://???
-					if ((int) $dat<10) $dat='0'.$dat;
+					if ((int) $dat<10) 
+					{
+						$dat='0'.$dat;
+					}
 					$msg = "$time Meta 0x20 $dat";
 					break;
 
@@ -1622,7 +1717,7 @@ public function _endElement($parser, $name)//NOSONAR
 	}
 }
 
-public function _chData($parser, $data)//NOSONAR
+private function _chData($parser, $data)//NOSONAR
 {
 	$this->dat = (trim($data)=='')?'':$data;//???
 }
@@ -1634,7 +1729,7 @@ public function _chData($parser, $data)//NOSONAR
 //---------------------------------------------------------------
 // hexstr to binstr
 //---------------------------------------------------------------
-public function _hex2bin($hex_str) {
+private function _hex2bin($hex_str) {
 	$bin_str='';
   for ($i = 0; $i < strlen($hex_str); $i += 2) {
 	$bin_str .= chr(hexdec(substr($hex_str, $i, 2)));
@@ -1645,7 +1740,7 @@ public function _hex2bin($hex_str) {
 //---------------------------------------------------------------
 // int to bytes (length $len)
 //---------------------------------------------------------------
-public function _getBytes($n,$len){
+protected function _getBytes($n,$len){
 	$str='';
 	for ($i=$len-1;$i>=0;$i--){
 		$str.=chr(floor($n/pow(256,$i)));
@@ -1656,11 +1751,13 @@ public function _getBytes($n,$len){
 //---------------------------------------------------------------
 // variable length string to int (+repositioning)
 //---------------------------------------------------------------
-public function _readVarLen($str,&$pos){
+private function _readVarLen($str, &$pos)
+{
 	if ( ($value = ord(@$str[$pos++])) & 0x80 )
 	{
 		$value &= 0x7F;
-		do {
+		do 
+		{
 			$value = ($value << 7) + (($c = ord(@$str[$pos++])) & 0x7F);
 		} 
 		while ($c & 0x80);
@@ -1671,7 +1768,7 @@ public function _readVarLen($str,&$pos){
 //---------------------------------------------------------------
 // int to variable length string
 //---------------------------------------------------------------
-public function _writeVarLen($value)
+protected function _writeVarLen($value)
 {
 	$buf = $value & 0x7F;
 	$str='';
@@ -1680,8 +1777,9 @@ public function _writeVarLen($value)
 		$buf <<= 8;
 		$buf |= (($value & 0x7F) | 0x80);
 	}
-	while (true){
-		$str.=chr($buf%256);
+	while (true)
+	{
+		$str .= chr($buf%256);
 		if ($buf & 0x80)
 		{
 			$buf >>= 8;
@@ -1697,7 +1795,7 @@ public function _writeVarLen($value)
 //---------------------------------------------------------------
 // converts all delta times in track to absolute times
 //---------------------------------------------------------------
-public function _delta2Absolute($track){
+private function _delta2Absolute($track){
 	$mc = count($track);
 	$last = 0;
 	for ($i=0;$i<$mc;$i++){
@@ -1713,7 +1811,7 @@ public function _delta2Absolute($track){
 	//---------------------------------------------------------------
 	// error message
 	//---------------------------------------------------------------
-	public function _err($str)
+	protected function _err($str)
 	{
 		if ($this->throwFlag) {
 			eval('throw new Exception($str);');
@@ -1721,6 +1819,16 @@ public function _delta2Absolute($track){
 			die('>>> ' . $str . '!');
 		}
 	}
+
+
+/**
+ * Get the value of tracks
+ */ 
+public function getTracks()
+{
+return $this->tracks;
+}
+
 
 } // END OF CLASS
 
