@@ -441,12 +441,13 @@ function loadLyric(url)
 		}
 	});
 }
+let trimTime = 8;
 function updateLyric(second)
 {
 	if($('.lyric-preview').find('.lyric-item').length > 0)
 	{
 		$('.lyric-preview').find('.lyric-item').each(function(e){
-			var tm = parseInt($(this).attr('data-atime'));
+			var tm = parseInt($(this).attr('data-atime')) - trimTime;
 			if(tm < (second * 1000))
 			{
 				$(this).addClass('hilight');

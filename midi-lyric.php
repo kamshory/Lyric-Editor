@@ -11,6 +11,9 @@ $midi->importMid($song->getFilePathMidi());
 
 $list = $midi->getLyric();
 
+$lyricMidi = "A pa yang ter ja di
+ke pa da &nbsp;";
+
 ?>
 
 <div class="main-content"> <link rel="stylesheet" type="text/css" href="assets/css/midi-player.css" />
@@ -19,7 +22,7 @@ $list = $midi->getLyric();
 
 <h3 style="font-size: 18px; padding-bottom:2px;"><?php echo $song->getTitle();?></h3>
 
-<input type="button" id="generate" value="Generate" class="btn btn-primary">
+
 
 <div class="modal" tabindex="-1" role="dialog" id="generate-dialog">
 	  <div class="modal-dialog" role="document">
@@ -60,7 +63,7 @@ $list = $midi->getLyric();
 			</div>
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-primary" id="save-genre" onclick="generateLyricFromVocal()">Generate</button>
+			<button type="button" class="btn btn-primary" id="save-genre" onclick="generateLyricFromVocal(); ">Generate</button>
 			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 		  </div>
 		</div>
@@ -95,23 +98,35 @@ $list = $midi->getLyric();
 			{
 				if(typeof lyric_data.note.tracks[i][channel] != 'undefined')
 				{
-					console.log(lyric_data.note.tracks[i][channel]);
 					if(lyric_data.note.tracks[i][channel].length > 0)
 					{
+						let lastNote = {};
+						let len = lyric_data.note.tracks[i][channel].length;
 						for(var j in lyric_data.note.tracks[i][channel])
 						{
 							note = lyric_data.note.tracks[i][channel][j];
+							
 							rtime = note.rtime;
 							if(rtime > lastRtime)
 							{
-							atime = note.atime;
-							tone = note.note;
-							symbol = getNoteFromCode(tone);
-							symbol2 = '"'+symbol.split('"').join('\\"')+' "';
+								atime = note.atime;
+								tone = note.note;
+
+								symbol = getNoteFromCode(tone);
+								symbol2 = '"'+symbol.split('"').join('\\"')+' "';
+
+								let x = lastNote[tone] || null;
+
+								if((x == null || note.event == 'On' || x.event == 'Off')) 
+								{
+
+								
+									var ta = '<textarea class="ta-lyric-editor">'+symbol2+'</textarea>';
+									var html = '<tr data-track="'+i+'" data-rtime="'+rtime+'" data-atime="'+atime+'"><td>'+note.event+'</td><td>'+i+'</td><td>'+rtime+'</td><td>'+atime+'</td><td>'+ta+'</td></tr>';
+									$('.lyric-editor tbody').append(html);
+								}
 							
-							var ta = '<textarea class="ta-lyric-editor">'+symbol2+'</textarea>';
-							var html = '<tr data-track="'+i+'" data-rtime="'+rtime+'" data-atime="'+atime+'"><td>'+i+'</td><td>'+rtime+'</td><td>'+atime+'</td><td>'+ta+'</td></tr>';
-							$('.lyric-editor tbody').append(html);
+								lastNote[tone] = note;
 							}
 							lastRtime = rtime;
 						}
@@ -120,6 +135,7 @@ $list = $midi->getLyric();
 			}
 		}
 		renderLyric();
+		playerModal.hide();
 	}
 	$(document).ready(function(e){
 		lyric_data.lyric = getLyric(midi_data);
@@ -135,6 +151,11 @@ $list = $midi->getLyric();
 		$(document).on('click', '#generate', function(e){
 			playerModal.show();
 		});
+
+		$(document).on('click', '#replace-lyric', function(e){
+
+		});
+
 		$(document).on('keyup', 'textarea', function(e){
 			renderLyric();
 		});
@@ -308,6 +329,17 @@ $list = $midi->getLyric();
 		width:100%;
 		transition:height 0.015s;
 	}
+	textarea.rawdata{
+		width: 100%;
+		box-sizing: border-box;
+		height: 200px;
+		resize: vertical;
+		border: 1px solid #CCCCCC;
+		padding: 10px;
+	}
+	.button-area{
+		padding: 5px 0;
+	}
 	[data-channel="1"] > div{
 	}
 	</style>
@@ -369,14 +401,23 @@ $list = $midi->getLyric();
 	</div>
 	
 	<div class="flex-row">
-	<div class="flex-column lyric-preview">
-	
+	<div class="flex-column lyric-preview-container">
+		<div class="raw-area">
+			<div><textarea name="rawdata" class="rawdata"><?php echo htmlspecialchars($lyricMidi);?></textarea>
+			</div>
+			<div class="button-area">
+			<input type="button" id="generate" value="Generate" class="btn btn-primary">
+			<input type="button" id="replace-lyric" value="Replace Lyric" class="btn btn-success">
+			</div>
+		</div>
+		<div class="lyric-preview"></div>
 	</div>
 	<div class="flex-column lyric-editor">
 	<table class="table" width="100%" border="0">
 		<thead>
 			<tr>
 				<td width="50">Track</td>
+				<td width="50">Event</td>
 				<td width="80">R Time</td>
 				<td width="150">A Time</td>
 				<td>Text</td>
