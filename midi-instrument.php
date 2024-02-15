@@ -8,7 +8,6 @@ if(isset($song))
 $midi = new MidiInstrument();
 
 $midi->importMid($song->getFilePathMidi());
-//$midi->importMid("files/Beraksi.mid");
 
 $list = $midi->getInstrument();
 

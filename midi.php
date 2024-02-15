@@ -10,7 +10,6 @@ use Pico\Database\PicoPage;
 use Pico\Database\PicoPredicate;
 use Pico\Database\PicoSort;
 use Pico\Database\PicoSortable;
-use Pico\Database\PicoSpecification;
 use Pico\Pagination\PicoPagination;
 use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
@@ -26,7 +25,7 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getSongId() !
   {
     $song = new EntitySong(null, $database);
     $song->findOneBySongId($inputGet->getSongId());
-    require_once "midi-instrument.php";
+    require_once "midi-lyric.php";
   }
   catch(Exception $e)
   {
