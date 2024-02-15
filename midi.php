@@ -1,15 +1,17 @@
 <?php
-use Pico\Pagination\PicoPagination;
 use Pico\Data\Entity\Album;
 use Pico\Data\Entity\Artist;
-use Pico\Data\Entity\EntityMidi;
+use Pico\Data\Entity\EntitySong;
+use Pico\Data\Entity\EntitySongComment;
 use Pico\Data\Entity\Genre;
-use Pico\Data\Entity\Midi;
 use Pico\Data\Tools\SelectOption;
 use Pico\Database\PicoPagable;
 use Pico\Database\PicoPage;
+use Pico\Database\PicoPredicate;
+use Pico\Database\PicoSort;
 use Pico\Database\PicoSortable;
-use Pico\Exceptions\NoRecordFoundException;
+use Pico\Database\PicoSpecification;
+use Pico\Pagination\PicoPagination;
 use Pico\Request\PicoFilterConstant;
 use Pico\Request\PicoRequest;
 use Pico\Utility\SpecificationUtil;
@@ -18,269 +20,141 @@ require_once "inc/auth-with-login-form.php";
 require_once "inc/header.php";
 
 $inputGet = new PicoRequest(INPUT_GET);
-if($inputGet->equalsAction('compose') && $inputGet->getMidiId() != null)
+if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getSongId() != null)
 {
-  $midi = new Midi(null, $database);
   try
   {
-  $midi->findOneByMidiId($inputGet->getMidiId());
-  
-  ?>
-<link rel="stylesheet" href="lib/midi-editor.css">
-<script src="lib/midi-editor.js"></script>
-<script src="lib/ajax.js"></script>
-<link rel="stylesheet" href="lib/icon.css">
+    $song = new EntitySong(null, $database);
+    $song->findOneBySongId($inputGet->getSongId());
+    ?>
+    <table class="table table-responsive">
+      <tbody>
+        <tr>
+          <td>Song ID</td>
+          <td><?php echo $song->getSongId();?></td>
+        </tr>
+        <tr>
+          <td>Title</td>
+          <td><?php echo $song->getTitle();?></td>
+        </tr>
+        <tr>
+          <td>Duration</td>
+          <td><?php echo $song->getDuration();?></td>
+        </tr>
+        <tr>
+          <td>Genre</td>
+          <td><?php echo $song->hasValueGenre() ? $song->getGenre()->getName() : '';?></td>
+        </tr>
+        <tr>
+          <td>Album</td>
+          <td><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : '';?></td>
+        </tr>
+        <tr>
+          <td>Vocal</td>
+          <td><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : '';?></td>
+        </tr>
+        <tr>
+          <td>Composer</td>
+          <td><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : '';?></td>
+        </tr>
+        <tr>
+          <td>Arranger</td>
+          <td><?php echo $song->hasValueArtistArranger() ? $song->getArtistArranger()->getName() : '';?></td>
+        </tr>
+        <tr>
+          <td>File Size</td>
+          <td><?php echo $song->getFileSize();?></td>
+        </tr>
+        <tr>
+          <td>Created</td>
+          <td><?php echo $song->getTimeCreate();?></td>
+        </tr>
+        <tr>
+          <td>Last Update</td>
+          <td><?php echo $song->getTimeEdit();?></td>
+        </tr>
+        <tr>
+          <td>Active</td>
+          <td><?php echo $song->booleanToTextByActive('Yes', 'No');?></td>
+        </tr>
+      </tbody>
+    </table>
+    <style>
+      .comment-wrapper{
+        padding: 10px 0;
+        margin-bottom: 4px;
+        border-bottom: 1px solid #DDDDDD;
+      }
+      .comment-content{
+        padding: 5px 0;
+      }
+      .summernote{
+        width: 100%;
+        height: 120px;
+      }
+      .button-area{
+        padding: 5px 0;
+      }
+    </style>
+    
+ 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs5.js" integrity="sha512-VqW3FWLsKVphZNAVsUKfA5UJ9oxVamFqNtHs46UxI7UA/gQ6GGaZ37GYdotPJ27Y/C8dvOQEKjWbfiNOkkhVAA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs5.min.css" integrity="sha512-ngQ4IGzHQ3s/Hh8kMyG4FC74wzitukRMIcTOoKT3EyzFZCILOPF0twiXOQn75eDINUfKBYmzYn2AA8DkAk8veQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-  <div class="srt-editor editor1">
-      <div class="row">
-          <div class="col col-7" style="display: none;">
-              <ul class="nav nav-tabs" id="myTab" role="tablist">
-                  <li class="nav-item" role="presentation">
-                      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Timeline</button>
-                  </li>
-                  <li class="nav-item" role="presentation">
-                      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Raw</button>
-                  </li>
-              </ul>
-              <div class="tab-content" id="srt-tab-content">
-                  <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
-                      <!-- list begin -->
-                      <div class="srt-list-wrapper">
-                          <div class="srt-list-container">
 
-                          </div>
-                      </div>
-                      <!-- list end -->
-
-                  </div>
-                  <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                      <div class="srt-raw">
-                          <textarea class="srt-text-raw" spellcheck="false"></textarea>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="col col-5">
-              <div class="player">
-                  <div class="text-display-container" style="display: none;">
-                      <div class="text-display">
-                          <div class="text-display-inner d-flex align-items-center justify-content-center"></div>
-                      </div>
-                  </div>
-                  <div class="srt-zoom-control-wrapper">
-                  <input type="range" class="srt-zoom-control" min="0" max="8" step="1" list="input-markers">
-                  <datalist id="input-markers" style="--list-length: 9;">
-                      <option value="0">0.125x</option><option value="1">0.25x</option><option value="2">0.5x</option><option value="3">0.75x</option><option value="4">1x</option><option value="5">1.25x</option><option value="6">1.5x</option><option value="7">1.75x</option><option value="8">2x</option>
-                  </datalist>
-                  </div>
-                  <div class="player-controller">
-                      <button class="btn btn-dark button-play-master">Play</button>
-                      <button class="btn btn-dark button-pause-master">Pause</button>
-                      <button class="btn btn-dark button-scroll-master">Scroll</button>
-                      <button class="btn btn-dark button-reset-master">Reset</button>
-                      <button class="btn btn-dark button-save-master">Save</button>
-                  </div>
-              </div>
-          </div>
-      </div>
-
-      <!-- controller drag begin -->
-      <div class="srt-map">
-          <div class="srt-map-first-layer">
-
-              <div class="srt-time-position">
-                  <div class="srt-time-position-inner">
-                      <div class="srt-time-position-pointer" data-toggle="tooltip" data-placement="top" title="00:00:00"></div>
-                  </div>
-              </div>
-
-              <div class="srt-timestamp">
-                  <canvas class="srt-timeline-canvas"></canvas>
-              </div>
-
-              <div class="srt-edit-area">
-                  <div class="srt-waveform">
-                      <canvas class="srt-timeline-canvas-edit" height="64" width="100%"></canvas>
-                  </div>
-                  <div class="srt-map-srt-container">
-                  </div>
-              </div>
-          </div>
-      </div>
-      <!-- controller drag end -->
-  </div>
-
-  <!-- Modal -->
-  <div class="modal fade" id="deleteItem" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteItemLabel" aria-hidden="true">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="deleteItemLabel">Delete Text</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  Are you sure you want to delete this one?
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-danger delete">OK</button>
-                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
-              </div>
-          </div>
-      </div>
-  </div>
-
-<?php
-    $lyric = $midi->getLyric();
-    if(strlen(trim($lyric)) == 0)
+    <form action="">
+      <h4>Comment</h4>
+    <div><textarea name="summernote" class="summernote" rows="4"></textarea></div>
+    <div class="button-area">
+      <input type="submit" class="btn btn-primary" name="save" value="Save">
+      <input type="button" class="btn btn-secondary" name="cancel" value="Cancel">
+    </div>
+    </form>
+    <script>
+      $(document).ready(function() {
+        $('.summernote').summernote({});
+      });
+    </script>
+    
+    <?php
+    
+    $songComment = new EntitySongComment(null, $database);
+    try
     {
-        $lyric = "{type here}";
+      $result = $songComment->findDescBySongId($inputGet->getSongId());
+      $comments = $result->getResult();
+      foreach($comments as $comment)
+      {
+        ?>
+        <div class="comment-wrapper">
+        <div class="comment-creator"><?php echo $comment->hasValueCreator() ? $comment->getCreator()->getName() : "";?> <?php echo date("j F Y H:i:s", strtotime($comment->hasValueTimeCreate()));?></div>
+        <div class="comment-content"><?php echo $comment->getComment();?></div>
+        <div class="comment-controller"><a class="comment-edit" href="javascript:">Edit</a> &nbsp; <a class="comment-delete" href="javascript:">Delete</a></div>
+        </div>
+        <?php
+      }
     }
-    if(stripos($lyric, "-->") === false)
+    catch(Exception $e)
     {
-        $lyric = "00:00:00,000 --> 00:00:01,000\r\n".$lyric;
+      echo $e->getMessage();
     }
-?>
-<script>
-    let midi_id = '<?php echo $midi->getMidiId(); ?>';
-    let path = '<?php echo $cfg->getMidiBaseUrl();?>/<?php echo $midi->getFileName(); ?>';
-    let jsonData = <?php echo json_encode(array('lyric'=>$lyric)); ?>;
-    let rawData = jsonData.lyric;
-</script>
-<script>
-    let midi;
-    $(document).ready(function(evt)
-    {      
-        midi = new MidiEditor('.editor1', rawData, path);
-        midi.onDeleteData = function(index, countData) {
-            if (countData > 1) {
-                idToDelete = index;
-                let myModal = new bootstrap.Modal(document.querySelector('#deleteItem'), {
-                    keyboard: false
-                });
-                myModal.show();
-                document.querySelector('#deleteItem .delete').addEventListener('click', function(e) {
-                    midi.deleteData(idToDelete);
-                    idToDelete = -1;
-                    myModal.hide();
-                });
-            }
-        };
-
-        document.querySelector('.button-play-master').addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            midi.play();
-        });
-
-        document.querySelector('.button-scroll-master').addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            midi.toggleScroll();
-        });
-
-        document.querySelector('.button-pause-master').addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            midi.pause(true);
-        });
-
-        document.querySelector('.button-save-master').addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            saveLyric();
-        });
-        document.querySelector('.button-reset-master').addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            resetLyric();
-        });
-
-        document.onkeydown = function(e) {
-            if (e.ctrlKey && e.keyCode === 83) {
-                e.preventDefault();
-                e.stopPropagation();
-                saveLyric();
-            }
-        };
-    });
-    function resetLyric()
-    {
-         $.ajax({
-            type:'GET',
-            url:'lib.ajax/lyric-load.php',
-            data:{midi_id:midi_id},
-            dataType:'json',
-            success:function(data)
-            {
-                rawData:data.lyric;
-                midi.initData(rawData, path)
-            }
-        });
-    }
-    function saveLyric()
-    {
-        if(midi.zoomLevelIndex < midi.zoomLevelIndexOriginal)
-        {
-            midi.resetZoom();
-        }
-        midi.updateData();
-        let duration = midi.duration;
-        rawData = midi.getFinalResult();
-        ajax.post('lib.ajax/lyric-save.php', {
-            midi_id: midi_id,
-            lyric: rawData,
-            duration: duration
-        }, function(response, status) {
-        });
-    }
-</script>
-
-<?php
-}
-catch(Exception $e)
-{
-    // do nothing
-}
-}
-else if($inputGet->equalsAction(PicoRequest::ACTION_DETAIL) && $inputGet->getMidiId() != null)
-{
-  $midi = new Midi(null, $database);
-  try
-  {
-  $midi->findOneByMidiId($inputGet->getMidiId());
-  ?>
-  <table class="table table-responsive">
-    <tbody>
-      <tr>
-        <td>MIDI ID</td>
-        <td><?php echo $midi->getMidiId();?></td>
-      </tr>
-      <tr>
-        <td>Title</td>
-        <td><?php echo $midi->getTitle();?></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  <?php
+    
+    ?>
+    
+    <?php
   }
-  catch(NoRecordFoundException $e)
+  catch(Exception $e)
   {
     ?>
     <div class="alert alert-warning"><?php echo $e->getMessage();?></div>
     <?php
   }
-  catch(Exception $e)
-  {
-    // do nothing
-  }
 }
 else
 {
-?>
-
-<div class="filter-container">
+    ?>
+    <div class="filter-container">
     <form action="" method="get">
     <div class="filter-group">
         <span>Genre</span>
@@ -308,31 +182,101 @@ else
         <input class="form-control" type="text" name="title" id="title" autocomplete="off" value="<?php echo $inputGet->getTitle(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>">
     </div>
     
+    <div class="filter-group">
+        <span>Vocal</span>
+        <select class="form-control" name="vocal" id="vocal">
+            <option value="">- All -</option>
+            <option value="1"<?php echo $inputGet->createSelectedVocal("1");?>>Yes</option>
+            <option value="0"<?php echo $inputGet->createSelectedVocal("0");?>>No</option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <span>Lyric</span>
+        <select class="form-control" name="lyric_complete" id="lyric_complete">
+            <option value="">- All -</option>
+            <option value="1"<?php echo $inputGet->createSelectedLyricComplete("1");?>>Yes</option>
+            <option value="0"<?php echo $inputGet->createSelectedLyricComplete("0");?>>No</option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <span>Active</span>
+        <select class="form-control" name="active" id="active">
+            <option value="">- All -</option>
+            <option value="1"<?php echo $inputGet->createSelectedActive("1");?>>Yes</option>
+            <option value="0"<?php echo $inputGet->createSelectedActive("0");?>>No</option>
+        </select>
+    </div>
+
     <input class="btn btn-success" type="submit" value="Show">
     
     </form>
 </div>
-
 <?php
+$orderMap = array(
+    'title'=>'title', 
+    'score'=>'score',
+    'albumId'=>'albumId', 
+    'album'=>'albumId', 
+    'trackNumber'=>'trackNumber',
+    'genreId'=>'genreId', 
+    'genre'=>'genreId',
+    'artistVocalId'=>'artistVocalId',
+    'artistVocal'=>'artistVocalId',
+    'artistComposerId'=>'artistComposerId',
+    'artistComposer'=>'artistComposerId',
+    'duration'=>'duration',
+    'lyricComplete'=>'lyricComplete',
+    'vocal'=>'vocal',
+    'active'=>'active'
+);
+$defaultOrderBy = 'albumId';
+$defaultOrderType = 'desc';
 $pagination = new PicoPagination($cfg->getResultPerPage());
 
-$spesification = SpecificationUtil::createMidiSpecification($inputGet);
+$spesification = SpecificationUtil::createSongSpecification($inputGet);
 
-$sortable = new PicoSortable('title', PicoSortable::ORDER_TYPE_DESC);
+$filter1 = new PicoPredicate();
+$filter1->notEquals("filePathMidi", null);
+$spesification->addAnd($filter1);
+
+if($pagination->getOrderBy() == '')
+{
+  $sortable = new PicoSortable();
+  $sort1 = new PicoSort('albumId', PicoSortable::ORDER_TYPE_DESC);
+  $sortable->addSortable($sort1);
+  $sort2 = new PicoSort('trackNumber', PicoSortable::ORDER_TYPE_ASC);
+  $sortable->addSortable($sort2);
+}
+else
+{
+  $sortable = new PicoSortable($pagination->getOrderBy($orderMap, $defaultOrderBy), $pagination->getOrderType($defaultOrderType));
+}
+
 $pagable = new PicoPagable(new PicoPage($pagination->getCurrentPage(), $pagination->getPageSize()), $sortable);
-$midi = new EntityMidi(null, $database);
-$rowData = $midi->findAll($spesification, $pagable, true);
+
+$songEntity = new EntitySong(null, $database);
+$rowData = $songEntity->findAll($spesification, $pagable, $sortable, true);
 
 $result = $rowData->getResult();
 
+?>
+
+<script>
+    $(document).ready(function(e){
+        let pg = new Pagination('.pagination', '.page-selector', 'data-page-number', 'page');
+        pg.init();
+        $(document).on('change', '.filter-container form select', function(e2){
+            $(this).closest('form').submit();
+        });
+    });
+</script>
+
+<?php
 if(!empty($result))
 {
 ?>
-
-<div class="pagination">
-
-</div>
-
 <div class="pagination">
     <div class="pagination-number">
     <?php
@@ -344,48 +288,62 @@ if(!empty($result))
     </div>
 </div>
 <table class="table">
-  <thead>
-    <tr>
-    <th scope="col" width="20"><i class="ti ti-edit"></i></th>
-    <th scope="col" width="20"><i class="ti ti-trash"></i></th>
-    <th scope="col" width="20"><i class="ti ti-music"></i></th>
-      <th scope="col" width="20">#</th>
-      <th scope="col">Title</th>
-      <th scope="col">Genre</th>
-      <th scope="col">Artist</th>
-      <th scope="col">Album</th>
-      <th scope="col">Duration</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php
-    $no = $pagination->getOffset();
-    foreach($result as $midi)
-    {
-      $no++;
-      $midiId = $midi->getMidiId();
-      $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&midi_id=".$midiId;
-      $linkMusic = basename($_SERVER['PHP_SELF'])."?action=compose&midi_id=".$midiId;
-      $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&midi_id=".$midiId;
-    ?>
-    <tr data-id="<?php echo $midiId;?>">
+    <thead>
+        <tr>
+        <th scope="col" width="20"><i class="ti ti-edit"></i></th>
+        <th scope="col" width="20"><i class="ti ti-trash"></i></th>
+        <th scope="col" width="20"><i class="ti ti-player-play"></i></th>
+        <th scope="col" width="20">#</th>
+        <th scope="col" class="col-sort" data-name="title">Title</th>
+        <th scope="col" class="col-sort" data-name="score">Score</th>
+        <th scope="col" class="col-sort" data-name="album_id">Album</th>
+        <th scope="col" class="col-sort" data-name="track_number">Track</th>
+        <th scope="col" class="col-sort" data-name="genre_id">Genre</th>
+        <th scope="col" class="col-sort" data-name="artist_vocal">Vocalist</th>
+        <th scope="col" class="col-sort" data-name="artist_composer">Composer</th>
+        <th scope="col" class="col-sort" data-name="duration">Duration</th>
+        <th scope="col" class="col-sort" data-name="vocal">Vocal</th>
+        <th scope="col" class="col-sort" data-name="lyric_complete">Lyric</th>
+        <th scope="col" class="col-sort" data-name="active">Active</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        $no = $pagination->getOffset();
+        foreach($result as $song)
+        {
+        $no++;
+        $songId = $song->getSongId();
+        $linkEdit = basename($_SERVER['PHP_SELF'])."?action=edit&song_id=".$songId;
+        $linkDetail = basename($_SERVER['PHP_SELF'])."?action=detail&song_id=".$songId;
+        $linkDelete = basename($_SERVER['PHP_SELF'])."?action=delete&song_id=".$songId;
+        ?>
+        <tr data-id="<?php echo $songId;?>">
         <th scope="row"><a href="<?php echo $linkEdit;?>" class="edit-data"><i class="ti ti-edit"></i></a></th>
-        <th scope="row"><a href="<?php echo $linkEdit;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
-        <th scope="row"><a href="<?php echo $linkMusic;?>" class="edit-data"><i class="ti ti-music"></i></a></th>
-        <th scope="row"><?php echo $no;?></th>
-        <td><a href="<?php echo $linkDetail;?>"><?php echo $midi->getTitle();?></a></td>
-        <td><?php echo $midi->hasValueGenre() ? $midi->getGenre()->getName() : "";?></td>
-        <td><?php echo $midi->hasValueArtistVocal() ? $midi->getArtistVocal()->getName() : "";?></td>
-        <td><?php echo $midi->hasValueAlbum() ? $midi->getAlbum()->getName() : "";?></td>
-        <td><?php echo $midi->getDuration();?></td>
-    </tr>
-    <?php
-    }
-    ?>
-    
-  </tbody>
-</table>
-<div class="pagination">
+        <th scope="row"><a href="<?php echo $linkDelete;?>" class="delete-data"><i class="ti ti-trash"></i></a></th>
+        <th scope="row"><a href="#" class="play-data" data-url="<?php echo $cfg->getSongBaseUrl()."/".$song->getFileName();?>?hash=<?php echo str_replace(array(' ', '-', ':'), '', $song->getLastUploadTime());?>"><i class="ti ti-player-play"></i></a></th>
+        <th class="text-right" scope="row"><?php echo $no;?></th>
+        <td><a href="<?php echo $linkDetail;?>" class="text-data text-data-title"><?php echo $song->getTitle();?></a></td>
+        <td class="text-data text-data-score"><?php echo $song->hasValueScore() ? $song->getScore() : "";?></td>
+        <td class="text-data text-data-album-name"><?php echo $song->hasValueAlbum() ? $song->getAlbum()->getName() : "";?></td>
+        <td class="text-data text-data-track-number"><?php echo $song->hasValueTrackNumber() ? $song->getTrackNumber() : "";?></td>
+        <td class="text-data text-data-genre-name"><?php echo $song->hasValueGenre() ? $song->getGenre()->getName() : "";?></td>
+        <td class="text-data text-data-artist-vocal-name"><?php echo $song->hasValueArtistVocal() ? $song->getArtistVocal()->getName() : "";?></td>
+        <td class="text-data text-data-artist-composer-name"><?php echo $song->hasValueArtistComposer() ? $song->getArtistComposer()->getName() : "";?></td>
+        <td class="text-data text-data-duration"><?php echo $song->getDuration();?></td>
+        <td class="text-data text-data-vocal"><?php echo $song->isVocal() ? 'Yes' : 'No';?></td>
+        <td class="text-data text-data-lyric-complete"><?php echo $song->isLyricComplete() ? 'Yes' : 'No';?></td>
+        <td class="text-data text-data-active"><?php echo $song->isActive() ? 'Yes' : 'No';?></td>
+        </tr>
+        <?php
+        }
+        ?>
+        
+    </tbody>
+    </table>
+
+
+    <div class="pagination">
     <div class="pagination-number">
     <?php
     foreach($rowData->getPagination() as $pg)
@@ -395,8 +353,121 @@ if(!empty($result))
     ?>
     </div>
 </div>
+
 <?php
 }
+?>
+
+<script>
+  let playerModal;
+  
+  
+  $(document).ready(function(e){
+    let playerModalSelector = document.querySelector('#songPlayer');
+    playerModal = new bootstrap.Modal(playerModalSelector, {
+      keyboard: false
+    });
+    
+    $('a.play-data').on('click', function(e2){
+      e2.preventDefault();
+      $('#songPlayer').find('audio').attr('src', $(this).attr('data-url'));
+      playerModal.show();
+    });
+    $('.close-player').on('click', function(e2){
+      e2.preventDefault();
+      $('#songPlayer').find('audio')[0].pause();
+      playerModal.hide();
+    });
+  });
+</script>
+
+<div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="songPlayer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="songPlayerLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addAlbumDialogLabel">Play Song</h5>
+              <button type="button" class="btn-primary btn-close close-player" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <audio style="width: 100%; height: 40px;" controls></audio>
+          </div>
+          
+          <div class="modal-footer">
+              <button type="button" class="btn btn-success close-player">Close</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="lazy-dom modal-container modal-update-data" data-url="lib.ajax/song-update-dialog.php"></div>
+
+<script>
+  let updateSongModal;
+  
+  $(document).ready(function(e){
+    
+    $(document).on('click', '.edit-data', function(e2){
+      e2.preventDefault();
+      e2.stopPropagation();
+      
+      let songId = $(this).closest('tr').attr('data-id') || '';
+      let dialogSelector = $('.modal-update-data');
+      dialogSelector.load(dialogSelector.attr('data-url')+'?song_id='+songId, function(data){
+        
+        let updateSongModalElem = document.querySelector('#updateSongDialog');
+        updateSongModal = new bootstrap.Modal(updateSongModalElem, {
+          keyboard: false
+        });
+        updateSongModal.show();
+        downloadForm('.lazy-dom-container', function(){
+          if(!allDownloaded)
+          {
+              initModal2();
+              console.log('loaded')
+              allDownloaded = true;
+          }
+          loadForm();
+      });
+      })
+    });
+
+    $(document).on('click', '.save-update-song', function(){
+      if($('.song-dialog audio').length > 0)
+      {
+        $('.song-dialog audio').each(function(){
+          $(this)[0].pause();
+        });
+      }
+      let dataSet = $(this).closest('form').serializeArray();
+      $.ajax({
+        type:'POST',
+        url:'lib.ajax/song-update.php',
+        data:dataSet, 
+        dataType:'json',
+        success: function(data)
+        {
+          updateSongModal.hide();
+          let formData = getFormData(dataSet);
+          let dataId = data.song_id;
+          let title = data.title;
+          let active = data.active;
+          $('[data-id="'+dataId+'"] .text-data.text-data-title').text(data.title);
+          $('[data-id="'+dataId+'"] .text-data.text-data-score').text(data.score);
+          $('[data-id="'+dataId+'"] .text-data.text-data-track-number').text(data.track_number);
+          $('[data-id="'+dataId+'"] .text-data.text-data-artist-vocal-name').text(data.artist_vocal_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-artist-composer-name').text(data.artist_composer_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-artist-arranger-name').text(data.artist_arranger_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-album-name').text(data.album_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-genre-name').text(data.genre_name);
+          $('[data-id="'+dataId+'"] .text-data.text-data-duration').text(data.duration);
+          $('[data-id="'+dataId+'"] .text-data.text-data-vocal').text(data.vocal === true || data.vocal == 1 || data.vocal == "1" ?'Yes':'No');
+          $('[data-id="'+dataId+'"] .text-data.text-data-active').text(data.active === true || data.active == 1 || data.active == "1" ?'Yes':'No');
+        }
+      })
+    });
+  });
+</script>
+<?php
 }
 require_once "inc/footer.php";
 ?>
