@@ -118,7 +118,28 @@ $(document).ready(function () {
     }
   });
 });
-
+function updateLyric2(value)
+{
+	value = value.split("\n").join("\r\n");
+	value = value.split("\r\r\n").join("\r\n");
+	value = value.split("\r").join("\r\n");
+	value = value.split("\r\n\n").join("\r\n");
+	let values = value.split('\r\n').join(' ').split(' ');
+	console.log(values);
+	let idx = 0;
+	$('.timetable tbody').find('tr').each(function(e){
+		let tr = $(this);
+		let sub = values[idx] || null;
+		if(sub != null && sub.length <= 10)
+		{
+			sub = sub.split('_').join(' ');
+			sub = sub.split('\\').join('\r\n');
+			tr.find('textarea.ta-lyric-editor').val('"'+sub+'"');
+		}
+		idx++;
+	});
+	renderLyric2();
+}
 $(document).ready(function (e) {
   lyricData.lyric = getLyric(midi_data);
   lyricData.time = getTempoData(midi_data);
@@ -130,6 +151,11 @@ $(document).ready(function (e) {
     keyboard: false,
   });
 
+  $(document).on('change, keyup', '.rawdata', function(e){
+	let value = $(this).val();
+	updateLyric2(value);
+  });
+
   $(document).on("click", "#generate", function (e) {
     playerModal.show();
   });
@@ -137,7 +163,7 @@ $(document).ready(function (e) {
   $(document).on("click", "#replace-lyric", function (e) {});
 
   $(document).on("keyup", "textarea", function (e) {
-    renderLyric();
+    renderLyric2();
   });
   $(document).on("mouseover", ".lyric-editor tbody tr", function (e2) {
     let tm = $(this).attr("data-rtime");
@@ -210,11 +236,8 @@ function generateLyricFromVocal() {
   let symbol2 = "";
   $(".lyric-editor tbody").empty();
   let lastRtime = 0;
-  console.log(lyricData);
   for (let i in lyricData.note.tracks) {
-    console.log("before");
     if (isValidLyricData(lyricData, i, channel)) {
-      console.log("after");
       let lastNote = {};
       for (let j in lyricData.note.tracks[i][channel]) {
         note = lyricData.note.tracks[i][channel][j];
@@ -228,9 +251,7 @@ function generateLyricFromVocal() {
           symbol2 = '"' + symbol.split('"').join('\\"') + ' "';
 
           let x = getLastEvent(lastNote, tone);
-          console.log("sebelum");
           if (isValidEvent(x, note)) {
-            console.log("sesudah");
             let ta =
               '<textarea class="ta-lyric-editor">' + symbol2 + "</textarea>";
             let html =

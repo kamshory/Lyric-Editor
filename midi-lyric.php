@@ -3,7 +3,21 @@
 use Midi\MidiLyric;
 
 require_once "inc/auth-with-login-form.php";
-
+function importLyricMidi($original)
+{
+	$match = preg_split('/\d+:\d+:\d+,\d+\s-->\s\d+:\d+:\d+,\d+./i', $original);
+	$str = implode("\r\n", $match);
+	$str = str_replace("\n", "\r\n", $str);
+	$str = str_replace("\r\r\n", "\r\n", $str);
+	$str = str_replace("\r", "\r\n", $str);
+	$str = str_replace("\r\n\n", "\r\n", $str);
+	$str = str_replace("\r\n\r\n", "\r\n", $str);
+	$str = str_replace("\r\n\r\n", "\r\n", $str);
+	$str = trim($str);
+	$str = str_replace("\r\n", "\\\r\n", $str);
+	$str = str_replace(" ", "_ ", $str);
+	return $str;
+}
 if (isset($song)) {
 	$midi = new MidiLyric();
 
@@ -11,8 +25,11 @@ if (isset($song)) {
 
 	$list = $midi->getLyric();
 
-	$lyricMidi = "A pa yang ter ja di
-ke pa da &nbsp;";
+	$lyricMidi = $song->getLyricMidi();
+	if(empty($lyricMidi))
+	{
+		$lyricMidi = importLyricMidi($song->getLyric());
+	}
 
 ?>
 
@@ -23,9 +40,7 @@ ke pa da &nbsp;";
 		<h3 style="font-size: 18px; padding-bottom:2px;"><?php echo $song->getTitle(); ?></h3>
 
 		<script type="text/javascript">
-			var midi_data = <?php
-							echo json_encode($midi->getMidData(), JSON_PRETTY_PRINT);
-							?>;
+			var midi_data = <?php echo json_encode($midi->getMidData());?>;
 		</script>
 		<script type="text/javascript" src="assets/js/lyric-editor.js"></script>
 		<script type="text/javascript" src="assets/midijs/midi.js"></script>
@@ -176,7 +191,7 @@ ke pa da &nbsp;";
 				<div class="lyric-preview"></div>
 			</div>
 			<div class="flex-column lyric-editor">
-				<table class="table" width="100%" border="0">
+				<table class="table timetable" width="100%" border="0">
 					<thead>
 						<tr>
 							<td width="50">Track</td>
