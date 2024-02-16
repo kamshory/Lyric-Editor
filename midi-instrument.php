@@ -2,7 +2,6 @@
 use Midi\MidiInstrument;
 
 require_once "inc/auth-with-login-form.php";
-
 if(isset($song))
 {
 $midi = new MidiInstrument();
