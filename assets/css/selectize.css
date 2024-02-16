@@ -203,6 +203,8 @@
   background: 0 0 !important;
   line-height: inherit !important;
   -webkit-user-select: auto !important;
+  -moz-user-select: auto !important;
+       user-select: auto !important;
   box-shadow: none !important;
 }
 .selectize-input > input::-ms-clear {

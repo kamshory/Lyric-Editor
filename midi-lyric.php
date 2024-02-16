@@ -1,6 +1,8 @@
 <?php
 
 use Midi\MidiLyric;
+use Pico\Data\Entity\Song;
+use Pico\Request\PicoRequest;
 
 require_once "inc/auth-with-login-form.php";
 function importLyricMidi($original)
@@ -18,7 +20,24 @@ function importLyricMidi($original)
 	$str = str_replace(" ", "_ ", $str);
 	return $str;
 }
+error_reporting(E_ALL);
+$inputGet = new PicoRequest(INPUT_GET);
+
+if($inputGet->equalsAction('save-raw'))
+{
+	$inputPost = new PicoRequest(INPUT_POST);
+	if($inputPost->getRaw() != null)
+	{
+		$raw = $inputPost->getRaw();
+		$songUpdate = new Song(array('songId'=>$inputPost->getSongId(), 'lyricMidi'=>$raw), $database);
+		$songUpdate->update();
+		error_log($songUpdate);
+	}
+	exit();
+}
+
 if (isset($song)) {
+	echo $song;
 	$midi = new MidiLyric();
 
 	$midi->importMid($song->getFilePathMidi());
@@ -33,6 +52,38 @@ if (isset($song)) {
 
 ?>
 
+<script>
+	$(document).ready(function(){
+		$(document).on('click', '#save-raw', function(e){
+			let rawData = $('#rawdata').val();
+			let songId = $('#song_id').val();
+			$.ajax({
+				url:'midi-lyric.php?action=save-raw',
+				type:'POST',
+				data:{'raw':rawData, 'song_id':songId},
+				success:function(data){				
+				},
+				error : function(e1, e2)
+				{
+					console.error(e1);
+					console.error(e2);
+				}
+			});
+		});
+		$(document).on('click', '#save-raw', function(e){
+			let rawData = $('#rawdata').val();
+			$.ajax({
+				url:'midi-lyric.php?action=save-raw',
+				type:'POST',
+				data:{'raw':rawData},
+				success:function(data){
+					
+				}
+			});
+		});
+	});
+</script>
+
 	<div class="main-content">
 		<link rel="stylesheet" type="text/css" href="assets/css/midi-player.css" />
 		<link rel="stylesheet" type="text/css" href="assets/css/lyric-editor.css" />
@@ -40,9 +91,9 @@ if (isset($song)) {
 		<h3 style="font-size: 18px; padding-bottom:2px;"><?php echo $song->getTitle(); ?></h3>
 
 		<script type="text/javascript">
-			var midi_data = <?php echo json_encode($midi->getMidData());?>;
+			var midi_data = <?php echo json_encode($midi->getMidData(), JSON_PRETTY_PRINT);?>;
 		</script>
-		<script type="text/javascript" src="assets/js/lyric-editor.js"></script>
+		<script type="text/javascript" src="assets/js/lyric-editor.js?rnd=<?php echo mt_rand(1, 9999999);?>"></script>
 		<script type="text/javascript" src="assets/midijs/midi.js"></script>
 
 		<div style="background-color: rgba(0, 0, 0, 0.11);" class="modal fade" id="generate-dialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="generateDialogLabel" aria-hidden="true">
@@ -177,15 +228,20 @@ if (isset($song)) {
 				</div>
 			</div>
 		</div>
+		
+		
 
 		<div class="flex-row">
 			<div class="flex-column lyric-preview-container">
 				<div class="raw-area">
-					<div><textarea name="rawdata" class="rawdata"><?php echo htmlspecialchars($lyricMidi); ?></textarea>
+					<div><textarea name="rawdata" id="rawdata" class="rawdata"><?php echo htmlspecialchars($lyricMidi); ?></textarea>
 					</div>
 					<div class="button-area">
 						<input type="button" id="generate" value="Generate" class="btn btn-primary">
 						<input type="button" id="replace-lyric" value="Replace Lyric" class="btn btn-success">
+						<input type="button" id="save-raw" value="Save Raw" class="btn btn-success">
+						<input type="button" id="update-midi" value="Update Lyric" class="btn btn-success">
+						<input type="hidden" name="song_id" id="song_id" value="<?php echo $song->getSongId();?>">
 					</div>
 				</div>
 				<div class="lyric-preview"></div>
@@ -194,8 +250,7 @@ if (isset($song)) {
 				<table class="table timetable" width="100%" border="0">
 					<thead>
 						<tr>
-							<td width="50">Track</td>
-							<td width="50">Event</td>
+							<td width="72">Tr/Ch</td>
 							<td width="80">R Time</td>
 							<td width="150">A Time</td>
 							<td>Text</td>

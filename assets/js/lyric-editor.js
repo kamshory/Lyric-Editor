@@ -210,7 +210,8 @@ $(document).ready(function (e) {
   renderLyric();
 });
 function isValidEvent(x, note) {
-  return x == null || note.event == "On" || x.event == "Off";
+  return note.event == "On";
+  //return x == null || note.event == "On" || x.event == "Off";
 }
 
 function isValidLyricData(lyricDt, i, channel) {
@@ -243,7 +244,8 @@ function generateLyricFromVocal() {
         note = lyricData.note.tracks[i][channel][j];
 
         rtime = note.rtime;
-        if (rtime > lastRtime) {
+        if (rtime >= lastRtime) 
+        {
           atime = note.atime;
           tone = note.note;
 
@@ -251,7 +253,8 @@ function generateLyricFromVocal() {
           symbol2 = '"' + symbol.split('"').join('\\"') + ' "';
 
           let x = getLastEvent(lastNote, tone);
-          if (isValidEvent(x, note)) {
+          if (isValidEvent(x, note)) 
+          {
             let ta =
               '<textarea class="ta-lyric-editor">' + symbol2 + "</textarea>";
             let html =
@@ -262,9 +265,7 @@ function generateLyricFromVocal() {
               '" data-atime="' +
               atime +
               '"><td>' +
-              note.event +
-              "</td><td>" +
-              i +
+              i+'/'+ channel +
               "</td><td>" +
               rtime +
               "</td><td>" +
