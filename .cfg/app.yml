@@ -1,5 +1,5 @@
 result_per_page: 20
-song_base_url: https://planetbiru.com/studio/production/files
+song_base_url: ${SONG_BASE_UER}
 database:
   time_zone_system: Asia/Jakarta
   default_charset: utf8
