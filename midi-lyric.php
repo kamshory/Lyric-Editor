@@ -51,64 +51,7 @@ if (isset($song)) {
 ?>
 
 <script>
-	$(document).ready(function(){
-		$(document).on('click', '#save-raw', function(e){
-			let rawData = $('#rawdata').val();
-			let songId = $('#song_id').val();
-			$.ajax({
-				url:'midi-lyric.php?action=save-raw',
-				type:'POST',
-				data:{'raw':rawData, 'song_id':songId},
-				success:function(data){				
-				},
-				error : function(e1, e2)
-				{
-					console.error(e1);
-					console.error(e2);
-				}
-			});
-		});
-		$(document).on('click', '#update-lyric', function(e){
-			getFormData();
-		});
-	});
 	
-	function getFormData() {
-		lyricData.lyric.tracks = [];
-		$('.lyric-editor table tbody').find('tr').each(function(e2) {
-			var rtime = $(this).attr('data-rtime');
-			var track = $(this).attr('data-track');
-			if ($(this).find('textarea').length > 0) {
-			var txt = $(this).find('textarea').val().trim();
-			txt = txt.substring(1, txt.length - 1);
-			txt = txt.split('\\"').join('"');
-			txt = txt.split('\n').join('\r\n');
-			txt = txt.split('\r\r\n').join('\r\n');
-			txt = txt.split('\r').join('\r\n');
-			txt = txt.split('\r\n\n').join('\r\n');
-			txt = txt.split('"').join('\\"');
-			txt = '"' + txt + '"';
-			if (typeof lyricData.lyric.tracks[track] == 'undefined') {
-				lyricData.lyric.tracks[track] = [];
-			}
-			lyricData.lyric.tracks[track].push(rtime + ' Meta Lyric ' + txt);
-			}
-		});
-		let songId = $('#song_id').val();
-		var url = $('.planet-midi-player').attr('data-midi-url');
-		$.ajax({
-			url: 'lib.ajax/lyric-midi-update.php',
-			type: 'post',
-			dataType: 'html',
-			data: {
-			song_id: songId,
-			lyric: JSON.stringify(lyricData.lyric)
-			},
-			success: function(data) {
-			console.log(data);
-			}
-		});
-		}
 </script>
 
 	<div class="main-content">

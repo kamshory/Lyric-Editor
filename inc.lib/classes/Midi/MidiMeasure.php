@@ -19,7 +19,7 @@ class MidiMeasure extends Midi
         $duration = 0;
         $t = 0;
         $track = $this->tracks[0];
- 
+
         foreach ($this->tracks as $trk) {
             $mc = count($trk);
             for ($i = 0; $i < $mc; $i++) {
@@ -164,7 +164,7 @@ class MidiMeasure extends Midi
         $duration = 0;
         $currentTempo = 0;
         $t = 0;
-        
+
         $f = 1 / $this->getTimebase() / 1000000;
 
         foreach ($this->tracks as $trk) {
@@ -200,4 +200,4 @@ class MidiMeasure extends Midi
     {
         return $this->tempo;
     }
-} 
+}

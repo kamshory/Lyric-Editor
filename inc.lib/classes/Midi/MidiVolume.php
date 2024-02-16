@@ -2,7 +2,8 @@
 
 namespace Midi;
 
-class MidiVolume extends Midi{
+class MidiVolume extends Midi
+{
 
 	//---------------------------------------------------------------
 	// sets global volume (0..127) by adding new volume controllers for channel 1-16
@@ -49,15 +50,16 @@ class MidiVolume extends Midi{
 		// insert them at found position
 		array_splice($this->tracks[0], $i, 0, $msgList);
 	}
-	
-	public function setChannelVolume($chan, $vol){
-		$i=0;
+
+	public function setChannelVolume($chan, $vol)
+	{
+		$i = 0;
 		$cnt = count($this->tracks[0]);
-		while ($i<$cnt){
+		while ($i < $cnt) {
 			$msg = explode(" ", $this->tracks[0][$i]);
-			if ($msg[0]!=0 || $msg[1]=='On') break;
+			if ($msg[0] != 0 || $msg[1] == 'On') break;
 			// remove existing volume controller for specified channel
-			if ($msg[1]=='Par' && $msg[2]=="ch=$chan" && $msg[3]=='c=7')
+			if ($msg[1] == 'Par' && $msg[2] == "ch=$chan" && $msg[3] == 'c=7')
 				array_splice($this->tracks[0], $i, 1);
 			else $i++;
 		}
@@ -65,24 +67,25 @@ class MidiVolume extends Midi{
 		$msg = "0 Par ch=$chan c=7 v=$vol";
 		array_splice($this->tracks[0], $i, 0, $msg);
 	}
-	
+
 	// returns array (channel=>volume) of all found volume controllers 
-	public function getVolumes(){
+	public function getVolumes()
+	{
 		// look for volume controllers with time=0 in first track
 		$volumes = array();
-		$i=0;
+		$i = 0;
 		$cnt = count($this->tracks[0]);
-		while ($i<$cnt){
+		while ($i < $cnt) {
 			$msg = explode(" ", $this->tracks[0][$i]);
-			if ($msg[0]!=0) break;
+			if ($msg[0] != 0) break;
 			//"0 Par ch=$ch c=7 v=$vol"
-			if ($msg[1]=='Par'&&$msg[3]=='c=7'){
-				eval("\$".$msg[2].';'); // ch
-				eval("\$".$msg[4].';'); // v
-				
+			if ($msg[1] == 'Par' && $msg[3] == 'c=7') {
+				eval("\$" . $msg[2] . ';'); // ch
+				eval("\$" . $msg[4] . ';'); // v
+
 				$ch = isset($ch) ? $ch : 0;
 				$v = isset($v) ? $v : 0;
-				
+
 				$volumes[$ch] = $v;
 			}
 			$i++;
