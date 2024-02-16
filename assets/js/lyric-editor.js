@@ -40,6 +40,27 @@ let timebase = 1;
 let timeInfo = [];
 let playerModal;
 
+function updateLyricForm(value) {
+  value = value.split("\n").join("\r\n");
+  value = value.split("\r\r\n").join("\r\n");
+  value = value.split("\r").join("\r\n");
+  value = value.split("\r\n\n").join("\r\n");
+  let values = value.split('\r\n').join(' ').split(' ');
+  console.log(values);
+  let idx = 0;
+  $('.timetable tbody').find('tr').each(function (e) {
+    let tr = $(this);
+    let sub = values[idx] || null;
+    if (sub != null && sub.length <= 10) {
+      sub = sub.split('_').join(' ');
+      sub = sub.split('\\').join('\r\n');
+      tr.find('textarea.ta-lyric-editor').val('"' + sub + '"');
+    }
+    idx++;
+  });
+  renderLyricEditor();
+}
+
 $(document).ready(function () {
   $(document).on("change", ".table-check-controller", function (e) {
     let checked = $(this)[0].checked;
@@ -117,30 +138,28 @@ $(document).ready(function () {
       MIDIjs.stop();
     }
   });
-});
-function updateLyric2(value)
-{
-	value = value.split("\n").join("\r\n");
-	value = value.split("\r\r\n").join("\r\n");
-	value = value.split("\r").join("\r\n");
-	value = value.split("\r\n\n").join("\r\n");
-	let values = value.split('\r\n').join(' ').split(' ');
-	console.log(values);
-	let idx = 0;
-	$('.timetable tbody').find('tr').each(function(e){
-		let tr = $(this);
-		let sub = values[idx] || null;
-		if(sub != null && sub.length <= 10)
-		{
-			sub = sub.split('_').join(' ');
-			sub = sub.split('\\').join('\r\n');
-			tr.find('textarea.ta-lyric-editor').val('"'+sub+'"');
-		}
-		idx++;
-	});
-	renderLyric2();
-}
-$(document).ready(function (e) {
+
+
+  $(document).on('click', '#save-raw', function (e) {
+    let rawData = $('#rawdata').val();
+    let songId = $('#song_id').val();
+    $.ajax({
+      url: 'midi-lyric.php?action=save-raw',
+      type: 'POST',
+      data: { 'raw': rawData, 'song_id': songId },
+      success: function (data) {
+      },
+      error: function (e1, e2) {
+        console.error(e1);
+        console.error(e2);
+      }
+    });
+  });
+  $(document).on('click', '#update-lyric', function (e) {
+    getFormData();
+  });
+
+
   lyricData.lyric = getLyric(midi_data);
   lyricData.time = getTempoData(midi_data);
   lyricData.timebase = midi_data.timebase;
@@ -151,19 +170,19 @@ $(document).ready(function (e) {
     keyboard: false,
   });
 
-  $(document).on('change, keyup', '.rawdata', function(e){
-	let value = $(this).val();
-	updateLyric2(value);
+  $(document).on('change, keyup', '.rawdata', function (e) {
+    let value = $(this).val();
+    updateLyricForm(value);
   });
 
   $(document).on("click", "#generate", function (e) {
     playerModal.show();
   });
 
-  $(document).on("click", "#replace-lyric", function (e) {});
+  $(document).on("click", "#replace-lyric", function (e) { });
 
   $(document).on("keyup", "textarea", function (e) {
-    renderLyric2();
+    renderLyricEditor();
   });
   $(document).on("mouseover", ".lyric-editor tbody tr", function (e2) {
     let tm = $(this).attr("data-rtime");
@@ -207,8 +226,46 @@ $(document).ready(function (e) {
     });
   });
   generateLyric();
-  renderLyric2();
+  renderLyricEditor();
 });
+
+function getFormData() {
+  lyricData.lyric.tracks = [];
+  $('.lyric-editor table tbody').find('tr').each(function (e2) {
+    var rtime = $(this).attr('data-rtime');
+    var track = $(this).attr('data-track');
+    if ($(this).find('textarea').length > 0) {
+      var txt = $(this).find('textarea').val().trim();
+      txt = txt.substring(1, txt.length - 1);
+      txt = txt.split('\\"').join('"');
+      txt = txt.split('\n').join('\r\n');
+      txt = txt.split('\r\r\n').join('\r\n');
+      txt = txt.split('\r').join('\r\n');
+      txt = txt.split('\r\n\n').join('\r\n');
+      txt = txt.split('"').join('\\"');
+      txt = '"' + txt + '"';
+      if (typeof lyricData.lyric.tracks[track] == 'undefined') {
+        lyricData.lyric.tracks[track] = [];
+      }
+      lyricData.lyric.tracks[track].push(rtime + ' Meta Lyric ' + txt);
+    }
+  });
+  let songId = $('#song_id').val();
+  var url = $('.planet-midi-player').attr('data-midi-url');
+  $.ajax({
+    url: 'lib.ajax/lyric-midi-update.php',
+    type: 'post',
+    dataType: 'html',
+    data: {
+      song_id: songId,
+      lyric: JSON.stringify(lyricData.lyric)
+    },
+    success: function (data) {
+      console.log(data);
+    }
+  });
+}
+
 function isValidEvent(x, note) {
   return note.event == "On";
   //return x == null || note.event == "On" || x.event == "Off";
@@ -244,8 +301,7 @@ function generateLyricFromVocal() {
         note = lyricData.note.tracks[i][channel][j];
 
         rtime = note.rtime;
-        if (rtime >= lastRtime) 
-        {
+        if (rtime >= lastRtime) {
           atime = note.atime;
           tone = note.note;
 
@@ -253,8 +309,7 @@ function generateLyricFromVocal() {
           symbol2 = '"' + symbol.split('"').join('\\"') + ' "';
 
           let x = getLastEvent(lastNote, tone);
-          if (isValidEvent(x, note)) 
-          {
+          if (isValidEvent(x, note)) {
             let ta =
               '<textarea class="ta-lyric-editor">' + symbol2 + "</textarea>";
             let html =
@@ -265,7 +320,7 @@ function generateLyricFromVocal() {
               '" data-atime="' +
               atime +
               '"><td>' +
-              i+'/'+ channel +
+              i + '/' + channel +
               "</td><td>" +
               rtime +
               "</td><td>" +
@@ -282,7 +337,7 @@ function generateLyricFromVocal() {
       }
     }
   }
-  renderLyric2();
+  renderLyricEditor();
   playerModal.hide();
 }
 
@@ -321,7 +376,7 @@ function generateLyric() {
     }
   }
 }
-function renderLyric2() {
+function renderLyricEditor() {
   let data = [];
   $(".lyric-editor table tbody")
     .find("tr")
@@ -970,7 +1025,7 @@ function getTime(lyric, time, time_data, timebase) {
   duration += dt * currentTempo * f;
   return duration * 1000;
 }
-function renderLyric(lyric, range_start, range_stop) {
+function renderLyricPlayer(lyric, range_start, range_stop) {
   let data = getLyricTrack(lyric);
   let lr = [];
   let time = 0;
@@ -1045,7 +1100,7 @@ function playPrev() {
     );
   }, 100);
 }
-let midiUpdate = function (time) {};
+let midiUpdate = function (time) { };
 let midiStop = function () {
   $("#midi-player").attr("data-system", "true");
   $("#midi-player").modal("hide");
@@ -1080,14 +1135,14 @@ function downloadMidi() {
   });
   window.open(
     "download.php?action=download-midi&ids=" +
-      ids +
-      "&file_name_option=" +
-      file_name_option +
-      "&file_name_separator=" +
-      file_name_separator +
-      "&file_name_white_space=" +
-      file_name_white_space +
-      "&dos=" +
-      dos
+    ids +
+    "&file_name_option=" +
+    file_name_option +
+    "&file_name_separator=" +
+    file_name_separator +
+    "&file_name_white_space=" +
+    file_name_white_space +
+    "&dos=" +
+    dos
   );
 }

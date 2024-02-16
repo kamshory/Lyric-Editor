@@ -97,7 +97,7 @@ if (isset($song)) {
 		let songId = $('#song_id').val();
 		var url = $('.planet-midi-player').attr('data-midi-url');
 		$.ajax({
-			url: 'ajax-save-lyric.php',
+			url: 'lib.ajax/lyric-midi-update.php',
 			type: 'post',
 			dataType: 'html',
 			data: {

@@ -157,6 +157,12 @@ class Song extends DynamicObject
 	protected $vocal;
 	
 	/**
+	 * @Column(name="instrument", type="longtext", nullable=true)
+	 * @var string
+	 */
+	protected $instrument;
+	
+	/**
 	 * @Column(name="score", type="int", length=11, nullable=true)
 	 * @var integer
 	 */
