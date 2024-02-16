@@ -25,7 +25,6 @@ if($inputGet->equalsAction(PicoRequest::ACTION_EDIT) && $inputGet->getSongId() !
   {
     $song = new EntitySong(null, $database);
     $song->findOneBySongId($inputGet->getSongId());
-    echo $song;
     require_once "midi-lyric.php";
   }
   catch(Exception $e)

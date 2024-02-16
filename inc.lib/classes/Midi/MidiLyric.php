@@ -85,7 +85,7 @@ class MidiLyric extends Midi{
 	 * @access public
 	 * @return int absolute time
 	 */
-	function getAbsoluteTime($relativeTime)
+	public function getAbsoluteTime($relativeTime)
 	{
 		$duration = 0;
 		$currentTempo = 0;
@@ -123,14 +123,14 @@ class MidiLyric extends Midi{
 		$duration += $dt * $currentTempo * $f;
 		return $duration * 1000;
 	}
-	function addLyric($lyric)
+	public function addLyric($lyric)
 	{
 		$this->lyric = $lyric;
 	}
 	//---------------------------------------------------------------
 	// saves MIDI song as Standard MIDI File
 	//---------------------------------------------------------------
-	function saveMidFile($mid_path, $chmod=false){
+	public function saveMidFile($mid_path, $chmod=false){
 		if (count($this->tracks)<1) $this->_err('MIDI song has no tracks');
 		$SMF = fopen($mid_path, "wb"); // SMF
 		$data = $this->getMidWithLyric($this->lyric);
@@ -141,7 +141,7 @@ class MidiLyric extends Midi{
 	//---------------------------------------------------------------
 	// returns binary MIDI string
 	//---------------------------------------------------------------
-	function getMidWithLyric($lyric)
+	public function getMidWithLyric($lyric)
 	{
 		$tracks = $this->tracks;
 		$tracks = $this->updateLyric($tracks, $lyric);
@@ -182,7 +182,7 @@ class MidiLyric extends Midi{
 		}
 		return $midStr;
 	}
-	function updateLyric($tracks, $lyric)
+	public function updateLyric($tracks, $lyric)
 	{
 		$tc = count($tracks);
 		$type = ($tc > 1)?1:0;
@@ -211,7 +211,7 @@ class MidiLyric extends Midi{
 		}
 		return $tracks;
 	}
-	function insertMid($track, $lyric)
+	public function insertMid($track, $lyric)
 	{
 		$trackResult = array();
 		$mc1 = count($track);
@@ -220,7 +220,7 @@ class MidiLyric extends Midi{
 		$lt2 = 0;
 		$lt3 = 0;
 		$maxIdx = 0;
-		if(count($track) > 0)
+		if(!empty($track))
 		{
 			$trackResult[] = $track[0];
 		}

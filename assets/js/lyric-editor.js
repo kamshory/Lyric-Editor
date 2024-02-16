@@ -207,7 +207,7 @@ $(document).ready(function (e) {
     });
   });
   generateLyric();
-  renderLyric();
+  renderLyric2();
 });
 function isValidEvent(x, note) {
   return note.event == "On";

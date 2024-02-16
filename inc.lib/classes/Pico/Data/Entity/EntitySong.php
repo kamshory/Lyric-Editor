@@ -174,6 +174,12 @@ class EntitySong extends DynamicObject
 	 * @var bool
 	 */
 	protected $lyricComplete;
+	
+	/**
+	 * @Column(name="lyric_midi", type="longtext", nullable=true)
+	 * @var string
+	 */
+	protected $lyricMidi;
 
 	/**
 	 * @Column(name="vocal", type="tinyint(1)", length=1, default_value="1", nullable=true)

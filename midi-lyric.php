@@ -31,13 +31,11 @@ if($inputGet->equalsAction('save-raw'))
 		$raw = $inputPost->getRaw();
 		$songUpdate = new Song(array('songId'=>$inputPost->getSongId(), 'lyricMidi'=>$raw), $database);
 		$songUpdate->update();
-		error_log($songUpdate);
 	}
 	exit();
 }
 
 if (isset($song)) {
-	echo $song;
 	$midi = new MidiLyric();
 
 	$midi->importMid($song->getFilePathMidi());
@@ -70,18 +68,47 @@ if (isset($song)) {
 				}
 			});
 		});
-		$(document).on('click', '#save-raw', function(e){
-			let rawData = $('#rawdata').val();
-			$.ajax({
-				url:'midi-lyric.php?action=save-raw',
-				type:'POST',
-				data:{'raw':rawData},
-				success:function(data){
-					
-				}
-			});
+		$(document).on('click', '#update-lyric', function(e){
+			getFormData();
 		});
 	});
+	
+	function getFormData() {
+		lyricData.lyric.tracks = [];
+		$('.lyric-editor table tbody').find('tr').each(function(e2) {
+			var rtime = $(this).attr('data-rtime');
+			var track = $(this).attr('data-track');
+			if ($(this).find('textarea').length > 0) {
+			var txt = $(this).find('textarea').val().trim();
+			txt = txt.substring(1, txt.length - 1);
+			txt = txt.split('\\"').join('"');
+			txt = txt.split('\n').join('\r\n');
+			txt = txt.split('\r\r\n').join('\r\n');
+			txt = txt.split('\r').join('\r\n');
+			txt = txt.split('\r\n\n').join('\r\n');
+			txt = txt.split('"').join('\\"');
+			txt = '"' + txt + '"';
+			if (typeof lyricData.lyric.tracks[track] == 'undefined') {
+				lyricData.lyric.tracks[track] = [];
+			}
+			lyricData.lyric.tracks[track].push(rtime + ' Meta Lyric ' + txt);
+			}
+		});
+		let songId = $('#song_id').val();
+		var url = $('.planet-midi-player').attr('data-midi-url');
+		$.ajax({
+			url: 'ajax-save-lyric.php',
+			type: 'post',
+			dataType: 'html',
+			data: {
+			song_id: songId,
+			lyric: JSON.stringify(lyricData.lyric)
+			},
+			success: function(data) {
+			console.log(data);
+			}
+		});
+		}
 </script>
 
 	<div class="main-content">
@@ -91,7 +118,7 @@ if (isset($song)) {
 		<h3 style="font-size: 18px; padding-bottom:2px;"><?php echo $song->getTitle(); ?></h3>
 
 		<script type="text/javascript">
-			var midi_data = <?php echo json_encode($midi->getMidData(), JSON_PRETTY_PRINT);?>;
+			var midi_data = <?php echo json_encode($midi->getMidData());?>;
 		</script>
 		<script type="text/javascript" src="assets/js/lyric-editor.js?rnd=<?php echo mt_rand(1, 9999999);?>"></script>
 		<script type="text/javascript" src="assets/midijs/midi.js"></script>
@@ -240,7 +267,7 @@ if (isset($song)) {
 						<input type="button" id="generate" value="Generate" class="btn btn-primary">
 						<input type="button" id="replace-lyric" value="Replace Lyric" class="btn btn-success">
 						<input type="button" id="save-raw" value="Save Raw" class="btn btn-success">
-						<input type="button" id="update-midi" value="Update Lyric" class="btn btn-success">
+						<input type="button" id="update-lyric" value="Update Lyric" class="btn btn-success">
 						<input type="hidden" name="song_id" id="song_id" value="<?php echo $song->getSongId();?>">
 					</div>
 				</div>
